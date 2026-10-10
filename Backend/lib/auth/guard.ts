@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { verifyJwtToken } from './jwt';
-import { validateDatabaseSession } from './session';
+import { validateDatabaseSession, validateCustomerDatabaseSession } from './session';
 import { AUTH_COOKIE_NAME } from './cookies';
 import { AuthenticationError, ForbiddenError } from '@/lib/http/errors';
 import type { SafeUser, AuthRole } from '@/types/auth';
@@ -47,11 +47,30 @@ export async function authenticateRequest(
     throw new AuthenticationError('Authentication required: Invalid or expired token');
   }
 
-  // Validate server-side session in database and verify session token hash
-  const sessionResult = await validateDatabaseSession(
-    jwtPayload.sessionId,
-    jwtPayload.sessionToken
-  );
+  // Validate server-side session in database according to role
+  let sessionResult: AuthenticatedContext | null = null;
+
+  if (jwtPayload.role === 'CUSTOMER') {
+    sessionResult = await validateCustomerDatabaseSession(
+      jwtPayload.sessionId,
+      jwtPayload.sessionToken
+    );
+    // Backward compatibility: If not found in customer_sessions, check user_sessions (legacy Step 1 customer accounts)
+    if (!sessionResult) {
+      sessionResult = await validateDatabaseSession(
+        jwtPayload.sessionId,
+        jwtPayload.sessionToken
+      );
+    }
+  } else if (jwtPayload.role === 'RESTAURANT_OWNER') {
+    sessionResult = await validateDatabaseSession(
+      jwtPayload.sessionId,
+      jwtPayload.sessionToken
+    );
+  } else {
+    throw new AuthenticationError('Unsupported or unrecognized authentication role');
+  }
+
   if (!sessionResult) {
     throw new AuthenticationError('Authentication required: Session expired or revoked');
   }

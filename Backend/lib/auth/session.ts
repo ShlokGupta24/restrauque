@@ -18,6 +18,10 @@ export function verifySessionTokenHash(token: string, storedHash: string): boole
   return crypto.timingSafeEqual(Buffer.from(computedHash), Buffer.from(storedHash));
 }
 
+// ==========================================
+// RESTAURANT OWNER SESSIONS (user_sessions)
+// ==========================================
+
 export async function createDatabaseSession(
   userId: string,
   ipAddress?: string | null,
@@ -103,14 +107,116 @@ export async function validateDatabaseSession(
 
 export async function revokeDatabaseSession(sessionId: string): Promise<boolean> {
   try {
-    await prisma.user_sessions.update({
+    const res = await prisma.user_sessions.updateMany({
       where: { id: sessionId },
       data: {
         status: 'revoked',
         revoked_at: new Date(),
       },
     });
-    return true;
+    return res.count > 0;
+  } catch {
+    return false;
+  }
+}
+
+// ==========================================
+// CUSTOMER SESSIONS (customer_sessions)
+// ==========================================
+
+export async function createCustomerDatabaseSession(
+  customerId: string,
+  ipAddress?: string | null,
+  userAgent?: string | null
+): Promise<{ sessionId: string; sessionToken: string; expiresAt: Date }> {
+  const sessionToken = generateSessionToken();
+  const sessionTokenHash = hashSessionToken(sessionToken);
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + SESSION_EXPIRY_DAYS);
+
+  const session = await prisma.customer_sessions.create({
+    data: {
+      customer_id: customerId,
+      session_token_hash: sessionTokenHash,
+      expires_at: expiresAt,
+      ip_address: ipAddress || null,
+      user_agent: userAgent || null,
+      status: 'active',
+    },
+  });
+
+  return {
+    sessionId: session.id,
+    sessionToken,
+    expiresAt,
+  };
+}
+
+export async function validateCustomerDatabaseSession(
+  sessionId: string,
+  sessionToken?: string
+): Promise<{ user: SafeUser; sessionId: string } | null> {
+  const session = await prisma.customer_sessions.findUnique({
+    where: { id: sessionId },
+    include: {
+      customers: true,
+    },
+  });
+
+  if (!session) {
+    return null;
+  }
+
+  // Check if session is expired or revoked
+  if (session.status !== 'active' || session.expires_at < new Date() || session.revoked_at) {
+    return null;
+  }
+
+  // Check if customer is active
+  if (session.customers.status !== 'active') {
+    return null;
+  }
+
+  // Cryptographically verify session token hash against stored hash if token is supplied
+  if (sessionToken && !verifySessionTokenHash(sessionToken, session.session_token_hash)) {
+    return null;
+  }
+
+  // Update last_used_at asynchronously (fail-safe)
+  prisma.customer_sessions
+    .update({
+      where: { id: sessionId },
+      data: { last_used_at: new Date() },
+    })
+    .catch(() => {});
+
+  const safeCustomer: SafeUser = {
+    id: session.customers.id,
+    email: null as unknown as string,
+    name: session.customers.name,
+    phone: session.customers.phone,
+    role: 'CUSTOMER',
+    status: session.customers.status,
+    createdAt: session.customers.created_at.toISOString(),
+    updatedAt: session.customers.updated_at.toISOString(),
+  };
+
+  return {
+    user: safeCustomer,
+    sessionId: session.id,
+  };
+}
+
+export async function revokeCustomerDatabaseSession(sessionId: string): Promise<boolean> {
+  try {
+    const res = await prisma.customer_sessions.updateMany({
+      where: { id: sessionId },
+      data: {
+        status: 'revoked',
+        revoked_at: new Date(),
+      },
+    });
+    return res.count > 0;
   } catch {
     return false;
   }

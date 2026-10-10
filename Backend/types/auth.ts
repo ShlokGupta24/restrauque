@@ -13,7 +13,7 @@ export const ALLOWED_REGISTRATION_ROLES: readonly AuthRole[] = [
 
 export interface SafeUser {
   id: string;
-  email: string;
+  email: string | null;
   name: string;
   phone: string | null;
   role: AuthRole;
@@ -26,8 +26,9 @@ export interface SessionPayload {
   userId: string;
   sessionId: string;
   sessionToken: string;
-  email: string;
   role: AuthRole;
+  email?: string | null;
+  phone?: string | null;
 }
 
 export interface ApiResponse<T = unknown> {

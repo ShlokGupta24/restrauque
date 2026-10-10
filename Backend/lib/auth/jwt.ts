@@ -35,8 +35,7 @@ export async function verifyJwtToken(token: string): Promise<SessionPayload | nu
       !payload.userId ||
       !payload.sessionId ||
       !payload.sessionToken ||
-      !payload.role ||
-      !payload.email
+      !payload.role
     ) {
       return null;
     }
@@ -45,8 +44,9 @@ export async function verifyJwtToken(token: string): Promise<SessionPayload | nu
       userId: payload.userId as string,
       sessionId: payload.sessionId as string,
       sessionToken: payload.sessionToken as string,
-      email: payload.email as string,
       role: payload.role as SessionPayload['role'],
+      email: (payload.email as string) || null,
+      phone: (payload.phone as string) || null,
     };
   } catch {
     return null;
