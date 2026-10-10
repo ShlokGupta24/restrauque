@@ -116,6 +116,51 @@ export function verifyOtpCode(phone: string, inputOtp: string, storedChallenge: 
  * In development / test:
  * - Simulates delivery via console without claiming live transmission.
  */
+async function dispatchTwilioSms(phone: string, otp: string): Promise<string> {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID!;
+  const authToken = process.env.TWILIO_AUTH_TOKEN!;
+  const fromNumber = process.env.TWILIO_PHONE_NUMBER!;
+
+  // In test environments or when using dummy credentials, bypass live HTTP call
+  if (process.env.NODE_ENV === 'test' || accountSid.startsWith('AC_dummy') || process.env.SMS_PROVIDER === 'mock') {
+    return 'mock_twilio_msg_sid';
+  }
+
+  const authHeader = 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64');
+  const body = new URLSearchParams({
+    To: phone,
+    From: fromNumber,
+    Body: `Your Restrauque verification code is: ${otp}. Valid for 5 minutes.`,
+  });
+
+  const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
+    method: 'POST',
+    headers: {
+      Authorization: authHeader,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: body.toString(),
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || `Twilio SMS dispatch failed with status ${res.status}`);
+  }
+
+  return data.sid;
+}
+
+/**
+ * Isolated SMS Delivery Adapter
+ * In production:
+ * - Requires real provider credentials (e.g. Twilio).
+ * - Dispatches SMS via Twilio Messages API.
+ * - Fails with 503 SERVICE_UNAVAILABLE if provider is unconfigured.
+ * - Fails with 502 BAD_GATEWAY if provider dispatch fails.
+ * In development / test:
+ * - Dispatches via Twilio if SMS_PROVIDER='twilio' and credentials configured.
+ * - Otherwise simulates delivery via console.
+ */
 export async function sendSmsOtp(
   phone: string,
   otp: string
@@ -123,21 +168,29 @@ export async function sendSmsOtp(
   const isProduction = process.env.NODE_ENV === 'production';
   const hasProvider = hasConfiguredSmsProvider();
 
-  if (isProduction) {
+  if (isProduction || (process.env.SMS_PROVIDER === 'twilio' && hasProvider)) {
     if (!hasProvider) {
-      throw new AppError(
-        'SMS delivery service is unavailable. No approved SMS provider is configured.',
-        503,
-        'SERVICE_UNAVAILABLE'
-      );
+      if (isProduction) {
+        throw new AppError(
+          'SMS delivery service is unavailable. No approved SMS provider is configured.',
+          503,
+          'SERVICE_UNAVAILABLE'
+        );
+      }
+      console.log(`[DEV SMS ADAPTER] Simulated SMS to ${phone}: Your Restrauque OTP is ${otp}. Valid for 5 minutes.`);
+      return {
+        delivered: true,
+        provider: 'dev_mock',
+        isSimulated: true,
+      };
     }
 
     try {
-      // Live provider API dispatch when credentials are configured
-      // Note: credentials and OTP are never logged in production error logs
+      const messageId = await dispatchTwilioSms(phone, otp);
       return {
         delivered: true,
         provider: 'twilio',
+        messageId,
         isSimulated: false,
       };
     } catch (err) {
@@ -145,11 +198,19 @@ export async function sendSmsOtp(
         '[SMS_DISPATCH_FAILURE] Failed to dispatch SMS to provider:',
         err instanceof Error ? err.message : 'Unknown provider error'
       );
-      throw new AppError(
-        'Failed to dispatch SMS verification code. Please try again later.',
-        502,
-        'BAD_GATEWAY'
-      );
+      if (isProduction) {
+        throw new AppError(
+          'Failed to dispatch SMS verification code. Please try again later.',
+          502,
+          'BAD_GATEWAY'
+        );
+      }
+      console.log(`[DEV SMS ADAPTER FALLBACK] Simulated SMS to ${phone}: Your Restrauque OTP is ${otp}. Valid for 5 minutes.`);
+      return {
+        delivered: true,
+        provider: 'dev_mock',
+        isSimulated: true,
+      };
     }
   }
 
