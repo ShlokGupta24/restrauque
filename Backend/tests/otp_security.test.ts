@@ -2,7 +2,7 @@ import { describe, it, expect, afterAll } from 'vitest';
 import { NextRequest } from 'next/server';
 import { POST as requestOtpHandler } from '@/app/api/v1/auth/customer/otp/request/route';
 import { POST as verifyOtpHandler } from '@/app/api/v1/auth/customer/otp/verify/route';
-import { hashOtpCode, verifyOtpCode } from '@/lib/auth/otp';
+import { hashOtpCode, verifyOtpCode, getOtpSecret } from '@/lib/auth/otp';
 import { prisma } from '@/lib/db/prisma';
 
 describe('STEP 1.2 — Customer OTP Security Verification', () => {
@@ -218,6 +218,101 @@ describe('STEP 1.2 — Customer OTP Security Verification', () => {
       });
       const correctRes = await verifyOtpHandler(correctReq);
       expect(correctRes.status).toBe(400);
+    });
+  });
+
+  describe('4. OTP Secret Resolution, Strength & Fail-Closed Behavior', () => {
+    it('should fail closed when both OTP_SECRET and JWT_SECRET are missing (zero hardcoded fallback)', () => {
+      const origOtpSecret = process.env.OTP_SECRET;
+      const origJwtSecret = process.env.JWT_SECRET;
+
+      try {
+        delete process.env.OTP_SECRET;
+        delete process.env.JWT_SECRET;
+
+        expect(() => getOtpSecret()).toThrowError(
+          /Server security configuration error: No valid OTP_SECRET or JWT_SECRET configured/
+        );
+        expect(() => hashOtpCode(securityPhone, '123456')).toThrowError(
+          /Server security configuration error: No valid OTP_SECRET or JWT_SECRET configured/
+        );
+      } finally {
+        if (origOtpSecret) process.env.OTP_SECRET = origOtpSecret;
+        if (origJwtSecret) process.env.JWT_SECRET = origJwtSecret;
+      }
+    });
+
+    it('should fail closed when OTP_SECRET is less than 32 characters', () => {
+      const origOtpSecret = process.env.OTP_SECRET;
+      try {
+        process.env.OTP_SECRET = 'short-secret-under-32-chars';
+
+        expect(() => getOtpSecret()).toThrowError(
+          /Server security configuration error: OTP_SECRET must be at least 32 characters long/
+        );
+      } finally {
+        if (origOtpSecret) process.env.OTP_SECRET = origOtpSecret;
+        else delete process.env.OTP_SECRET;
+      }
+    });
+
+    it('should fail closed when fallback JWT_SECRET is less than 32 characters', () => {
+      const origOtpSecret = process.env.OTP_SECRET;
+      const origJwtSecret = process.env.JWT_SECRET;
+      try {
+        delete process.env.OTP_SECRET;
+        process.env.JWT_SECRET = 'short-jwt-secret';
+
+        expect(() => getOtpSecret()).toThrowError(
+          /Server security configuration error: Fallback JWT_SECRET must be at least 32 characters long/
+        );
+      } finally {
+        if (origOtpSecret) process.env.OTP_SECRET = origOtpSecret;
+        if (origJwtSecret) process.env.JWT_SECRET = origJwtSecret;
+      }
+    });
+
+    it('should prioritize dedicated OTP_SECRET over JWT_SECRET when both are valid', () => {
+      const origOtpSecret = process.env.OTP_SECRET;
+      const origJwtSecret = process.env.JWT_SECRET;
+      try {
+        const dedicatedSecret = 'dedicated-otp-secret-32-chars-long-1234';
+        const fallbackSecret = 'fallback-jwt-secret-32-chars-long-5678';
+        process.env.OTP_SECRET = dedicatedSecret;
+        process.env.JWT_SECRET = fallbackSecret;
+
+        expect(getOtpSecret()).toBe(dedicatedSecret);
+
+        const hashed = hashOtpCode(securityPhone, '123456');
+        expect(verifyOtpCode(securityPhone, '123456', hashed)).toBe(true);
+      } finally {
+        if (origOtpSecret) process.env.OTP_SECRET = origOtpSecret;
+        else delete process.env.OTP_SECRET;
+        if (origJwtSecret) process.env.JWT_SECRET = origJwtSecret;
+      }
+    });
+
+    it('should document and verify that rotating OTP secret invalidates outstanding challenges without data corruption', () => {
+      const origOtpSecret = process.env.OTP_SECRET;
+      try {
+        // Issue OTP under Secret A
+        process.env.OTP_SECRET = 'secret-version-1-for-testing-purposes-123';
+        const rawCode = '445566';
+        const hashUnderSecretA = hashOtpCode(securityPhone, rawCode);
+        expect(verifyOtpCode(securityPhone, rawCode, hashUnderSecretA)).toBe(true);
+
+        // Rotate to Secret B
+        process.env.OTP_SECRET = 'secret-version-2-for-testing-purposes-456';
+        // Verification of old challenge under new secret must fail
+        expect(verifyOtpCode(securityPhone, rawCode, hashUnderSecretA)).toBe(false);
+
+        // New challenge under Secret B succeeds
+        const hashUnderSecretB = hashOtpCode(securityPhone, rawCode);
+        expect(verifyOtpCode(securityPhone, rawCode, hashUnderSecretB)).toBe(true);
+      } finally {
+        if (origOtpSecret) process.env.OTP_SECRET = origOtpSecret;
+        else delete process.env.OTP_SECRET;
+      }
     });
   });
 });

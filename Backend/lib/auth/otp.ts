@@ -25,13 +25,56 @@ export function hasConfiguredSmsProvider(): boolean {
 }
 
 /**
+ * Resolves and validates the OTP secret key.
+ * Preference:
+ * 1. Dedicated `process.env.OTP_SECRET` (minimum 32 characters).
+ * 2. Explicit fallback to `process.env.JWT_SECRET` (minimum 32 characters).
+ *
+ * NOTE: Changing or rotating the OTP secret immediately invalidates any
+ * outstanding pending OTP challenges, requiring the recipient to request a fresh code.
+ *
+ * Never uses a hardcoded default secret. Missing or weak configuration fails closed.
+ */
+export function getOtpSecret(): string {
+  const otpSecret = process.env.OTP_SECRET;
+  if (otpSecret) {
+    if (otpSecret.length < 32) {
+      throw new AppError(
+        'Server security configuration error: OTP_SECRET must be at least 32 characters long.',
+        500,
+        'INTERNAL_SERVER_ERROR'
+      );
+    }
+    return otpSecret;
+  }
+
+  const jwtSecret = process.env.JWT_SECRET;
+  if (jwtSecret) {
+    if (jwtSecret.length < 32) {
+      throw new AppError(
+        'Server security configuration error: Fallback JWT_SECRET must be at least 32 characters long.',
+        500,
+        'INTERNAL_SERVER_ERROR'
+      );
+    }
+    return jwtSecret;
+  }
+
+  throw new AppError(
+    'Server security configuration error: No valid OTP_SECRET or JWT_SECRET configured.',
+    500,
+    'INTERNAL_SERVER_ERROR'
+  );
+}
+
+/**
  * Keyed HMAC computation for OTP storage and verification.
  * Prevents rainbow tables and offline brute-force attacks against database dumps.
  * Uses base64url sliced to 10 characters to fit the existing `otp_code VarChar(10)` column
  * without requiring destructive database schema migrations.
  */
 export function hashOtpCode(phone: string, otp: string): string {
-  const secret = process.env.OTP_SECRET || process.env.JWT_SECRET || 'restrauque-secure-otp-secret';
+  const secret = getOtpSecret();
   return crypto
     .createHmac('sha256', secret)
     .update(`${phone}:${otp.trim()}`)
