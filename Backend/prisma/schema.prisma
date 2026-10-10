@@ -1,0 +1,1040 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model ai_agent_actions {
+  id                String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  agent_run_id      String            @db.Uuid
+  restaurant_id     String            @db.Uuid
+  branch_id         String?           @db.Uuid
+  action_type       String            @db.VarChar(50)
+  target_type       String?           @db.VarChar(50)
+  target_id         String?           @db.Uuid
+  status            String            @default("pending") @db.VarChar(20)
+  requires_approval Boolean           @default(false)
+  approved_by       String?           @db.Uuid
+  approved_at       DateTime?         @db.Timestamptz(6)
+  input_data        Json?
+  action_data       Json?
+  result_data       Json?
+  error_message     String?
+  executed_at       DateTime?         @db.Timestamptz(6)
+  created_at        DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime          @default(now()) @db.Timestamptz(6)
+  restaurant_staff  restaurant_staff? @relation(fields: [approved_by], references: [id], onUpdate: NoAction, map: "fk_ai_agent_actions_approved_by")
+  branches          branches?         @relation(fields: [branch_id], references: [id], onUpdate: NoAction, map: "fk_ai_agent_actions_branch")
+  restaurants       restaurants       @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_ai_agent_actions_restaurant")
+  ai_agent_runs     ai_agent_runs     @relation(fields: [agent_run_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_ai_agent_actions_run")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model ai_agent_runs {
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id     String             @db.Uuid
+  branch_id         String?            @db.Uuid
+  agent_type        String             @db.VarChar(50)
+  trigger_type      String             @default("manual") @db.VarChar(30)
+  status            String             @default("running") @db.VarChar(20)
+  objective         String?
+  input_data        Json?
+  reasoning_summary String?
+  tools_used        Json?
+  output_data       Json?
+  error_message     String?
+  started_at        DateTime           @default(now()) @db.Timestamptz(6)
+  completed_at      DateTime?          @db.Timestamptz(6)
+  created_at        DateTime           @default(now()) @db.Timestamptz(6)
+  ai_agent_actions  ai_agent_actions[]
+  branches          branches?          @relation(fields: [branch_id], references: [id], onUpdate: NoAction, map: "fk_ai_agent_runs_branch")
+  restaurants       restaurants        @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_ai_agent_runs_restaurant")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model ai_insight_evidence {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  insight_id    String      @db.Uuid
+  source_type   String      @db.VarChar(50)
+  source_id     String?     @db.Uuid
+  evidence_role String      @default("supporting") @db.VarChar(30)
+  metric_name   String?     @db.VarChar(100)
+  metric_value  Decimal?    @db.Decimal(14, 4)
+  evidence_text String?
+  created_at    DateTime    @default(now()) @db.Timestamptz(6)
+  ai_insights   ai_insights @relation(fields: [insight_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_ai_insight_evidence_insight")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model ai_insights {
+  id                    String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id         String                @db.Uuid
+  branch_id             String?               @db.Uuid
+  insight_type          String                @db.VarChar(50)
+  title                 String                @db.VarChar(200)
+  summary               String
+  severity              String                @default("info") @db.VarChar(20)
+  status                String                @default("new") @db.VarChar(20)
+  confidence            Decimal?              @db.Decimal(5, 4)
+  metric_name           String?               @db.VarChar(100)
+  metric_value          Decimal?              @db.Decimal(14, 4)
+  previous_metric_value Decimal?              @db.Decimal(14, 4)
+  change_percentage     Decimal?              @db.Decimal(8, 4)
+  detected_at           DateTime              @default(now()) @db.Timestamptz(6)
+  valid_until           DateTime?             @db.Timestamptz(6)
+  created_at            DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime              @default(now()) @db.Timestamptz(6)
+  ai_insight_evidence   ai_insight_evidence[]
+  branches              branches?             @relation(fields: [branch_id], references: [id], onUpdate: NoAction, map: "fk_ai_insights_branch")
+  restaurants           restaurants           @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_ai_insights_restaurant")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model analytics_daily_metrics {
+  id                     String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id          String      @db.Uuid
+  branch_id              String?     @db.Uuid
+  metric_date            DateTime    @db.Date
+  total_orders           Int         @default(0)
+  completed_orders       Int         @default(0)
+  cancelled_orders       Int         @default(0)
+  total_customers        Int         @default(0)
+  new_customers          Int         @default(0)
+  returning_customers    Int         @default(0)
+  total_revenue          Decimal     @default(0) @db.Decimal(12, 2)
+  total_discount         Decimal     @default(0) @db.Decimal(12, 2)
+  total_tax              Decimal     @default(0) @db.Decimal(12, 2)
+  average_order_value    Decimal     @default(0) @db.Decimal(12, 2)
+  total_items_sold       Int         @default(0)
+  positive_reviews       Int         @default(0)
+  negative_reviews       Int         @default(0)
+  average_rating         Decimal?    @db.Decimal(3, 2)
+  loyalty_stars_earned   Int         @default(0)
+  loyalty_stars_redeemed Int         @default(0)
+  created_at             DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime    @default(now()) @db.Timestamptz(6)
+  branches               branches?   @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_analytics_daily_metrics_branch")
+  restaurants            restaurants @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_analytics_daily_metrics_restaurant")
+
+  @@unique([restaurant_id, branch_id, metric_date], map: "unique_daily_metrics")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model analytics_product_metrics {
+  id                        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id             String      @db.Uuid
+  branch_id                 String?     @db.Uuid
+  product_id                String      @db.Uuid
+  metric_date               DateTime    @db.Date
+  units_sold                Int         @default(0)
+  orders_containing_product Int         @default(0)
+  total_revenue             Decimal     @default(0) @db.Decimal(12, 2)
+  total_discount            Decimal     @default(0) @db.Decimal(12, 2)
+  average_selling_price     Decimal     @default(0) @db.Decimal(12, 2)
+  unique_customers          Int         @default(0)
+  repeat_customers          Int         @default(0)
+  positive_feedback_count   Int         @default(0)
+  negative_feedback_count   Int         @default(0)
+  average_product_rating    Decimal?    @db.Decimal(3, 2)
+  created_at                DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime    @default(now()) @db.Timestamptz(6)
+  branches                  branches?   @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_analytics_product_metrics_branch")
+  products                  products    @relation(fields: [product_id], references: [id], onUpdate: NoAction, map: "fk_analytics_product_metrics_product")
+  restaurants               restaurants @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_analytics_product_metrics_restaurant")
+
+  @@unique([restaurant_id, branch_id, product_id, metric_date], map: "unique_product_daily_metrics")
+}
+
+model audit_logs {
+  id               String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id    String?           @db.Uuid
+  staff_id         String?           @db.Uuid
+  action           String            @db.VarChar(100)
+  entity_type      String            @db.VarChar(50)
+  entity_id        String?           @db.Uuid
+  description      String?
+  old_values       Json?
+  new_values       Json?
+  ip_address       String?           @db.Inet
+  user_agent       String?
+  created_at       DateTime          @default(now()) @db.Timestamptz(6)
+  restaurants      restaurants?      @relation(fields: [restaurant_id], references: [id], onUpdate: NoAction, map: "fk_audit_logs_restaurant")
+  restaurant_staff restaurant_staff? @relation(fields: [staff_id], references: [id], onUpdate: NoAction, map: "fk_audit_logs_staff")
+}
+
+model branches {
+  id                        String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id             String                      @db.Uuid
+  name                      String                      @db.VarChar(150)
+  address                   String?
+  city                      String?                     @db.VarChar(100)
+  state                     String?                     @db.VarChar(100)
+  country                   String                      @default("India") @db.VarChar(100)
+  phone                     String?                     @db.VarChar(20)
+  timezone                  String                      @default("Asia/Kolkata") @db.VarChar(50)
+  status                    String                      @default("active") @db.VarChar(20)
+  created_at                DateTime                    @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime                    @default(now()) @db.Timestamptz(6)
+  ai_agent_actions          ai_agent_actions[]
+  ai_agent_runs             ai_agent_runs[]
+  ai_insights               ai_insights[]
+  analytics_daily_metrics   analytics_daily_metrics[]
+  analytics_product_metrics analytics_product_metrics[]
+  restaurants               restaurants                 @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_branches_restaurant")
+  customer_events           customer_events[]
+  feedback                  feedback[]
+  orders                    orders[]
+  restaurant_staff          restaurant_staff[]
+  restaurant_tables         restaurant_tables[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model campaign_recipients {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  campaign_id    String    @db.Uuid
+  customer_id    String    @db.Uuid
+  channel        String    @default("in_app") @db.VarChar(20)
+  status         String    @default("pending") @db.VarChar(20)
+  sent_at        DateTime? @db.Timestamptz(6)
+  delivered_at   DateTime? @db.Timestamptz(6)
+  opened_at      DateTime? @db.Timestamptz(6)
+  converted_at   DateTime? @db.Timestamptz(6)
+  order_id       String?   @db.Uuid
+  coupon_id      String?   @db.Uuid
+  failure_reason String?
+  created_at     DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime  @default(now()) @db.Timestamptz(6)
+  campaigns      campaigns @relation(fields: [campaign_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_campaign_recipients_campaign")
+  coupons        coupons?  @relation(fields: [coupon_id], references: [id], onUpdate: NoAction, map: "fk_campaign_recipients_coupon")
+  customers      customers @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_campaign_recipients_customer")
+  orders         orders?   @relation(fields: [order_id], references: [id], onUpdate: NoAction, map: "fk_campaign_recipients_order")
+
+  @@unique([campaign_id, customer_id], map: "unique_campaign_customer")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model campaigns {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id       String                @db.Uuid
+  name                String                @db.VarChar(150)
+  description         String?
+  campaign_type       String                @db.VarChar(30)
+  status              String                @default("draft") @db.VarChar(20)
+  target_segment_id   String?               @db.Uuid
+  coupon_id           String?               @db.Uuid
+  start_at            DateTime?             @db.Timestamptz(6)
+  end_at              DateTime?             @db.Timestamptz(6)
+  budget              Decimal?              @db.Decimal(12, 2)
+  target_count        Int                   @default(0)
+  sent_count          Int                   @default(0)
+  delivered_count     Int                   @default(0)
+  opened_count        Int                   @default(0)
+  converted_count     Int                   @default(0)
+  created_at          DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime              @default(now()) @db.Timestamptz(6)
+  campaign_recipients campaign_recipients[]
+  coupons             coupons?              @relation(fields: [coupon_id], references: [id], onUpdate: NoAction, map: "fk_campaigns_coupon")
+  restaurants         restaurants           @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_campaigns_restaurant")
+  customer_segments   customer_segments?    @relation(fields: [target_segment_id], references: [id], onUpdate: NoAction, map: "fk_campaigns_segment")
+}
+
+model categories {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id String      @db.Uuid
+  name          String      @db.VarChar(100)
+  description   String?
+  display_order Int         @default(0)
+  is_active     Boolean     @default(true)
+  created_at    DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime    @default(now()) @db.Timestamptz(6)
+  restaurants   restaurants @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_catgeories_restaurant")
+  products      products[]
+
+  @@unique([restaurant_id, name], map: "unique_category_name_per_restaurant")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model coupons {
+  id                      String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id           String                @db.Uuid
+  code                    String                @db.VarChar(50)
+  name                    String                @db.VarChar(150)
+  description             String?
+  discount_type           String                @db.VarChar(20)
+  discount_value          Decimal               @db.Decimal(10, 2)
+  minimum_order_amount    Decimal               @default(0) @db.Decimal(10, 2)
+  maximum_discount_amount Decimal?              @db.Decimal(10, 2)
+  usage_limit             Int?
+  usage_count             Int                   @default(0)
+  valid_from              DateTime              @default(now()) @db.Timestamptz(6)
+  valid_until             DateTime?             @db.Timestamptz(6)
+  is_active               Boolean               @default(true)
+  created_at              DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime              @default(now()) @db.Timestamptz(6)
+  campaign_recipients     campaign_recipients[]
+  campaigns               campaigns[]
+  restaurants             restaurants           @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_coupons_restaurant")
+  order_coupons           order_coupons[]
+
+  @@unique([restaurant_id, code], map: "unique_coupon_code_per_restaurant")
+}
+
+model customer_events {
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customer_id       String?            @db.Uuid
+  restaurant_id     String             @db.Uuid
+  branch_id         String?            @db.Uuid
+  session_id        String?            @db.Uuid
+  event_type        String             @db.VarChar(50)
+  product_id        String?            @db.Uuid
+  order_id          String?            @db.Uuid
+  menu_id           String?            @db.Uuid
+  reward_id         String?            @db.Uuid
+  event_data        Json?
+  occurred_at       DateTime           @default(now()) @db.Timestamptz(6)
+  created_at        DateTime           @default(now()) @db.Timestamptz(6)
+  branches          branches?          @relation(fields: [branch_id], references: [id], onUpdate: NoAction, map: "fk_customer_events_branch")
+  customers         customers?         @relation(fields: [customer_id], references: [id], onUpdate: NoAction, map: "fk_customer_events_customer")
+  menus             menus?             @relation(fields: [menu_id], references: [id], onUpdate: NoAction, map: "fk_customer_events_menu")
+  orders            orders?            @relation(fields: [order_id], references: [id], onUpdate: NoAction, map: "fk_customer_events_order")
+  products          products?          @relation(fields: [product_id], references: [id], onUpdate: NoAction, map: "fk_customer_events_product")
+  restaurants       restaurants        @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_customer_events_restaurant")
+  loyalty_rewards   loyalty_rewards?   @relation(fields: [reward_id], references: [id], onUpdate: NoAction, map: "fk_customer_events_reward")
+  customer_sessions customer_sessions? @relation(fields: [session_id], references: [id], onUpdate: NoAction, map: "fk_customer_events_session")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model customer_loyalty_accounts {
+  id                      String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customer_id             String                 @db.Uuid
+  restaurant_id           String                 @db.Uuid
+  loyalty_program_id      String                 @db.Uuid
+  stars_balance           Int                    @default(0)
+  lifetime_stars_earned   Int                    @default(0)
+  lifetime_stars_redeemed Int                    @default(0)
+  tier                    String                 @default("standard") @db.VarChar(30)
+  status                  String                 @default("active") @db.VarChar(20)
+  joined_at               DateTime               @default(now()) @db.Timestamptz(6)
+  created_at              DateTime               @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime               @default(now()) @db.Timestamptz(6)
+  customers               customers              @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_customer_loyalty_customer")
+  loyalty_programs        loyalty_programs       @relation(fields: [loyalty_program_id], references: [id], onUpdate: NoAction, map: "fk_customer_loyalty_program")
+  restaurants             restaurants            @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_customer_loyalty_restaurant")
+  loyalty_redemptions     loyalty_redemptions[]
+  loyalty_transactions    loyalty_transactions[]
+
+  @@unique([customer_id, restaurant_id], map: "unique_customer_loyalty_account")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model customer_metrics {
+  id                              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customer_id                     String      @db.Uuid
+  restaurant_id                   String      @db.Uuid
+  first_order_at                  DateTime?   @db.Timestamptz(6)
+  last_order_at                   DateTime?   @db.Timestamptz(6)
+  total_orders                    Int         @default(0)
+  completed_orders                Int         @default(0)
+  total_spend                     Decimal     @default(0) @db.Decimal(12, 2)
+  average_order_value             Decimal     @default(0) @db.Decimal(12, 2)
+  total_items_purchased           Int         @default(0)
+  unique_products_purchased       Int         @default(0)
+  days_since_last_order           Int?
+  orders_last_7_days              Int         @default(0)
+  orders_last_30_days             Int         @default(0)
+  orders_last_90_days             Int         @default(0)
+  spend_last_30_days              Decimal     @default(0) @db.Decimal(12, 2)
+  spend_last_90_days              Decimal     @default(0) @db.Decimal(12, 2)
+  lifetime_value                  Decimal     @default(0) @db.Decimal(12, 2)
+  current_loyalty_stars           Int         @default(0)
+  lifetime_loyalty_stars_earned   Int         @default(0)
+  lifetime_loyalty_stars_redeemed Int         @default(0)
+  last_feedback_at                DateTime?   @db.Timestamptz(6)
+  average_rating_given            Decimal?    @db.Decimal(3, 2)
+  customer_segment                String?     @db.VarChar(50)
+  calculated_at                   DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at                      DateTime    @default(now()) @db.Timestamptz(6)
+  customers                       customers   @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_customer_metrics_customer")
+  restaurants                     restaurants @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_customer_metrics_restaurant")
+
+  @@unique([customer_id, restaurant_id], map: "unique_customer_restaurant_metrics")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model customer_segment_members {
+  id                String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customer_id       String            @db.Uuid
+  segment_id        String            @db.Uuid
+  assigned_at       DateTime          @default(now()) @db.Timestamptz(6)
+  last_evaluated_at DateTime?         @db.Timestamptz(6)
+  membership_source String            @default("system") @db.VarChar(30)
+  is_active         Boolean           @default(true)
+  created_at        DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime          @default(now()) @db.Timestamptz(6)
+  customers         customers         @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_customer_segment_members_customer")
+  customer_segments customer_segments @relation(fields: [segment_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_customer_segment_members_segment")
+
+  @@unique([customer_id, segment_id], map: "unique_customer_segment")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model customer_segments {
+  id                       String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id            String                     @db.Uuid
+  name                     String                     @db.VarChar(100)
+  code                     String                     @db.VarChar(50)
+  description              String?
+  segment_type             String                     @default("system") @db.VarChar(30)
+  criteria                 Json?
+  is_active                Boolean                    @default(true)
+  created_at               DateTime                   @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime                   @default(now()) @db.Timestamptz(6)
+  campaigns                campaigns[]
+  customer_segment_members customer_segment_members[]
+  restaurants              restaurants                @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_customer_segments_restaurant")
+
+  @@unique([restaurant_id, code], map: "unique_segment_code_per_restaurant")
+  @@unique([restaurant_id, name], map: "unique_segment_name_per_restaurant")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model customer_sessions {
+  id                 String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customer_id        String            @db.Uuid
+  session_token_hash String            @unique(map: "unique_session_token_hash")
+  expires_at         DateTime          @db.Timestamptz(6)
+  last_used_at       DateTime?         @db.Timestamptz(6)
+  revoked_at         DateTime?         @db.Timestamptz(6)
+  status             String            @default("active") @db.VarChar(20)
+  ip_address         String?           @db.Inet
+  user_agent         String?
+  created_at         DateTime          @default(now()) @db.Timestamptz(6)
+  customer_events    customer_events[]
+  customers          customers         @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_customer_sessions_customer")
+}
+
+model customers {
+  id                        String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                      String                      @db.VarChar(150)
+  phone                     String                      @unique(map: "unique_customer_phone") @db.VarChar(20)
+  status                    String                      @default("active") @db.VarChar(20)
+  first_visit_at            DateTime                    @default(now()) @db.Timestamptz(6)
+  last_visit_at             DateTime?                   @db.Timestamptz(6)
+  created_at                DateTime                    @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime                    @default(now()) @db.Timestamptz(6)
+  campaign_recipients       campaign_recipients[]
+  customer_events           customer_events[]
+  customer_loyalty_accounts customer_loyalty_accounts[]
+  customer_metrics          customer_metrics[]
+  customer_segment_members  customer_segment_members[]
+  customer_sessions         customer_sessions[]
+  feedback                  feedback[]
+  loyalty_redemptions       loyalty_redemptions[]
+  loyalty_transactions      loyalty_transactions[]
+  notifications             notifications[]
+  orders                    orders[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model feedback {
+  id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id        String                 @db.Uuid
+  branch_id            String                 @db.Uuid
+  order_id             String                 @db.Uuid
+  customer_id          String                 @db.Uuid
+  rating               Int?
+  comment              String?
+  feedback_type        String                 @default("review") @db.VarChar(30)
+  status               String                 @default("published") @db.VarChar(20)
+  submitted_at         DateTime               @default(now()) @db.Timestamptz(6)
+  created_at           DateTime               @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime               @default(now()) @db.Timestamptz(6)
+  branches             branches               @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_feedback_branch")
+  customers            customers              @relation(fields: [customer_id], references: [id], onUpdate: NoAction, map: "fk_feedback_customer")
+  orders               orders                 @relation(fields: [order_id], references: [id], onUpdate: NoAction, map: "fk_feedback_order")
+  restaurants          restaurants            @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_feedback_restaurant")
+  feedback_aspects     feedback_aspects[]
+  feedback_embeddings  feedback_embeddings?
+  feedback_products    feedback_products[]
+  feedback_topics      feedback_topics[]
+  loyalty_transactions loyalty_transactions[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model feedback_aspects {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  feedback_id  String    @db.Uuid
+  product_id   String?   @db.Uuid
+  aspect       String    @db.VarChar(100)
+  sentiment    String    @db.VarChar(20)
+  aspect_value String?
+  confidence   Decimal?  @db.Decimal(5, 4)
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime  @default(now()) @db.Timestamptz(6)
+  feedback     feedback  @relation(fields: [feedback_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_feedback_aspects_feedback")
+  products     products? @relation(fields: [product_id], references: [id], onDelete: Restrict, onUpdate: NoAction, map: "fk_feedback_aspects_product")
+}
+
+model feedback_embeddings {
+  id          String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  feedback_id String                @unique(map: "unique_feedback_embedding") @db.Uuid
+  embedding   Unsupported("vector")
+  model_name  String                @db.VarChar(100)
+  created_at  DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime              @default(now()) @db.Timestamptz(6)
+  feedback    feedback              @relation(fields: [feedback_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_feedback_embeddings_feedback")
+}
+
+model feedback_products {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  feedback_id String   @db.Uuid
+  product_id  String   @db.Uuid
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  feedback    feedback @relation(fields: [feedback_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_feedback_products_feedback")
+  products    products @relation(fields: [product_id], references: [id], onUpdate: NoAction, map: "fk_feedback_products_product")
+
+  @@unique([feedback_id, product_id], map: "unique_feedback_product")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model feedback_topics {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  feedback_id String   @db.Uuid
+  topic       String   @db.VarChar(100)
+  sentiment   String   @db.VarChar(20)
+  confidence  Decimal? @db.Decimal(5, 4)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+  feedback    feedback @relation(fields: [feedback_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_feedback_topics_feedback")
+
+  @@unique([feedback_id, topic], map: "unique_feedback_topic")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model loyalty_programs {
+  id                        String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id             String                      @unique(map: "unique_loyalty_program_per_restaurant") @db.Uuid
+  name                      String                      @db.VarChar(150)
+  description               String?
+  is_active                 Boolean                     @default(true)
+  earning_mode              String                      @default("vsiist_and_review") @db.VarChar(30)
+  stars_per_visit           Int                         @default(1)
+  stars_per_review          Int                         @default(1)
+  created_at                DateTime                    @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime                    @default(now()) @db.Timestamptz(6)
+  customer_loyalty_accounts customer_loyalty_accounts[]
+  restaurants               restaurants                 @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_loyalty_programs_restaurant")
+  loyalty_rewards           loyalty_rewards[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model loyalty_redemptions {
+  id                        String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  loyalty_account_id        String                    @db.Uuid
+  customer_id               String                    @db.Uuid
+  restaurant_id             String                    @db.Uuid
+  reward_id                 String                    @db.Uuid
+  order_id                  String?                   @db.Uuid
+  stars_redeemed            Int
+  status                    String                    @default("completed") @db.VarChar(20)
+  redeemed_at               DateTime                  @default(now()) @db.Timestamptz(6)
+  notes                     String?
+  created_at                DateTime                  @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime                  @default(now()) @db.Timestamptz(6)
+  customer_loyalty_accounts customer_loyalty_accounts @relation(fields: [loyalty_account_id], references: [id], onUpdate: NoAction, map: "fk_loyalty_redemptions_account")
+  customers                 customers                 @relation(fields: [customer_id], references: [id], onUpdate: NoAction, map: "fk_loyalty_redemptions_customer")
+  orders                    orders?                   @relation(fields: [order_id], references: [id], onUpdate: NoAction, map: "fk_loyalty_redemptions_order")
+  restaurants               restaurants               @relation(fields: [restaurant_id], references: [id], onUpdate: NoAction, map: "fk_loyalty_redemptions_restaurant")
+  loyalty_rewards           loyalty_rewards           @relation(fields: [reward_id], references: [id], onUpdate: NoAction, map: "fk_loyalty_redemptions_reward")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model loyalty_rewards {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id       String                @db.Uuid
+  loyalty_program_id  String                @db.Uuid
+  name                String                @db.VarChar(150)
+  description         String?
+  reward_type         String                @db.VarChar(30)
+  stars_required      Int
+  discount_amount     Decimal?              @db.Decimal(10, 2)
+  discount_percentage Decimal?              @db.Decimal(10, 2)
+  product_id          String?               @db.Uuid
+  redemption_limit    Int?
+  redemption_count    Int                   @default(0)
+  valid_from          DateTime              @default(now()) @db.Timestamptz(6)
+  valid_until         DateTime?             @db.Timestamptz(6)
+  is_active           Boolean               @default(true)
+  created_at          DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime              @default(now()) @db.Timestamptz(6)
+  customer_events     customer_events[]
+  loyalty_redemptions loyalty_redemptions[]
+  products            products?             @relation(fields: [product_id], references: [id], onUpdate: NoAction, map: "fk_loyalty_rewards_product")
+  loyalty_programs    loyalty_programs      @relation(fields: [loyalty_program_id], references: [id], onUpdate: NoAction, map: "fk_loyalty_rewards_program")
+  restaurants         restaurants           @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_loyalty_rewards_restaurant")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model loyalty_transactions {
+  id                        String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  loyalty_account_id        String                    @db.Uuid
+  customer_id               String                    @db.Uuid
+  restaurant_id             String                    @db.Uuid
+  order_id                  String?                   @db.Uuid
+  feedback_id               String?                   @db.Uuid
+  transaction_type          String                    @db.VarChar(30)
+  stars                     Int
+  description               String?
+  created_at                DateTime                  @default(now()) @db.Timestamptz(6)
+  customer_loyalty_accounts customer_loyalty_accounts @relation(fields: [loyalty_account_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_loyalty_transactions_account")
+  customers                 customers                 @relation(fields: [customer_id], references: [id], onUpdate: NoAction, map: "fk_loyalty_transactions_customer")
+  feedback                  feedback?                 @relation(fields: [feedback_id], references: [id], onUpdate: NoAction, map: "fk_loyalty_transactions_feedback")
+  orders                    orders?                   @relation(fields: [order_id], references: [id], onUpdate: NoAction, map: "fk_loyalty_transactions_order")
+  restaurants               restaurants               @relation(fields: [restaurant_id], references: [id], onUpdate: NoAction, map: "fk_loyalty_transactions_restaurant")
+}
+
+model menu_products {
+  id                                          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  menu_id                                     String   @db.Uuid
+  product_id                                  String   @db.Uuid
+  display_order                               Int      @default(0)
+  is_available                                Boolean  @default(true)
+  created_at                                  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at                                  DateTime @default(now()) @db.Timestamptz(6)
+  products_menu_products_menu_idToproducts    products @relation("menu_products_menu_idToproducts", fields: [menu_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_menu_products_menu")
+  products_menu_products_product_idToproducts products @relation("menu_products_product_idToproducts", fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_menu_products_product")
+
+  @@unique([menu_id, product_id], map: "unique_product_per_menu")
+}
+
+model menus {
+  id              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id   String            @db.Uuid
+  name            String            @db.VarChar(150)
+  description     String?
+  is_active       Boolean           @default(true)
+  created_at      DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime          @default(now()) @db.Timestamptz(6)
+  customer_events customer_events[]
+  restaurants     restaurants       @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_menus_restaurant")
+
+  @@unique([restaurant_id, name], map: "unique_menu_name_per_restaurant")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model notifications {
+  id                String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customer_id       String?           @db.Uuid
+  staff_id          String?           @db.Uuid
+  restaurant_id     String?           @db.Uuid
+  notification_type String            @db.VarChar(50)
+  title             String            @db.VarChar(200)
+  message           String
+  reference_type    String?           @db.VarChar(50)
+  reference_id      String?           @db.Uuid
+  channel           String            @default("in_app") @db.VarChar(20)
+  status            String            @default("unread") @db.VarChar(20)
+  sent_at           DateTime?         @db.Timestamptz(6)
+  read_at           DateTime?         @db.Timestamptz(6)
+  created_at        DateTime          @default(now()) @db.Timestamptz(6)
+  customers         customers?        @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_notifications_customer")
+  restaurants       restaurants?      @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_notifications_restaurant")
+  restaurant_staff  restaurant_staff? @relation(fields: [staff_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_notifications_staff")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model order_coupons {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id        String   @db.Uuid
+  coupon_id       String   @db.Uuid
+  coupon_code     String   @db.VarChar(50)
+  discount_type   String   @db.VarChar(20)
+  discount_value  Decimal  @db.Decimal(10, 2)
+  discount_amount Decimal  @db.Decimal(10, 2)
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+  coupons         coupons  @relation(fields: [coupon_id], references: [id], onUpdate: NoAction, map: "fk_order_coupons_coupon")
+  orders          orders   @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_order_coupons_order")
+
+  @@unique([order_id, coupon_id], map: "unique_coupon_per_order")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model order_item_addons {
+  id               String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_item_id    String          @db.Uuid
+  product_addon_id String?         @db.Uuid
+  addon_name       String          @db.VarChar(100)
+  quantity         Int             @default(1)
+  unit_price       Decimal         @db.Decimal(10, 2)
+  total_price      Decimal         @db.Decimal(10, 2)
+  created_at       DateTime        @default(now()) @db.Timestamptz(6)
+  order_items      order_items     @relation(fields: [order_item_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_order_item_addons_order_item")
+  product_addons   product_addons? @relation(fields: [product_addon_id], references: [id], onUpdate: NoAction, map: "fk_order_item_addons_product_addon")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model order_items {
+  id                   String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id             String              @db.Uuid
+  product_id           String              @db.Uuid
+  variant_id           String?             @db.Uuid
+  product_name         String              @db.VarChar(150)
+  variant_name         String?             @db.VarChar(100)
+  quantity             Int                 @default(1)
+  unit_price           Decimal             @db.Decimal(10, 2)
+  total_price          Decimal             @db.Decimal(10, 2)
+  special_instructions String?
+  created_at           DateTime            @default(now()) @db.Timestamptz(6)
+  order_item_addons    order_item_addons[]
+  orders               orders              @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_order_items_order")
+  products             products            @relation(fields: [product_id], references: [id], onUpdate: NoAction, map: "fk_order_items_product")
+  product_variants     product_variants?   @relation(fields: [variant_id], references: [id], onUpdate: NoAction, map: "fk_order_items_variant")
+}
+
+model order_status_history {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id   String   @db.Uuid
+  status     String   @db.VarChar(30)
+  changed_at DateTime @default(now()) @db.Timestamptz(6)
+  notes      String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  orders     orders   @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_order_status_history_order")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model orders {
+  id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id        String                 @db.Uuid
+  branch_id            String                 @db.Uuid
+  table_id             String?                @db.Uuid
+  customer_id          String                 @db.Uuid
+  order_number         String                 @db.VarChar(30)
+  order_type           String                 @default("dine_in") @db.VarChar(20)
+  status               String                 @default("pending") @db.VarChar(30)
+  subtotal             Decimal                @default(0) @db.Decimal(10, 2)
+  discount_amount      Decimal                @default(0) @db.Decimal(10, 2)
+  tax_amount           Decimal                @default(0) @db.Decimal(10, 2)
+  total_amount         Decimal                @default(0) @db.Decimal(10, 2)
+  notes                String?
+  ordered_at           DateTime               @default(now()) @db.Timestamptz(6)
+  completed_at         DateTime?              @db.Timestamptz(6)
+  created_at           DateTime               @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime               @default(now()) @db.Timestamptz(6)
+  campaign_recipients  campaign_recipients[]
+  customer_events      customer_events[]
+  feedback             feedback[]
+  loyalty_redemptions  loyalty_redemptions[]
+  loyalty_transactions loyalty_transactions[]
+  order_coupons        order_coupons[]
+  order_items          order_items[]
+  order_status_history order_status_history[]
+  branches             branches               @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_orders_branch")
+  customers            customers              @relation(fields: [customer_id], references: [id], onUpdate: NoAction, map: "fk_orders_customer")
+  restaurants          restaurants            @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_orders_restaurant")
+  restaurant_tables    restaurant_tables?     @relation(fields: [table_id], references: [id], onUpdate: NoAction, map: "fk_orders_table")
+  payments             payments[]
+
+  @@unique([branch_id, order_number], map: "unique_order_number_per_branch")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model otp_verifications {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  phone        String    @db.VarChar(20)
+  otp_code     String    @db.VarChar(10)
+  purpose      String    @default("login") @db.VarChar(30)
+  expires_at   DateTime  @db.Timestamptz(6)
+  verified_at  DateTime? @db.Timestamptz(6)
+  attempts     Int       @default(0)
+  max_attempts Int       @default(5)
+  status       String    @default("pending") @db.VarChar(20)
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model payment_transactions {
+  id                      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  payment_id              String    @db.Uuid
+  provider                String    @db.VarChar(50)
+  transaction_id          String?   @unique(map: "unique_transaction_id") @db.VarChar(150)
+  provider_transaction_id String?   @db.VarChar(150)
+  amount                  Decimal   @db.Decimal(10, 2)
+  currency                String    @default("INR") @db.VarChar(10)
+  status                  String    @default("initiated") @db.VarChar(30)
+  response_code           String?   @db.VarChar(50)
+  response_message        String?
+  gateway_payload         Json?
+  initiated_at            DateTime  @default(now()) @db.Timestamptz(6)
+  completed_at            DateTime? @db.Timestamptz(6)
+  created_at              DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime  @default(now()) @db.Timestamptz(6)
+  payments                payments  @relation(fields: [payment_id], references: [id], onUpdate: NoAction, map: "fk_payment_transactions_payment")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model payments {
+  id                    String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id              String                 @db.Uuid
+  amount                Decimal                @db.Decimal(10, 2)
+  payment_method        String                 @db.VarChar(30)
+  status                String                 @default("pending") @db.VarChar(30)
+  transaction_reference String?                @db.VarChar(150)
+  paid_at               DateTime?              @db.Timestamptz(6)
+  created_at            DateTime               @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime               @default(now()) @db.Timestamptz(6)
+  payment_transactions  payment_transactions[]
+  orders                orders                 @relation(fields: [order_id], references: [id], onUpdate: NoAction, map: "fk_payments_order")
+}
+
+model permissions {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code              String              @unique(map: "unique_permission_code") @db.VarChar(100)
+  name              String              @unique(map: "unique_permission_name") @db.VarChar(150)
+  description       String?
+  module            String              @db.VarChar(50)
+  created_at        DateTime            @default(now()) @db.Timestamptz(6)
+  staff_permissions staff_permissions[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model product_addons {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  product_id        String              @db.Uuid
+  name              String              @db.VarChar(100)
+  price             Decimal             @default(0) @db.Decimal(10, 2)
+  is_available      Boolean             @default(true)
+  is_active         Boolean             @default(true)
+  display_order     Int                 @default(0)
+  created_at        DateTime            @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime            @default(now()) @db.Timestamptz(6)
+  order_item_addons order_item_addons[]
+  products          products            @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_product_addons_product")
+
+  @@unique([product_id, name], map: "unique_addon_name_per_product")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model product_variants {
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  product_id    String        @db.Uuid
+  name          String        @db.VarChar(100)
+  price         Decimal       @db.Decimal(10, 2)
+  display_order Int           @default(0)
+  is_available  Boolean       @default(true)
+  is_active     Boolean       @default(true)
+  created_at    DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime      @default(now()) @db.Timestamptz(6)
+  order_items   order_items[]
+  products      products      @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_product_variants_product")
+
+  @@unique([product_id, name], map: "unique_variant_name_per_product")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model products {
+  id                                               String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id                                    String                      @db.Uuid
+  category_id                                      String                      @db.Uuid
+  name                                             String                      @db.VarChar(150)
+  description                                      String?
+  price                                            Decimal                     @db.Decimal(10, 2)
+  image_url                                        String?
+  display_order                                    Int                         @default(0)
+  is_available                                     Boolean                     @default(true)
+  is_active                                        Boolean                     @default(true)
+  created_at                                       DateTime                    @default(now()) @db.Timestamptz(6)
+  updated_at                                       DateTime                    @default(now()) @db.Timestamptz(6)
+  analytics_product_metrics                        analytics_product_metrics[]
+  customer_events                                  customer_events[]
+  feedback_aspects                                 feedback_aspects[]
+  feedback_products                                feedback_products[]
+  loyalty_rewards                                  loyalty_rewards[]
+  menu_products_menu_products_menu_idToproducts    menu_products[]             @relation("menu_products_menu_idToproducts")
+  menu_products_menu_products_product_idToproducts menu_products[]             @relation("menu_products_product_idToproducts")
+  order_items                                      order_items[]
+  product_addons                                   product_addons[]
+  product_variants                                 product_variants[]
+  categories                                       categories                  @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_products_category")
+  restaurants                                      restaurants                 @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_products_restaurant")
+
+  @@unique([restaurant_id, name], map: "unique_product_name_per_restaurant")
+}
+
+model qr_codes {
+  id                String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  table_id          String            @db.Uuid
+  code              String            @unique(map: "unique_qr_code") @db.VarChar(100)
+  qr_type           String            @default("table") @db.VarChar(30)
+  is_active         Boolean           @default(true)
+  created_at        DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime          @default(now()) @db.Timestamptz(6)
+  restaurant_tables restaurant_tables @relation(fields: [table_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_qr_codes_table")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model restaurant_staff {
+  id                                                               String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurant_id                                                    String                    @db.Uuid
+  branch_id                                                        String?                   @db.Uuid
+  name                                                             String                    @db.VarChar(150)
+  phone                                                            String                    @db.VarChar(20)
+  email                                                            String?                   @db.VarChar(255)
+  role                                                             String                    @default("staff") @db.VarChar(30)
+  status                                                           String                    @default("active") @db.VarChar(20)
+  last_login_at                                                    DateTime?                 @db.Timestamptz(6)
+  created_at                                                       DateTime                  @default(now()) @db.Timestamptz(6)
+  updated_at                                                       DateTime                  @default(now()) @db.Timestamptz(6)
+  ai_agent_actions                                                 ai_agent_actions[]
+  audit_logs                                                       audit_logs[]
+  notifications                                                    notifications[]
+  branches                                                         branches?                 @relation(fields: [branch_id], references: [id], onUpdate: NoAction, map: "fk_restaurant_staff_branch")
+  restaurants                                                      restaurants               @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_restaurant_staff_restaurant")
+  staff_otp_verifications                                          staff_otp_verifications[]
+  staff_permissions_staff_permissions_granted_byTorestaurant_staff staff_permissions[]       @relation("staff_permissions_granted_byTorestaurant_staff")
+  staff_permissions_staff_permissions_staff_idTorestaurant_staff   staff_permissions[]       @relation("staff_permissions_staff_idTorestaurant_staff")
+  staff_sessions                                                   staff_sessions[]
+
+  @@unique([restaurant_id, phone], map: "unique_staff_phone_per_restaurant")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model restaurant_tables {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id    String     @db.Uuid
+  table_number String     @db.VarChar(20)
+  capacity     Int        @default(2)
+  status       String     @default("available") @db.VarChar(20)
+  is_active    Boolean    @default(true)
+  created_at   DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime   @default(now()) @db.Timestamptz(6)
+  orders       orders[]
+  qr_codes     qr_codes[]
+  branches     branches   @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_restaurant_tables_branch")
+
+  @@unique([branch_id, table_number], map: "unique_table_number_per_branch")
+}
+
+model restaurants {
+  id                        String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                      String                      @db.VarChar(150)
+  legal_name                String?                     @db.VarChar(200)
+  email                     String?                     @db.VarChar(255)
+  phone                     String?                     @db.VarChar(20)
+  address                   String?
+  city                      String?                     @db.VarChar(100)
+  state                     String?                     @db.VarChar(100)
+  country                   String                      @default("India") @db.VarChar(100)
+  timezone                  String                      @default("Asia/Kolkata") @db.VarChar(50)
+  status                    String                      @default("active") @db.VarChar(20)
+  created_at                DateTime                    @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime                    @default(now()) @db.Timestamptz(6)
+  ai_agent_actions          ai_agent_actions[]
+  ai_agent_runs             ai_agent_runs[]
+  ai_insights               ai_insights[]
+  analytics_daily_metrics   analytics_daily_metrics[]
+  analytics_product_metrics analytics_product_metrics[]
+  audit_logs                audit_logs[]
+  branches                  branches[]
+  campaigns                 campaigns[]
+  categories                categories[]
+  coupons                   coupons[]
+  customer_events           customer_events[]
+  customer_loyalty_accounts customer_loyalty_accounts[]
+  customer_metrics          customer_metrics[]
+  customer_segments         customer_segments[]
+  feedback                  feedback[]
+  loyalty_programs          loyalty_programs?
+  loyalty_redemptions       loyalty_redemptions[]
+  loyalty_rewards           loyalty_rewards[]
+  loyalty_transactions      loyalty_transactions[]
+  menus                     menus[]
+  notifications             notifications[]
+  orders                    orders[]
+  products                  products[]
+  restaurant_staff          restaurant_staff[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model staff_otp_verifications {
+  id               String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  staff_id         String?           @db.Uuid
+  phone            String            @db.VarChar(20)
+  otp_code_hash    String
+  purpose          String            @default("login") @db.VarChar(30)
+  expires_at       DateTime          @db.Timestamptz(6)
+  verified_at      DateTime?         @db.Timestamptz(6)
+  attempts         Int               @default(0)
+  max_attempts     Int               @default(5)
+  status           String            @default("pending") @db.VarChar(20)
+  created_at       DateTime          @default(now()) @db.Timestamptz(6)
+  restaurant_staff restaurant_staff? @relation(fields: [staff_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_staff_otp_staff")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model staff_permissions {
+  id                                                              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  staff_id                                                        String            @db.Uuid
+  permission_id                                                   String            @db.Uuid
+  granted_by                                                      String?           @db.Uuid
+  granted_at                                                      DateTime          @default(now()) @db.Timestamptz(6)
+  expires_at                                                      DateTime?         @db.Timestamptz(6)
+  is_active                                                       Boolean           @default(true)
+  restaurant_staff_staff_permissions_granted_byTorestaurant_staff restaurant_staff? @relation("staff_permissions_granted_byTorestaurant_staff", fields: [granted_by], references: [id], onUpdate: NoAction, map: "fk_staff_permissions_granted_by")
+  permissions                                                     permissions       @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_staff_permissions_permission")
+  restaurant_staff_staff_permissions_staff_idTorestaurant_staff   restaurant_staff  @relation("staff_permissions_staff_idTorestaurant_staff", fields: [staff_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_staff_permissions_staff")
+
+  @@unique([staff_id, permission_id], map: "unique_staff_permission")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model staff_sessions {
+  id                 String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  staff_id           String           @db.Uuid
+  session_token_hash String           @unique(map: "unique_staff_session_token_hash")
+  expires_at         DateTime         @db.Timestamptz(6)
+  last_used_at       DateTime?        @db.Timestamptz(6)
+  revoked_at         DateTime?        @db.Timestamptz(6)
+  status             String           @default("active") @db.VarChar(20)
+  ip_address         String?          @db.Inet
+  user_agent         String?
+  created_at         DateTime         @default(now()) @db.Timestamptz(6)
+  restaurant_staff   restaurant_staff @relation(fields: [staff_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_staff_sessions_staff")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model user_sessions {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id            String    @db.Uuid
+  session_token_hash String    @unique
+  expires_at         DateTime  @db.Timestamptz(6)
+  last_used_at       DateTime? @db.Timestamptz(6)
+  revoked_at         DateTime? @db.Timestamptz(6)
+  status             String    @default("active") @db.VarChar(20)
+  ip_address         String?   @db.Inet
+  user_agent         String?
+  created_at         DateTime  @default(now()) @db.Timestamptz(6)
+  users              users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([session_token_hash], map: "idx_user_sessions_token_hash")
+  @@index([user_id], map: "idx_user_sessions_user_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model users {
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email         String          @unique @db.VarChar(255)
+  password_hash String
+  role          String          @db.VarChar(50)
+  name          String          @db.VarChar(150)
+  phone         String?         @db.VarChar(20)
+  status        String          @default("active") @db.VarChar(20)
+  created_at    DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime        @default(now()) @db.Timestamptz(6)
+  user_sessions user_sessions[]
+
+  @@index([email], map: "idx_users_email")
+}
