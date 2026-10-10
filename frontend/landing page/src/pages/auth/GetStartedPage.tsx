@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { AuthLayout } from '../../components/layout/AuthLayout';
 
+// This page acts as a fork in the road for new users.
+// It asks them to identify as a Restaurant or a Customer and directs them to the correct login/signup flow.
 export default function GetStartedPage() {
   const navigate = useNavigate();
   return (

@@ -2,8 +2,12 @@ import { type FormEvent } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { AuthLayout } from '../../components/layout/AuthLayout';
 
+// The standard email/password login screen designed for restaurant owners and staff.
+// Currently serves as a frontend prototype UI, so it intercepts the submit event 
+// to prevent an actual page reload and shows an alert instead.
 export default function RestaurantLoginPage() {
   const submit = (event: FormEvent<HTMLFormElement>) => {
+    // Prevent the default browser form submission
     event.preventDefault();
     window.alert('Authentication is not connected yet. This is a frontend prototype.');
   };

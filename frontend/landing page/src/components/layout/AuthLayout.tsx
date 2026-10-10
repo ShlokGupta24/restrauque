@@ -9,6 +9,9 @@ interface AuthLayoutProps {
   showNewToLink?: boolean;
 }
 
+// A reusable layout wrapper for all authentication-related pages (login, get started, etc.).
+// By keeping the structure and styling here, we ensure all auth pages look consistent
+// without duplicating the background, logo, and "back to website" HTML on every single page.
 export function AuthLayout({ title, subtitle, eyebrow, children, showNewToLink = true }: AuthLayoutProps) {
   return (
     <main className="auth-screen">

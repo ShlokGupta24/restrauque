@@ -3,10 +3,17 @@ import { ArrowRight, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../../components/layout/AuthLayout';
 
+// Simulates a phone number & OTP (One-Time Password) login flow for restaurant customers.
+// It manages a multi-step form state locally, tracking whether the user is typing their phone number,
+// entering the OTP, or has finished verification.
 export default function CustomerLoginPage() {
   const navigate = useNavigate();
+  
+  // State for form inputs
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
+  
+  // State to track which screen of the login flow we are currently viewing
   const [step, setStep] = useState<'phone' | 'otp' | 'done'>('phone');
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
