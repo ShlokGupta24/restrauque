@@ -49,16 +49,18 @@ export async function POST(request: NextRequest) {
       throw new AuthenticationError('Account is suspended or inactive');
     }
 
-    // Establish secure session
+    // Establish secure session with random token
     const ipAddress = request.headers.get('x-forwarded-for') || null;
     const userAgent = request.headers.get('user-agent') || null;
 
-    const { sessionId } = await createDatabaseSession(user.id, ipAddress, userAgent);
+    const { sessionId, sessionToken } = await createDatabaseSession(user.id, ipAddress, userAgent);
 
     // Role is loaded directly from DB record, never trusted from client
+    // Issue JWT binding user ID, session ID, and the unhashed session token
     const token = await createJwtToken({
       userId: user.id,
       sessionId,
+      sessionToken,
       email: user.email,
       role: user.role as AuthRole,
     });

@@ -6,6 +6,7 @@ describe('JWT Token Lifecycle', () => {
   const samplePayload: SessionPayload = {
     userId: '11111111-1111-1111-1111-111111111111',
     sessionId: '22222222-2222-2222-2222-222222222222',
+    sessionToken: '3333333333333333333333333333333333333333333333333333333333333333',
     email: 'user@example.com',
     role: 'CUSTOMER',
   };
@@ -19,6 +20,7 @@ describe('JWT Token Lifecycle', () => {
     expect(verified).not.toBeNull();
     expect(verified?.userId).toBe(samplePayload.userId);
     expect(verified?.sessionId).toBe(samplePayload.sessionId);
+    expect(verified?.sessionToken).toBe(samplePayload.sessionToken);
     expect(verified?.email).toBe(samplePayload.email);
     expect(verified?.role).toBe(samplePayload.role);
   });

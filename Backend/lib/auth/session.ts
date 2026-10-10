@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { prisma } from '@/lib/db/prisma';
-import type { SafeUser, SessionPayload, AuthRole } from '@/types/auth';
+import type { SafeUser, AuthRole } from '@/types/auth';
 
 const SESSION_EXPIRY_DAYS = 7;
 
@@ -10,6 +10,12 @@ export function hashSessionToken(token: string): string {
 
 export function generateSessionToken(): string {
   return crypto.randomBytes(32).toString('hex');
+}
+
+export function verifySessionTokenHash(token: string, storedHash: string): boolean {
+  const computedHash = hashSessionToken(token);
+  if (computedHash.length !== storedHash.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(computedHash), Buffer.from(storedHash));
 }
 
 export async function createDatabaseSession(
@@ -41,7 +47,8 @@ export async function createDatabaseSession(
 }
 
 export async function validateDatabaseSession(
-  sessionId: string
+  sessionId: string,
+  sessionToken?: string
 ): Promise<{ user: SafeUser; sessionId: string } | null> {
   const session = await prisma.user_sessions.findUnique({
     where: { id: sessionId },
@@ -61,6 +68,11 @@ export async function validateDatabaseSession(
 
   // Check if user is active
   if (session.users.status !== 'active') {
+    return null;
+  }
+
+  // Cryptographically verify session token hash against stored hash if token is supplied
+  if (sessionToken && !verifySessionTokenHash(sessionToken, session.session_token_hash)) {
     return null;
   }
 

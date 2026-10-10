@@ -41,14 +41,17 @@ export async function authenticateRequest(
     throw new AuthenticationError('Authentication required: Missing credentials');
   }
 
-  // Verify JWT signature and basic payload
+  // Verify JWT signature and claims (including sessionToken)
   const jwtPayload = await verifyJwtToken(token);
   if (!jwtPayload) {
     throw new AuthenticationError('Authentication required: Invalid or expired token');
   }
 
-  // Validate server-side session in database (ensures session has not been revoked)
-  const sessionResult = await validateDatabaseSession(jwtPayload.sessionId);
+  // Validate server-side session in database and verify session token hash
+  const sessionResult = await validateDatabaseSession(
+    jwtPayload.sessionId,
+    jwtPayload.sessionToken
+  );
   if (!sessionResult) {
     throw new AuthenticationError('Authentication required: Session expired or revoked');
   }

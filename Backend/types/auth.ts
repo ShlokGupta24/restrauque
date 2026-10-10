@@ -25,6 +25,7 @@ export interface SafeUser {
 export interface SessionPayload {
   userId: string;
   sessionId: string;
+  sessionToken: string;
   email: string;
   role: AuthRole;
 }

@@ -34,6 +34,7 @@ export async function verifyJwtToken(token: string): Promise<SessionPayload | nu
     if (
       !payload.userId ||
       !payload.sessionId ||
+      !payload.sessionToken ||
       !payload.role ||
       !payload.email
     ) {
@@ -43,6 +44,7 @@ export async function verifyJwtToken(token: string): Promise<SessionPayload | nu
     return {
       userId: payload.userId as string,
       sessionId: payload.sessionId as string,
+      sessionToken: payload.sessionToken as string,
       email: payload.email as string,
       role: payload.role as SessionPayload['role'],
     };

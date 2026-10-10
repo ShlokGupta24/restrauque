@@ -335,5 +335,23 @@ describe('API Route Integration Tests', () => {
       const meRes = await meHandler(meReq);
       expect(meRes.status).toBe(401);
     });
+
+    it('should reject request when session token does not match database hash', async () => {
+      // Create a JWT with a valid session ID but wrong sessionToken
+      const { createJwtToken } = await import('@/lib/auth/jwt');
+      const forgedToken = await createJwtToken({
+        userId: ownerId,
+        sessionId: (await prisma.user_sessions.findFirst({ where: { user_id: ownerId } }))!.id,
+        sessionToken: 'wrong_session_token_that_does_not_hash_to_stored_hash',
+        email: ownerEmail,
+        role: 'RESTAURANT_OWNER',
+      });
+
+      const req = new NextRequest('http://localhost:3000/api/v1/auth/me', {
+        headers: { authorization: `Bearer ${forgedToken}` },
+      });
+      const res = await meHandler(req);
+      expect(res.status).toBe(401);
+    });
   });
 });
