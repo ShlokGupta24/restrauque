@@ -22,6 +22,22 @@ export interface SafeBranchSummary {
   updatedAt: string;
 }
 
+export interface SafeRestaurantProfile extends SafeRestaurantSummary {
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  ownerId: string | null;
+}
+
+export interface SafeBranchProfile extends SafeBranchSummary {
+  phone: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+}
+
 export interface OwnerRestaurantContext {
   owner: SafeUser;
   restaurant: SafeRestaurantSummary | null;

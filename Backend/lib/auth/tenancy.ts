@@ -6,6 +6,8 @@ import { ForbiddenError, NotFoundError, ValidationError } from '@/lib/http/error
 import type {
   SafeRestaurantSummary,
   SafeBranchSummary,
+  SafeRestaurantProfile,
+  SafeBranchProfile,
   OwnerRestaurantContext,
   AuthorizedRestaurantContext,
   AuthorizedBranchContext,
@@ -13,12 +15,48 @@ import type {
 
 const uuidSchema = z.string().uuid({ message: 'Identifier must be a valid UUID' });
 
-function validateUuid(id: string, fieldName: string): string {
+export function validateUuid(id: string, fieldName: string): string {
   const result = uuidSchema.safeParse(id);
   if (!result.success) {
     throw new ValidationError(`Invalid ${fieldName}: must be a valid UUID`);
   }
   return result.data;
+}
+
+export function formatRestaurantProfile(r: any): SafeRestaurantProfile {
+  return {
+    id: r.id,
+    name: r.name,
+    legalName: r.legal_name,
+    email: r.email,
+    phone: r.phone,
+    address: r.address,
+    city: r.city,
+    state: r.state,
+    country: r.country,
+    timezone: r.timezone,
+    status: r.status,
+    ownerId: r.owner_id,
+    createdAt: r.created_at.toISOString(),
+    updatedAt: r.updated_at.toISOString(),
+  };
+}
+
+export function formatBranchProfile(b: any): SafeBranchProfile {
+  return {
+    id: b.id,
+    restaurantId: b.restaurant_id,
+    name: b.name,
+    phone: b.phone,
+    address: b.address,
+    city: b.city,
+    state: b.state,
+    country: b.country,
+    timezone: b.timezone,
+    status: b.status,
+    createdAt: b.created_at.toISOString(),
+    updatedAt: b.updated_at.toISOString(),
+  };
 }
 
 /**
@@ -194,7 +232,8 @@ export async function requireAuthorizedRestaurant(
 export async function requireAuthorizedBranch(
   request: Request | NextRequest,
   restaurantId: string,
-  branchId: string
+  branchId: string,
+  options?: { allowInactive?: boolean }
 ): Promise<AuthorizedBranchContext> {
   const restaurantContext = await requireAuthorizedRestaurant(request, restaurantId);
   const validatedBranchId = validateUuid(branchId, 'branchId');
@@ -214,7 +253,7 @@ export async function requireAuthorizedBranch(
     );
   }
 
-  if (branch.status !== 'active') {
+  if (!options?.allowInactive && branch.status !== 'active') {
     throw new ForbiddenError('Branch is suspended or inactive');
   }
 
