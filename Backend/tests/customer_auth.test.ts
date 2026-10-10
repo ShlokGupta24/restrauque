@@ -64,19 +64,28 @@ describe('Customer Phone & OTP Authentication Flow', () => {
       expect(json.data.phone).toBe(testPhone);
       expect(json.data.expiresInSeconds).toBe(300);
 
-      // Verify OTP is recorded in database
+      // Verify OTP is recorded in database as a protected keyed HMAC, NEVER plaintext 6 digits
       const challenge = await prisma.otp_verifications.findFirst({
         where: { phone: testPhone, status: 'pending' },
         orderBy: { created_at: 'desc' },
       });
       expect(challenge).not.toBeNull();
-      expect(challenge?.otp_code).toMatch(/^\d{6}$/);
+      expect(challenge?.otp_code).toHaveLength(10);
+      expect(challenge?.otp_code).not.toMatch(/^\d{6}$/);
     });
 
     it('should strictly NOT expose OTP in production environment responses', async () => {
       const origEnv = process.env.NODE_ENV;
+      const origSid = process.env.TWILIO_ACCOUNT_SID;
+      const origToken = process.env.TWILIO_AUTH_TOKEN;
+      const origPhone = process.env.TWILIO_PHONE_NUMBER;
+
       try {
         (process.env as Record<string, string | undefined>).NODE_ENV = 'production';
+        process.env.TWILIO_ACCOUNT_SID = 'AC_dummy_sid_for_test';
+        process.env.TWILIO_AUTH_TOKEN = 'dummy_token_for_test';
+        process.env.TWILIO_PHONE_NUMBER = '+15551234567';
+
         // Wait or bypass cooldown for test: update previous challenge created_at to 2 minutes ago
         await prisma.otp_verifications.updateMany({
           where: { phone: testPhone },
@@ -94,8 +103,12 @@ describe('Customer Phone & OTP Authentication Flow', () => {
 
         const json = await res.json();
         expect(json.data.devOtp).toBeUndefined();
+        expect(JSON.stringify(json)).not.toContain('otp');
       } finally {
         (process.env as Record<string, string | undefined>).NODE_ENV = origEnv;
+        if (origSid) process.env.TWILIO_ACCOUNT_SID = origSid; else delete process.env.TWILIO_ACCOUNT_SID;
+        if (origToken) process.env.TWILIO_AUTH_TOKEN = origToken; else delete process.env.TWILIO_AUTH_TOKEN;
+        if (origPhone) process.env.TWILIO_PHONE_NUMBER = origPhone; else delete process.env.TWILIO_PHONE_NUMBER;
       }
     });
 
