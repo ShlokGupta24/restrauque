@@ -119,7 +119,7 @@ export function verifyOtpCode(phone: string, inputOtp: string, storedChallenge: 
 async function dispatchTwilioSms(phone: string, otp: string): Promise<string> {
   const accountSid = process.env.TWILIO_ACCOUNT_SID!;
   const authToken = process.env.TWILIO_AUTH_TOKEN!;
-  const fromNumber = process.env.TWILIO_PHONE_NUMBER!;
+  const verifySid = process.env.TWILIO_VERIFY_SERVICE_SID;
 
   // In test environments or when using dummy credentials, bypass live HTTP call
   if (process.env.NODE_ENV === 'test' || accountSid.startsWith('AC_dummy') || process.env.SMS_PROVIDER === 'mock') {
@@ -127,6 +127,33 @@ async function dispatchTwilioSms(phone: string, otp: string): Promise<string> {
   }
 
   const authHeader = 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64');
+
+  // If Twilio Verify Service is configured, use Twilio Verify API
+  if (verifySid) {
+    const body = new URLSearchParams({
+      To: phone,
+      Channel: 'sms',
+    });
+
+    const res = await fetch(`https://verify.twilio.com/v2/Services/${verifySid}/Verifications`, {
+      method: 'POST',
+      headers: {
+        Authorization: authHeader,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: body.toString(),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || `Twilio Verify dispatch failed with status ${res.status}`);
+    }
+
+    return data.sid;
+  }
+
+  // Fallback: Standard Twilio Programmable Messages API
+  const fromNumber = process.env.TWILIO_PHONE_NUMBER!;
   const body = new URLSearchParams({
     To: phone,
     From: fromNumber,
@@ -148,6 +175,55 @@ async function dispatchTwilioSms(phone: string, otp: string): Promise<string> {
   }
 
   return data.sid;
+}
+
+/**
+ * Validates verification code against Twilio Verify Service if configured.
+ * Safely bypassed in test environments.
+ */
+export async function checkTwilioVerification(phone: string, inputOtp: string): Promise<boolean> {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const verifySid = process.env.TWILIO_VERIFY_SERVICE_SID;
+
+  if (!accountSid || !authToken || !verifySid) {
+    return false;
+  }
+
+  // Bypass live HTTP call in test / mock environment
+  if (process.env.NODE_ENV === 'test' || accountSid.startsWith('AC_dummy') || process.env.SMS_PROVIDER === 'mock') {
+    return false;
+  }
+
+  try {
+    const authHeader = 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64');
+    const body = new URLSearchParams({
+      To: phone,
+      Code: inputOtp.trim(),
+    });
+
+    const res = await fetch(`https://verify.twilio.com/v2/Services/${verifySid}/VerificationCheck`, {
+      method: 'POST',
+      headers: {
+        Authorization: authHeader,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: body.toString(),
+    });
+
+    if (!res.ok) {
+      return false;
+    }
+
+    const data = await res.json();
+    return data.status === 'approved';
+  } catch (err) {
+    console.error(
+      '[TWILIO_VERIFY_CHECK_FAILURE]',
+      err instanceof Error ? err.message : 'Unknown Twilio check error'
+    );
+    return false;
+  }
 }
 
 /**
@@ -372,7 +448,12 @@ export async function verifyCustomerOtp(
   }
 
   // Check code match using timing-safe comparison
-  const isMatch = verifyOtpCode(phone, inputOtp, challenge.otp_code);
+  let isMatch = verifyOtpCode(phone, inputOtp, challenge.otp_code);
+
+  // If local HMAC does not match and Twilio Verify Service is active, query Twilio Verify
+  if (!isMatch && process.env.TWILIO_VERIFY_SERVICE_SID) {
+    isMatch = await checkTwilioVerification(phone, inputOtp);
+  }
 
   if (!isMatch) {
     // Atomically increment attempts
