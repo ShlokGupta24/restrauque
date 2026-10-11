@@ -35,6 +35,9 @@ export async function POST(
     const newHashedCode = hashQrToken(newRawToken);
 
     const newQr = await prisma.$transaction(async (tx) => {
+      // Row-lock the parent table to strictly serialize concurrent rotations on the same table
+      await tx.$queryRaw`SELECT id FROM restaurant_tables WHERE id = ${tableId}::uuid FOR UPDATE`;
+
       // Invalidate all existing QR codes for this table
       await tx.qr_codes.updateMany({
         where: { table_id: tableId },

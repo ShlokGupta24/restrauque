@@ -596,6 +596,45 @@ describe('STEP 5 — Dining Table Management & Secure QR Code APIs', () => {
       owner1Table1RawToken = newRawToken;
     });
 
+    it('should retain old QR code records as inactive and leave exactly ONE active QR record after multiple rotations', async () => {
+      // Rotate a second time
+      const params = Promise.resolve({ tableId: owner1Table1Id });
+      const req = new NextRequest(`http://localhost:3000/api/v1/owner/tables/${owner1Table1Id}/qr/rotate`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${owner1Token}` },
+      });
+
+      const res = await rotateTableQrHandler(req, { params });
+      expect(res.status).toBe(200);
+
+      const json = await res.json();
+      const latestRawToken = json.data.rawToken;
+
+      // Query database directly for all QR records belonging to this table
+      const allQrs = await prisma.qr_codes.findMany({
+        where: { table_id: owner1Table1Id },
+        orderBy: { created_at: 'asc' },
+      });
+
+      // Total of 3 records: initial creation + rotation 1 + rotation 2
+      expect(allQrs.length).toBe(3);
+
+      const activeQrs = allQrs.filter((q) => q.is_active);
+      const inactiveQrs = allQrs.filter((q) => !q.is_active);
+
+      // Exactly ONE active record, and all prior records retained as inactive
+      expect(activeQrs.length).toBe(1);
+      expect(inactiveQrs.length).toBe(2);
+
+      // Verify ONLY the latest token can resolve publicly
+      const latestParams = Promise.resolve({ token: latestRawToken });
+      const latestReq = new NextRequest(`http://localhost:3000/api/v1/public/qr/${latestRawToken}`);
+      const latestRes = await resolvePublicQrHandler(latestReq, { params: latestParams });
+      expect(latestRes.status).toBe(200);
+
+      owner1Table1RawToken = latestRawToken;
+    });
+
     it('should reject public QR resolution for invalid format or nonexistent token', async () => {
       // Malformed / too short
       const shortParams = Promise.resolve({ token: 'abc' });
