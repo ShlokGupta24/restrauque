@@ -10,6 +10,32 @@ export interface SafeCategory {
   updatedAt: string;
 }
 
+export interface SafeProductVariant {
+  id: string;
+  productId: string;
+  name: string;
+  price: number;
+  priceFormatted: string;
+  displayOrder: number;
+  isActive: boolean;
+  isAvailable: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SafeProductAddon {
+  id: string;
+  productId: string;
+  name: string;
+  price: number;
+  priceFormatted: string;
+  displayOrder: number;
+  isActive: boolean;
+  isAvailable: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface SafeProduct {
   id: string;
   restaurantId: string;
@@ -23,6 +49,8 @@ export interface SafeProduct {
   displayOrder: number;
   isActive: boolean;
   isAvailable: boolean;
+  variants?: SafeProductVariant[];
+  addons?: SafeProductAddon[];
   createdAt: string;
   updatedAt: string;
 }

@@ -29,6 +29,20 @@ export async function GET(
         categories: {
           select: { name: true },
         },
+        product_variants: {
+          orderBy: [
+            { display_order: 'asc' },
+            { name: 'asc' },
+            { id: 'asc' },
+          ],
+        },
+        product_addons: {
+          orderBy: [
+            { display_order: 'asc' },
+            { name: 'asc' },
+            { id: 'asc' },
+          ],
+        },
       },
     });
 

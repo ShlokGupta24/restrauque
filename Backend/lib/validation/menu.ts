@@ -140,7 +140,93 @@ export const updateProductSchema = z
   })
   .strict();
 
+export const createVariantSchema = z
+  .object({
+    name: z
+      .string({ required_error: 'Variant name is required' })
+      .trim()
+      .min(1, 'Variant name cannot be empty')
+      .max(100, 'Variant name cannot exceed 100 characters'),
+    price: priceSchema,
+    displayOrder: z
+      .number()
+      .int('Display order must be an integer')
+      .min(0, 'Display order cannot be negative')
+      .optional()
+      .default(0),
+    isActive: z.boolean().optional().default(true),
+    isAvailable: z.boolean().optional().default(true),
+  })
+  .strict();
+
+export const updateVariantSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(1, 'Variant name cannot be empty')
+      .max(100, 'Variant name cannot exceed 100 characters')
+      .optional(),
+    price: priceSchema.optional(),
+    displayOrder: z
+      .number()
+      .int('Display order must be an integer')
+      .min(0, 'Display order cannot be negative')
+      .optional(),
+    isActive: z.boolean().optional(),
+    isAvailable: z.boolean().optional(),
+  })
+  .strict()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: 'At least one field must be provided for update',
+  });
+
+export const createAddonSchema = z
+  .object({
+    name: z
+      .string({ required_error: 'Add-on name is required' })
+      .trim()
+      .min(1, 'Add-on name cannot be empty')
+      .max(100, 'Add-on name cannot exceed 100 characters'),
+    price: priceSchema.optional().default(0),
+    displayOrder: z
+      .number()
+      .int('Display order must be an integer')
+      .min(0, 'Display order cannot be negative')
+      .optional()
+      .default(0),
+    isActive: z.boolean().optional().default(true),
+    isAvailable: z.boolean().optional().default(true),
+  })
+  .strict();
+
+export const updateAddonSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(1, 'Add-on name cannot be empty')
+      .max(100, 'Add-on name cannot exceed 100 characters')
+      .optional(),
+    price: priceSchema.optional(),
+    displayOrder: z
+      .number()
+      .int('Display order must be an integer')
+      .min(0, 'Display order cannot be negative')
+      .optional(),
+    isActive: z.boolean().optional(),
+    isAvailable: z.boolean().optional(),
+  })
+  .strict()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: 'At least one field must be provided for update',
+  });
+
 export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
 export type UpdateCategoryInput = z.infer<typeof updateCategorySchema>;
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
+export type CreateVariantInput = z.infer<typeof createVariantSchema>;
+export type UpdateVariantInput = z.infer<typeof updateVariantSchema>;
+export type CreateAddonInput = z.infer<typeof createAddonSchema>;
+export type UpdateAddonInput = z.infer<typeof updateAddonSchema>;
