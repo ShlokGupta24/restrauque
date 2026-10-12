@@ -50,7 +50,8 @@ export function formatOwnerOrderPaymentSummary(payments?: any[]): OwnerOrderPaym
     };
   }
 
-  const primaryPayment = payments[0];
+  const paidPayment = payments.find((p) => p.status === 'paid');
+  const primaryPayment = paidPayment || payments[0];
   const normalizedStatus = (primaryPayment.status === 'paid' ? 'paid' : 'pending') as 'pending' | 'paid';
   const amountDec = primaryPayment.amount ? parseDecimal(primaryPayment.amount) : null;
 
@@ -73,7 +74,8 @@ export function formatOwnerOrderPaymentDetail(payments?: any[]): OwnerOrderPayme
     };
   }
 
-  const primaryPayment = payments[0];
+  const paidPayment = payments.find((p) => p.status === 'paid');
+  const primaryPayment = paidPayment || payments[0];
   const normalizedStatus = (primaryPayment.status === 'paid' ? 'paid' : 'pending') as 'pending' | 'paid';
   const amountDec = primaryPayment.amount ? parseDecimal(primaryPayment.amount) : null;
 

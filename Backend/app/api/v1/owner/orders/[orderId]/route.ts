@@ -61,7 +61,7 @@ export async function GET(
             transaction_reference: true,
             paid_at: true,
           },
-          orderBy: { created_at: 'desc' },
+          orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
         },
         order_status_history: {
           select: {

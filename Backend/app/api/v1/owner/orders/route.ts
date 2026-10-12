@@ -112,8 +112,7 @@ export async function GET(request: NextRequest) {
           },
           payments: {
             select: { id: true, status: true, amount: true, payment_method: true },
-            orderBy: { created_at: 'desc' },
-            take: 1,
+            orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
           },
           _count: {
             select: { order_items: true },

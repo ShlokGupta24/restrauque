@@ -193,6 +193,58 @@ describe('Owner Orders: Validation & State Machine Tests', () => {
       expect(detailPayment.paidAt).toBeNull();
     });
 
+    it('should prioritize a paid payment record over older failed or pending payment records', () => {
+      const payments = [
+        {
+          id: 'pay-paid-2',
+          status: 'paid',
+          payment_method: 'cash',
+          amount: new Prisma.Decimal('250.00'),
+          created_at: new Date('2026-10-12T10:05:00Z'),
+        },
+        {
+          id: 'pay-failed-1',
+          status: 'failed',
+          payment_method: 'card',
+          amount: new Prisma.Decimal('250.00'),
+          created_at: new Date('2026-10-12T10:00:00Z'),
+        },
+      ];
+
+      const summary = formatOwnerOrderPaymentSummary(payments);
+      expect(summary.status).toBe('paid');
+      expect(summary.paymentMethod).toBe('cash');
+      expect(summary.amount).toBe(250);
+
+      const detail = formatOwnerOrderPaymentDetail(payments);
+      expect(detail.status).toBe('paid');
+      expect(detail.id).toBe('pay-paid-2');
+      expect(detail.paymentMethod).toBe('cash');
+      expect(detail.amount).toBe(250);
+    });
+
+    it('should prioritize a paid record even if a failed record appears first in the array', () => {
+      const payments = [
+        {
+          id: 'pay-failed-1',
+          status: 'failed',
+          payment_method: 'card',
+          amount: new Prisma.Decimal('300.00'),
+        },
+        {
+          id: 'pay-paid-1',
+          status: 'paid',
+          payment_method: 'upi',
+          amount: new Prisma.Decimal('300.00'),
+        },
+      ];
+
+      const summary = formatOwnerOrderPaymentSummary(payments);
+      expect(summary.status).toBe('paid');
+      expect(summary.paymentMethod).toBe('upi');
+      expect(summary.amount).toBe(300);
+    });
+
     it('should preserve historical item and add-on snapshots without alteration', () => {
       const mockOrder = {
         id: '11111111-1111-1111-1111-111111111111',
