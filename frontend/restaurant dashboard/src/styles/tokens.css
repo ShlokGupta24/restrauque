@@ -1,0 +1,61 @@
+:root {
+  /* Restrauque Brand Colors */
+  --brand-red: #e53935;
+  --brand-red-hover: #d32f2f;
+  --brand-red-light: #fef2f2;
+  --brand-red-border: #fecaca;
+
+  /* Neutrals & Surfaces */
+  --bg-app: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-sidebar: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --bg-hover: #f8fafc;
+
+  /* Graphite & Dark Accents */
+  --graphite-900: #111827;
+  --graphite-800: #1f2937;
+  --graphite-700: #374151;
+  --graphite-600: #4b5563;
+
+  /* Typography Colors */
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --text-subtle: #9ca3af;
+  --text-inverse: #ffffff;
+
+  /* Borders */
+  --border-color: #e5e7eb;
+  --border-light: #f3f4f6;
+  --border-focus: #e53935;
+
+  /* Status Colors */
+  --status-success-bg: #ecfdf5;
+  --status-success-text: #059669;
+  --status-warning-bg: #fffbeb;
+  --status-warning-text: #b45309;
+  --status-danger-bg: #fef2f2;
+  --status-danger-text: #dc2626;
+  --status-neutral-bg: #f3f4f6;
+  --status-neutral-text: #4b5563;
+
+  /* Radii */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+
+  /* Layout Dimensions */
+  --sidebar-width: 240px;
+  --topbar-height: 64px;
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
