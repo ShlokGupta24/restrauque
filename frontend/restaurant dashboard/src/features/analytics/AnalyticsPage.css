@@ -1,0 +1,375 @@
+/* Analytics & Reports Styles */
+.analytics-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+/* Header & Filter Row */
+.analytics-header-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.analytics-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.analytics-title-row h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.analytics-subtitle {
+  font-size: 13.5px;
+  color: #6B7280;
+  margin: 0;
+}
+
+.analytics-timeframe-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: -6px;
+}
+
+.analytics-timeframe-select {
+  padding: 7px 32px 7px 14px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236B7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  appearance: none;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.15s ease;
+}
+
+.analytics-timeframe-select:hover {
+  border-color: #D1D5DB;
+  background-color: #F9FAFB;
+}
+
+/* 4 KPI Cards Grid */
+.analytics-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .analytics-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .analytics-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.analytics-kpi-card {
+  background-color: #ffffff;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 16px 18px;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.analytics-kpi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.analytics-kpi-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #4B5563;
+}
+
+.analytics-kpi-icon {
+  color: #9CA3AF;
+  font-size: 13px;
+}
+
+.analytics-kpi-val {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.analytics-kpi-trend {
+  font-size: 12px;
+  font-weight: 600;
+  color: #059669;
+  margin-bottom: 4px;
+}
+
+.analytics-kpi-subtext {
+  font-size: 11.5px;
+  color: #6B7280;
+}
+
+/* Middle Row: Revenue Chart & Top Products */
+.analytics-middle-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+@media (max-width: 1024px) {
+  .analytics-middle-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.analytics-card {
+  background-color: #ffffff;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+}
+
+.analytics-card-header {
+  margin-bottom: 16px;
+}
+
+.analytics-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.01em;
+  margin: 0 0 4px 0;
+}
+
+.analytics-card-subtitle {
+  font-size: 12.5px;
+  color: #6B7280;
+  margin: 0;
+}
+
+/* Revenue Chart Details */
+.revenue-headline-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.revenue-headline-num {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.02em;
+}
+
+.pill-growth {
+  background-color: #ECFDF5;
+  color: #059669;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 12px;
+}
+
+/* Area Chart SVG Container */
+.revenue-chart-container {
+  width: 100%;
+  height: 200px;
+  position: relative;
+  margin-top: auto;
+}
+
+.chart-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Top Products by Revenue */
+.top-products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 8px;
+}
+
+.top-product-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.top-product-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.top-product-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.top-product-revenue {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.top-product-bar-bg {
+  width: 100%;
+  height: 7px;
+  background-color: #F3F4F6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.top-product-bar-fill {
+  height: 100%;
+  background-color: #1F2937;
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Bottom Row: Order Source Mix & Schema Coverage */
+.analytics-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 1024px) {
+  .analytics-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Order Source Mix Cards */
+.order-source-cards-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 16px 0;
+}
+
+@media (max-width: 640px) {
+  .order-source-cards-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.order-source-card {
+  background-color: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.order-source-type-label {
+  font-size: 11.5px;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.order-source-pct {
+  font-size: 26px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.02em;
+}
+
+.order-source-orders {
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.order-source-notice {
+  font-size: 12px;
+  color: #6B7280;
+  margin-top: auto;
+  padding-top: 10px;
+  line-height: 1.45;
+}
+
+/* Schema Coverage List */
+.schema-coverage-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.schema-coverage-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.badge-schema {
+  background-color: #ECFDF5;
+  color: #059669;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  min-width: 58px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.badge-needed {
+  background-color: #FEF3C7;
+  color: #D97706;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  min-width: 58px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.schema-item-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.schema-item-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.schema-item-desc {
+  font-size: 12px;
+  color: #6B7280;
+}

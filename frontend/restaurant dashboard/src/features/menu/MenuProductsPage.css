@@ -1,0 +1,272 @@
+.menu-products-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.menu-subbanner {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.menu-top-action-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -8px;
+}
+
+.add-product-btn {
+  background: var(--brand-red);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 2px rgba(229, 57, 53, 0.2);
+}
+
+.add-product-btn:hover {
+  background: var(--brand-red-hover);
+}
+
+/* 3 KPI Grid */
+.menu-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.menu-kpi-card {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 90px;
+}
+
+.menu-kpi-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.menu-kpi-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--graphite-900);
+  margin-top: 4px;
+  letter-spacing: -0.5px;
+}
+
+/* Table Card */
+.menu-table-card {
+  padding: 20px;
+}
+
+/* Filter Controls Bar */
+.menu-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+
+.search-input-wide {
+  width: 260px;
+}
+
+.manage-categories-btn {
+  font-size: 12px;
+  padding: 7px 14px;
+}
+
+/* Menu Table */
+.menu-table-wrapper {
+  overflow-x: auto;
+  margin-top: 8px;
+}
+
+.menu-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.th-product-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.menu-table th {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-light);
+  background: #fafafa;
+}
+
+.menu-table td {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+
+.menu-table-row:hover {
+  background: #fbfcfe;
+}
+
+/* Product Info Cell */
+.cell-product-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-thumb-box {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: #f1f5f9;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.product-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-thumb-placeholder {
+  color: #9ca3af;
+}
+
+.product-table-name {
+  font-weight: 600;
+  color: var(--graphite-900);
+}
+
+.cell-category {
+  color: var(--text-secondary);
+}
+
+.cell-price {
+  font-weight: 600;
+  color: var(--graphite-900);
+}
+
+.cell-active {
+  color: var(--text-secondary);
+}
+
+.active-text-label {
+  font-size: 12px;
+}
+
+/* Availability Switch Group */
+.availability-switch-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle-switch {
+  width: 36px;
+  height: 20px;
+  border-radius: var(--radius-pill);
+  background: #d1d5db;
+  position: relative;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  transition: background-color 0.2s ease;
+}
+
+.toggle-switch.switch-on {
+  background: #059669;
+}
+
+.toggle-switch.switch-off {
+  background: #d1d5db;
+}
+
+.toggle-thumb {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.switch-on .toggle-thumb {
+  transform: translateX(16px);
+}
+
+.switch-off .toggle-thumb {
+  transform: translateX(0);
+}
+
+/* Availability Pills */
+.pill-availability {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.pill-available {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.pill-unavailable {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+/* Action Links */
+.btn-action-link {
+  font-size: 12px;
+  font-weight: 500;
+  color: #4b5563;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-action-link:hover {
+  color: var(--graphite-900);
+}
+
+.link-make-available {
+  color: #4b5563;
+}
+
+/* Footer */
+.menu-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 12px;
+}
+
+@media (max-width: 900px) {
+  .menu-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}

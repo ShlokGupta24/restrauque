@@ -1,0 +1,139 @@
+.topbar-container {
+  height: 68px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.topbar-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.topbar-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.breadcrumb-separator {
+  color: #d1d5db;
+}
+
+.topbar-page-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--graphite-900);
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-demo-pill {
+  font-size: 10px;
+  font-weight: 600;
+  color: #4b5563;
+  background: #f3f4f6;
+  border-radius: var(--radius-pill);
+  padding: 4px 12px;
+  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+}
+
+.topbar-demo-pill.future-ready {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.future-ready-dot {
+  color: #d97706;
+  font-size: 8px;
+  margin-right: 5px;
+}
+
+.topbar-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  position: relative;
+  transition: all 0.15s ease;
+}
+
+.topbar-icon-btn:hover {
+  background: var(--bg-subtle);
+  border-color: #d1d5db;
+}
+
+.topbar-notification-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 6px;
+  height: 6px;
+  background: var(--brand-red);
+  border-radius: 50%;
+  border: 1px solid #ffffff;
+}
+
+.topbar-user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 8px;
+}
+
+.topbar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--graphite-800);
+}
+
+.topbar-user-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar-username {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.topbar-userrole {
+  font-size: 10px;
+  color: var(--text-muted);
+}

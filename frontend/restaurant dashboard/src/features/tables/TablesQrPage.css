@@ -1,0 +1,252 @@
+.tables-qr-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tables-subbanner {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.tables-top-action-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -8px;
+}
+
+.add-table-btn {
+  background: var(--brand-red);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 2px rgba(229, 57, 53, 0.2);
+}
+
+.add-table-btn:hover {
+  background: var(--brand-red-hover);
+}
+
+/* 4 KPI Grid */
+.tables-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.tables-kpi-card {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 115px;
+}
+
+.kpi-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tables-kpi-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.kpi-arrow-icon {
+  color: #9ca3af;
+}
+
+.tables-kpi-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--graphite-900);
+  margin-top: 4px;
+  letter-spacing: -0.5px;
+}
+
+.tables-kpi-note {
+  font-size: 9px;
+  color: #059669;
+  font-weight: 500;
+  margin-top: 4px;
+  line-height: 1.25;
+}
+
+/* 2-Column Content Grid */
+.tables-content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+/* Floor Tables Card */
+.floor-tables-card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.floor-grid-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.floor-table-item {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.floor-table-item:hover {
+  border-color: #d1d5db;
+  box-shadow: var(--shadow-sm);
+}
+
+.floor-table-item.table-selected {
+  border: 1.5px solid var(--brand-red);
+  box-shadow: 0 0 0 1px var(--brand-red);
+}
+
+.floor-table-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.floor-table-num {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--graphite-900);
+}
+
+.table-selected .floor-table-num {
+  color: var(--brand-red);
+}
+
+.floor-grid-icon {
+  color: #9ca3af;
+}
+
+.table-selected .floor-grid-icon {
+  color: var(--brand-red);
+}
+
+.floor-seats-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 3px 0 8px;
+}
+
+.floor-status-badge {
+  display: inline-block;
+  background: #f3f4f6;
+  color: #4b5563;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.floor-sub-info {
+  font-size: 9px;
+  color: var(--text-subtle);
+  margin-top: 8px;
+}
+
+.floor-footer-notice {
+  font-size: 10px;
+  color: var(--text-subtle);
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light);
+}
+
+/* QR Preview Card */
+.qr-preview-card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.large-qr-container {
+  width: 170px;
+  height: 170px;
+  margin: 20px auto 14px;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.large-qr-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.qr-headline-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--graphite-900);
+  text-align: center;
+  margin-top: 4px;
+}
+
+.qr-subline-text {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 2px;
+  margin-bottom: 20px;
+}
+
+.qr-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.qr-btn-action {
+  width: 100%;
+  font-size: 11px;
+  padding: 8px 12px;
+}
+
+.backend-confirm-box {
+  background: #fbfcfe;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.confirm-box-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--graphite-900);
+  margin-bottom: 4px;
+}
+
+.confirm-box-text {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+@media (max-width: 1100px) {
+  .tables-content-grid {
+    grid-template-columns: 1fr;
+  }
+  .tables-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

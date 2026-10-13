@@ -1,0 +1,1 @@
+Copy your dashboard UI/UX PNG reference images into this folder. Antigravity must inspect these images before implementing any screen.
