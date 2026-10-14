@@ -1,6 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, Plus, Image as ImageIcon, Trash2, AlertCircle, Check } from 'lucide-react';
+import {
+  ArrowLeft,
+  Plus,
+  Image as ImageIcon,
+  Trash2,
+  AlertCircle,
+  Check,
+  UploadCloud,
+  Loader2,
+  RefreshCw,
+} from 'lucide-react';
 import {
   menuService,
   SafeCategory,
@@ -51,6 +61,80 @@ export const EditProductPage: React.FC = () => {
   const [isActive, setIsActive] = useState(true);
   const [isAvailable, setIsAvailable] = useState(true);
 
+  // Image Upload & Preview states
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [imageLoadError, setImageLoadError] = useState<boolean>(false);
+  const [showManualUrlInput, setShowManualUrlInput] = useState<boolean>(false);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const objectUrlRef = useRef<string | null>(null);
+
+  // Safely manage local object URL lifecycle to prevent memory leaks
+  const setLocalPreview = useCallback((file: File | null) => {
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+    }
+    if (file) {
+      const url = URL.createObjectURL(file);
+      objectUrlRef.current = url;
+      setLocalPreviewUrl(url);
+    } else {
+      setLocalPreviewUrl(null);
+    }
+  }, []);
+
+  // Cleanup object URL on component unmount
+  useEffect(() => {
+    return () => {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+      }
+    };
+  }, []);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUploadError(null);
+    setImageLoadError(false);
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+    if (!allowedTypes.includes(file.type)) {
+      setUploadError('Invalid format. Please select a JPEG, PNG, or WebP image.');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    const maxSize = 5 * 1024 * 1024; // 5 MB
+    if (file.size > maxSize) {
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+      setUploadError(`File is too large (${sizeMb} MB). Maximum allowed size is 5 MB.`);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    setSelectedFile(file);
+    setLocalPreview(file);
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedFile(null);
+    setLocalPreview(null);
+    setImageUrl('');
+    setUploadError(null);
+    setImageLoadError(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   // Nested collections
   const [variants, setVariants] = useState<VariantItem[]>([]);
   const [addons, setAddons] = useState<AddonItem[]>([]);
@@ -84,6 +168,10 @@ export const EditProductPage: React.FC = () => {
       setCategoryId(prod.categoryId);
       setDisplayOrder(prod.displayOrder);
       setImageUrl(prod.imageUrl || '');
+      setSelectedFile(null);
+      setLocalPreview(null);
+      setImageLoadError(false);
+      setUploadError(null);
       setIsActive(prod.isActive);
       setIsAvailable(prod.isAvailable);
 
@@ -133,6 +221,10 @@ export const EditProductPage: React.FC = () => {
         }
         setDisplayOrder('0');
         setImageUrl('');
+        setSelectedFile(null);
+        setLocalPreview(null);
+        setImageLoadError(false);
+        setUploadError(null);
         setIsActive(true);
         setIsAvailable(true);
         setVariants([]);
@@ -228,7 +320,30 @@ export const EditProductPage: React.FC = () => {
     }
 
     setIsSubmitting(true);
+    setUploadError(null);
     try {
+      let finalImageUrl = imageUrl.trim() || null;
+
+      // 1. If a new local file was selected, upload it to Cloudinary first
+      if (selectedFile) {
+        setIsUploading(true);
+        setUploadProgress('Uploading image to Cloudinary...');
+        try {
+          const uploadRes = await menuService.uploadProductImage(selectedFile);
+          finalImageUrl = uploadRes.secureUrl;
+          setImageUrl(finalImageUrl);
+          setSelectedFile(null);
+          setLocalPreview(null);
+        } catch (uploadErr) {
+          const msg = uploadErr instanceof Error ? uploadErr.message : 'Image upload failed';
+          setUploadError(msg);
+          throw new Error(msg);
+        } finally {
+          setIsUploading(false);
+          setUploadProgress(null);
+        }
+      }
+
       let targetProductId = productId;
 
       if (isCreateMode) {
@@ -239,7 +354,7 @@ export const EditProductPage: React.FC = () => {
           price: Math.round(numericPrice * 100) / 100,
           categoryId,
           displayOrder: parseInt(String(displayOrder), 10) || 0,
-          imageUrl: imageUrl.trim() || null,
+          imageUrl: finalImageUrl,
           isActive,
           isAvailable,
         });
@@ -281,7 +396,7 @@ export const EditProductPage: React.FC = () => {
           price: Math.round(numericPrice * 100) / 100,
           categoryId,
           displayOrder: parseInt(String(displayOrder), 10) || 0,
-          imageUrl: imageUrl.trim() || null,
+          imageUrl: finalImageUrl,
           isActive,
           isAvailable,
         });
@@ -548,33 +663,120 @@ export const EditProductPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="form-row-two">
-                <div className="form-group">
-                  <label className="form-label">Display order</label>
-                  <input
-                    type="number"
-                    min="0"
-                    className="form-input"
-                    value={displayOrder}
-                    onChange={(e) => setDisplayOrder(e.target.value)}
-                    disabled={isSubmitting}
-                  />
+              <div className="form-group" style={{ marginBottom: '16px' }}>
+                <label className="form-label">Display order</label>
+                <input
+                  type="number"
+                  min="0"
+                  className="form-input"
+                  style={{ maxWidth: '200px' }}
+                  value={displayOrder}
+                  onChange={(e) => setDisplayOrder(e.target.value)}
+                  disabled={isSubmitting || isUploading}
+                />
+              </div>
+
+              {/* Product Image Selection & Upload Area */}
+              <div className="form-group image-selection-group">
+                <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>Product Image</span>
+                  <button
+                    type="button"
+                    className="toggle-manual-url-btn"
+                    onClick={() => setShowManualUrlInput(!showManualUrlInput)}
+                  >
+                    {showManualUrlInput ? 'Hide manual URL input' : 'Enter URL manually'}
+                  </button>
+                </label>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  style={{ display: 'none' }}
+                  onChange={handleFileSelect}
+                  disabled={isSubmitting || isUploading}
+                />
+
+                <div className="image-upload-control-box">
+                  <div className="image-upload-actions-row">
+                    <button
+                      type="button"
+                      className="btn-upload-file"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isSubmitting || isUploading}
+                    >
+                      <UploadCloud size={16} />
+                      {selectedFile || imageUrl ? 'Change Image from Device' : 'Select Image from Device'}
+                    </button>
+
+                    {(selectedFile || imageUrl) && (
+                      <button
+                        type="button"
+                        className="btn-remove-image"
+                        onClick={handleRemoveImage}
+                        disabled={isSubmitting || isUploading}
+                      >
+                        <Trash2 size={14} />
+                        Remove Image
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="image-upload-meta">
+                    {selectedFile ? (
+                      <div className="selected-file-badge">
+                        <span className="file-name">{selectedFile.name}</span>
+                        <span className="file-size">({(selectedFile.size / 1024).toFixed(0)} KB ready to upload)</span>
+                      </div>
+                    ) : imageUrl ? (
+                      <div className="current-image-badge">
+                        <span className="current-url-preview" title={imageUrl}>
+                          {imageUrl.includes('cloudinary.com') ? 'Cloudinary Hosted' : 'Active Image URL'}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="form-field-hint">
+                        Accepted formats: JPEG, PNG, WebP (Max 5 MB). Uploads automatically upon saving.
+                      </span>
+                    )}
+                  </div>
+
+                  {uploadError && (
+                    <div className="image-upload-error-alert">
+                      <AlertCircle size={14} />
+                      <span>{uploadError}</span>
+                    </div>
+                  )}
+
+                  {uploadProgress && (
+                    <div className="image-upload-progress-alert">
+                      <Loader2 size={14} className="spinner-icon" />
+                      <span>{uploadProgress}</span>
+                    </div>
+                  )}
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Image URL</label>
-                  <input
-                    type="url"
-                    className="form-input"
-                    placeholder="https://images.example.com/item.jpg"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    disabled={isSubmitting}
-                  />
-                  <span className="form-field-hint">
-                    {imageUrl ? 'Preview loaded on the right' : 'Optional HTTP or HTTPS URL'}
-                  </span>
-                </div>
+                {showManualUrlInput && (
+                  <div className="manual-url-input-box" style={{ marginTop: '10px' }}>
+                    <input
+                      type="url"
+                      className="form-input"
+                      placeholder="https://res.cloudinary.com/... or https://..."
+                      value={imageUrl}
+                      onChange={(e) => {
+                        setImageUrl(e.target.value);
+                        setSelectedFile(null);
+                        setLocalPreview(null);
+                        setImageLoadError(false);
+                      }}
+                      disabled={isSubmitting || isUploading}
+                    />
+                    <span className="form-field-hint">
+                      Optional: Paste a direct HTTPS image URL if you host assets externally.
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -911,23 +1113,73 @@ export const EditProductPage: React.FC = () => {
 
             {/* IMAGE PREVIEW Card */}
             <div className="card form-section-card">
-              <h3 className="form-card-title">IMAGE PREVIEW</h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <h3 className="form-card-title" style={{ margin: 0 }}>IMAGE PREVIEW</h3>
+                {localPreviewUrl && (
+                  <span className="preview-badge pending-badge">Pending Save</span>
+                )}
+                {!localPreviewUrl && imageUrl && (
+                  <span className="preview-badge saved-badge">Active</span>
+                )}
+              </div>
 
               <div className="image-preview-box">
-                {imageUrl ? (
-                  <img
-                    src={imageUrl}
-                    alt="Preview"
-                    className="product-media-preview-img"
-                    onError={(e) => {
-                      (e.target as HTMLElement).style.display = 'none';
-                    }}
-                  />
-                ) : (
+                {isUploading ? (
                   <div className="empty-media-box">
-                    <ImageIcon size={24} className="empty-media-icon" />
-                    <div className="empty-media-title">No image supplied</div>
-                    <div className="empty-media-sub">Enter an image URL above to preview product media.</div>
+                    <Loader2 size={28} className="spinner-icon" style={{ color: '#e53935', marginBottom: '8px' }} />
+                    <div className="empty-media-title">Uploading to Cloudinary...</div>
+                    <div className="empty-media-sub">Optimizing and storing product media</div>
+                  </div>
+                ) : (localPreviewUrl || imageUrl) ? (
+                  imageLoadError ? (
+                    <div className="empty-media-box preview-error-box">
+                      <AlertCircle size={28} className="empty-media-icon" style={{ color: '#ef4444' }} />
+                      <div className="empty-media-title" style={{ color: '#ef4444' }}>Unable to load image</div>
+                      <div className="empty-media-sub">The image could not be rendered. Click below to re-select.</div>
+                      <button
+                        type="button"
+                        className="btn-retry-image"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <RefreshCw size={12} />
+                        Select Different File
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="preview-image-wrapper">
+                      <img
+                        key={localPreviewUrl || imageUrl}
+                        src={localPreviewUrl || imageUrl}
+                        alt="Product preview"
+                        className="product-media-preview-img"
+                        onLoad={() => setImageLoadError(false)}
+                        onError={() => setImageLoadError(true)}
+                      />
+                      <div className="preview-actions-overlay">
+                        <button
+                          type="button"
+                          className="preview-overlay-btn"
+                          onClick={() => fileInputRef.current?.click()}
+                          title="Change Image"
+                        >
+                          Change
+                        </button>
+                        <button
+                          type="button"
+                          className="preview-overlay-btn btn-danger"
+                          onClick={handleRemoveImage}
+                          title="Remove Image"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  )
+                ) : (
+                  <div className="empty-media-box" onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer' }}>
+                    <ImageIcon size={28} className="empty-media-icon" />
+                    <div className="empty-media-title">No image selected</div>
+                    <div className="empty-media-sub">Click to select an image from your device (JPEG, PNG, WebP up to 5MB).</div>
                   </div>
                 )}
               </div>

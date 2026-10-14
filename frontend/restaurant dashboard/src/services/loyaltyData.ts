@@ -128,6 +128,11 @@ let loyaltyProgramMemoryStore: LoyaltyProgramConfig = {
   ...DEFAULT_LOYALTY_PROGRAM,
 };
 
+/**
+ * In-memory client preview store.
+ * NOTE: Loyalty API endpoints are not yet deployed in the backend.
+ * These helpers support UI demonstration and do NOT persist to database.
+ */
 export function getLoyaltyProgram(): LoyaltyProgramConfig {
   return { ...loyaltyProgramMemoryStore };
 }

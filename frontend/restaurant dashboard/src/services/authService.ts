@@ -31,6 +31,8 @@ export interface BackendBranchSummary {
   country: string;
   createdAt: string;
   updatedAt: string;
+  address?: string | null;
+  city?: string | null;
 }
 
 export interface OwnerContextResponse {

@@ -34,7 +34,7 @@ export const LoyaltySetupPage: React.FC = () => {
   };
 
   const handleSave = () => {
-    const saved = saveLoyaltyProgram({
+    saveLoyaltyProgram({
       programName: programName.trim() || 'Basil & Brick VIP Club',
       tagline: tagline.trim(),
       isActive,
@@ -48,7 +48,7 @@ export const LoyaltySetupPage: React.FC = () => {
       tiers,
     });
 
-    setToastMessage(`Loyalty program "${saved.programName}" saved and activated!`);
+    setToastMessage(`Loyalty preview updated locally (no database write).`);
     setTimeout(() => {
       navigate('/dashboard/loyalty');
     }, 600);
@@ -77,6 +77,27 @@ export const LoyaltySetupPage: React.FC = () => {
         </div>
       )}
 
+      {/* Future Ready Notice */}
+      <div
+        style={{
+          padding: '12px 18px',
+          borderRadius: '8px',
+          background: 'rgba(59, 130, 246, 0.08)',
+          border: '1px solid rgba(59, 130, 246, 0.25)',
+          color: '#93c5fd',
+          fontSize: '13px',
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+        }}
+      >
+        <span>ℹ️</span>
+        <span>
+          <strong>FUTURE READY PREVIEW:</strong> The loyalty backend service is planned for a future release. Configuring parameters here updates the local demonstration view only and does not write to the database or modify live customer accounts.
+        </span>
+      </div>
+
       {/* Header */}
       <div className="setup-header-section">
         <button
@@ -87,16 +108,16 @@ export const LoyaltySetupPage: React.FC = () => {
           ← Back to loyalty
         </button>
         <p className="setup-breadcrumb">
-          Loyalty / Program Setup & Configuration · Configure earning rates, tiers and member perks
+          Loyalty / Program Setup & Configuration · Configure earning rates, tiers and member perks (Preview)
         </p>
         <div className="setup-title-row">
-          <h1>Start / Configure Loyalty Program</h1>
+          <h1>Configure Loyalty Program (Preview)</h1>
           <button
             className="btn-setup-save"
             id="btn-header-save-program"
             onClick={handleSave}
           >
-            Save & Activate Program
+            Update Preview Configuration
           </button>
         </div>
       </div>
@@ -348,10 +369,10 @@ export const LoyaltySetupPage: React.FC = () => {
           {/* Card 3: Notice */}
           <div className="setup-card" style={{ backgroundColor: '#F9FAFB' }}>
             <h3 style={{ fontSize: '14px', fontWeight: 700, margin: '0 0 8px 0', color: '#111827' }}>
-              ✦ Live Synchronization
+              ✦ Client Demonstration
             </h3>
             <p style={{ fontSize: '12.5px', color: '#4B5563', lineHeight: 1.5, margin: 0 }}>
-              Saving this program will immediately populate the Loyalty Dashboard with configured rules, active reward cards, and sample customer accounts.
+              Updating this preview demonstrates how tier thresholds and reward rules will display on customer loyalty profiles once backend loyalty storage is deployed.
             </p>
           </div>
         </div>
@@ -360,7 +381,7 @@ export const LoyaltySetupPage: React.FC = () => {
       {/* Bottom Action Bar */}
       <div className="setup-bottom-bar">
         <div className="setup-bottom-left">
-          Changes will take effect immediately across all digital menus for Hazratganj branch.
+          Local preview only. Loyalty service is planned for a future release; changes do not persist to database.
         </div>
         <div className="setup-bottom-actions">
           <button
@@ -375,7 +396,7 @@ export const LoyaltySetupPage: React.FC = () => {
             id="btn-bottom-save-program"
             onClick={handleSave}
           >
-            Save & Activate Program
+            Update Preview Configuration
           </button>
         </div>
       </div>

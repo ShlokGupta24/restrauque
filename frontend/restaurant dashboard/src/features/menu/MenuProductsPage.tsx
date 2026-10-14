@@ -11,6 +11,32 @@ import {
 import { ApiClientError } from '../../services/apiClient';
 import './MenuProductsPage.css';
 
+function ProductThumbnail({ imageUrl, name }: { imageUrl: string | null; name: string }) {
+  const [hasError, setHasError] = useState(false);
+
+  // Reset error state if imageUrl changes
+  useEffect(() => {
+    setHasError(false);
+  }, [imageUrl]);
+
+  if (imageUrl && !hasError) {
+    return (
+      <img
+        src={imageUrl}
+        alt={name}
+        className="product-thumb-img"
+        onError={() => setHasError(true)}
+      />
+    );
+  }
+
+  return (
+    <div className="product-thumb-placeholder">
+      <ImageIcon size={16} />
+    </div>
+  );
+}
+
 export const MenuProductsPage: React.FC = () => {
   const { formatCurrency } = useRestaurant();
   const navigate = useNavigate();
@@ -512,21 +538,7 @@ export const MenuProductsPage: React.FC = () => {
                     {/* Product Thumbnail + Name */}
                     <td className="cell-product-info">
                       <div className="product-thumb-box">
-                        {prod.imageUrl ? (
-                          <img
-                            src={prod.imageUrl}
-                            alt={prod.name}
-                            className="product-thumb-img"
-                            onError={(e) => {
-                              // Fallback on broken image link
-                              (e.target as HTMLElement).style.display = 'none';
-                            }}
-                          />
-                        ) : (
-                          <div className="product-thumb-placeholder">
-                            <ImageIcon size={16} />
-                          </div>
-                        )}
+                        <ProductThumbnail imageUrl={prod.imageUrl} name={prod.name} />
                       </div>
                       <div>
                         <span className="product-table-name">{prod.name}</span>

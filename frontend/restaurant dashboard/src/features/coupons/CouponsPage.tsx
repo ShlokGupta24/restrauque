@@ -15,6 +15,8 @@ export const CouponsPage: React.FC = () => {
   );
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  const [couponsCount, setCouponsCount] = useState<number | null>(null);
+
   useEffect(() => {
     setActiveTab(location.pathname.includes('/loyalty') ? 'loyalty' : 'coupons');
   }, [location.pathname]);
@@ -109,7 +111,7 @@ export const CouponsPage: React.FC = () => {
             type="button"
           >
             <span>🏷 Coupons</span>
-            <span className="tab-badge">5</span>
+            <span className="tab-badge">{couponsCount !== null ? couponsCount : '...'}</span>
           </button>
           <button
             className={`sliding-tab-btn ${activeTab === 'loyalty' ? 'active' : ''}`}
@@ -133,7 +135,7 @@ export const CouponsPage: React.FC = () => {
             className={`smooth-shift-panel ${activeTab !== 'coupons' ? 'panel-inactive' : ''}`}
             id="panel-coupons-view"
           >
-            <CouponsView onNotify={showToast} />
+            <CouponsView onNotify={showToast} onCountUpdate={setCouponsCount} />
           </div>
 
           {/* Loyalty Panel */}

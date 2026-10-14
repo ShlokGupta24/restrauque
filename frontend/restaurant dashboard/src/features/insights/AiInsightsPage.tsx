@@ -79,7 +79,7 @@ export const AiInsightsPage: React.FC = () => {
           <div className="preview-banner-text">
             <span className="preview-indicator-badge">SIMULATED PREVIEW</span>
             <span>
-              Displaying demonstration evidence records for <strong>Basil & Brick · Hazratganj</strong> based on 1,058 completed orders and QR tables. Recommendations require owner authorization before taking effect.
+              Displaying demonstration evidence records for UI layout testing. AI recommendations operate as client previews and require connection to the dedicated AI workspace before actions can be persisted to the database.
             </span>
           </div>
           <button
@@ -419,20 +419,24 @@ export const AiInsightsPage: React.FC = () => {
                             type="button"
                             className="btn-approve-action"
                             onClick={() => handleActionApproval(insight.id, true)}
+                            title="Preview demonstration only: does not call backend APIs"
                           >
-                            ✓ Owner Approve
+                            Preview Authorization
                           </button>
                           <button
                             type="button"
                             className="btn-dismiss-action"
                             onClick={() => handleActionApproval(insight.id, false)}
+                            title="Preview demonstration only: does not call backend APIs"
                           >
-                            ✕ Dismiss
+                            Preview Dismiss
                           </button>
                         </>
                       ) : (
                         <span className={`status-pill ${insight.proposed_action.status}`}>
-                          {insight.proposed_action.status === 'approved' ? '✓ Authorized by Owner' : '✕ Dismissed'}
+                          {insight.proposed_action.status === 'approved'
+                            ? '✓ Preview Authorized (Demonstration only)'
+                            : '✕ Preview Dismissed (Demonstration only)'}
                         </span>
                       )}
                     </div>

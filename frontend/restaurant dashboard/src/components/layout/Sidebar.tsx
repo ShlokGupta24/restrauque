@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   Home,
@@ -13,6 +13,7 @@ import {
 import { useRestaurant } from '../../context/RestaurantContext';
 import { useEntitlements } from '../../context/EntitlementContext';
 import { useAuth } from '../../context/AuthContext';
+import { orderService } from '../../services/orderService';
 import './Sidebar.css';
 
 interface NavItemConfig {
@@ -25,11 +26,46 @@ interface NavItemConfig {
 }
 
 export const Sidebar: React.FC = () => {
-  const { restaurant } = useRestaurant();
+  const { restaurant, activeBranch, hasRestaurant } = useRestaurant();
   const { hasAccess } = useEntitlements();
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [pendingOrdersCount, setPendingOrdersCount] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (!hasRestaurant || !activeBranch) {
+      setPendingOrdersCount(undefined);
+      return;
+    }
+
+    const fetchPendingCount = async () => {
+      try {
+        const res = await orderService.getOrders({
+          limit: 1,
+          branchId: activeBranch.id,
+          status: 'pending',
+        });
+        if (isMounted) {
+          const count = res.summary?.pendingOrders ?? res.pagination?.totalCount ?? 0;
+          setPendingOrdersCount(count > 0 ? count : undefined);
+        }
+      } catch {
+        if (isMounted) {
+          setPendingOrdersCount(undefined);
+        }
+      }
+    };
+
+    fetchPendingCount();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [hasRestaurant, activeBranch?.id, location.pathname]);
 
   const navItems: NavItemConfig[] = [
     {
@@ -43,7 +79,7 @@ export const Sidebar: React.FC = () => {
       label: 'Orders',
       path: '/dashboard/orders',
       icon: <FileText size={18} strokeWidth={1.8} />,
-      badge: 7,
+      badge: pendingOrdersCount,
     },
     {
       id: 'menu_products',

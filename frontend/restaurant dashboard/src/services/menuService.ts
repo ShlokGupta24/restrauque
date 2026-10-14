@@ -136,6 +136,15 @@ export interface UpdateProductInput {
   isAvailable?: boolean;
 }
 
+export interface ProductImageUploadResponse {
+  secureUrl: string;
+  publicId: string;
+  format?: string;
+  width?: number;
+  height?: number;
+  bytes?: number;
+}
+
 export interface CreateVariantInput {
   name: string;
   price: number;
@@ -283,6 +292,15 @@ export const menuService = {
   deleteProduct: async (productId: string): Promise<DeleteOperationResult> => {
     return apiClient.delete<DeleteOperationResult>(
       `/api/v1/owner/menu/products/${encodeURIComponent(productId)}`
+    );
+  },
+
+  uploadProductImage: async (file: File): Promise<ProductImageUploadResponse> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return apiClient.upload<ProductImageUploadResponse>(
+      '/api/v1/owner/menu/products/upload',
+      formData
     );
   },
 

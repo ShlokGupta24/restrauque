@@ -82,18 +82,40 @@ export const FeedbackPage: React.FC = () => {
               <span>01–07 Oct 2026 · DEMO</span>
             </button>
 
-            <button
-              type="button"
+            <span
               className="feedback-refresh-btn"
-              id="btn-refresh-feedback"
-              onClick={() => setIsDemoMode((prev) => !prev)}
+              style={{ cursor: 'default', opacity: 0.65 }}
+              title="Backend customer feedback service is not yet connected"
             >
-              <span className="refresh-icon">🔄</span>
-              <span>Refresh feedback</span>
-            </button>
+              <span className="refresh-icon">○</span>
+              <span>API Not Connected</span>
+            </span>
           </div>
         </div>
       </div>
+
+      {/* Demonstration Banner when preview mode is toggled on */}
+      {isDemoMode && (
+        <div
+          style={{
+            padding: '10px 16px',
+            borderRadius: '8px',
+            background: 'rgba(255, 171, 0, 0.08)',
+            border: '1px solid rgba(255, 171, 0, 0.25)',
+            color: '#fbbf24',
+            fontSize: '12.5px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            marginBottom: '16px',
+          }}
+        >
+          <span>⚠️</span>
+          <span>
+            <strong>DEMONSTRATION PREVIEW:</strong> Displaying synthetic review dataset for UI testing. Customer feedback collection endpoints are not yet implemented in the backend.
+          </span>
+        </div>
+      )}
 
       {/* 3 KPI Summary Cards */}
       <div className="feedback-kpi-grid">

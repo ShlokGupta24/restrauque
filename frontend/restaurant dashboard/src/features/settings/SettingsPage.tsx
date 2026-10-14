@@ -36,7 +36,7 @@ export const SettingsPage: React.FC = () => {
   const [ownerContact, setOwnerContact] = useState<string>(restaurant?.ownerEmail || '');
   const [restaurantPhone, setRestaurantPhone] = useState<string>('');
   const [restaurantAddress, setRestaurantAddress] = useState<string>('');
-  const [restaurantCity, setRestaurantCity] = useState<string>('Lucknow');
+  const [restaurantCity, setRestaurantCity] = useState<string>('');
   const [saveSuccessMessage, setSaveSuccessMessage] = useState<string | null>(null);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [isSavingProfile, setIsSavingProfile] = useState<boolean>(false);
@@ -47,7 +47,7 @@ export const SettingsPage: React.FC = () => {
   const [branchError, setBranchError] = useState<string | null>(null);
   const [isAddBranchOpen, setIsAddBranchOpen] = useState<boolean>(false);
   const [newBranchName, setNewBranchName] = useState<string>('');
-  const [newBranchCity, setNewBranchCity] = useState<string>('Lucknow');
+  const [newBranchCity, setNewBranchCity] = useState<string>('');
   const [newBranchAddress, setNewBranchAddress] = useState<string>('');
   const [newBranchPhone, setNewBranchPhone] = useState<string>('');
   const [isSavingBranch, setIsSavingBranch] = useState<boolean>(false);
@@ -64,6 +64,9 @@ export const SettingsPage: React.FC = () => {
       if (res.restaurant) {
         setRestaurantName(res.restaurant.name);
         if (restaurant?.ownerEmail) setOwnerContact(restaurant.ownerEmail);
+        if (res.restaurant.phone) setRestaurantPhone(res.restaurant.phone);
+        if (res.restaurant.address) setRestaurantAddress(res.restaurant.address);
+        if (res.restaurant.city) setRestaurantCity(res.restaurant.city);
       }
     } catch {
       // Keep existing context state if fetch fails
@@ -233,7 +236,7 @@ export const SettingsPage: React.FC = () => {
               id="tab-team-permissions"
               onClick={() => handleTabChange('team')}
             >
-              Team & permissions
+              Team & permissions <span style={{ fontSize: '10px', opacity: 0.6 }}>· Preview</span>
             </button>
 
             <button
@@ -242,7 +245,7 @@ export const SettingsPage: React.FC = () => {
               id="tab-qr-appearance"
               onClick={() => handleTabChange('qr_appearance')}
             >
-              QR menu appearance
+              QR menu appearance <span style={{ fontSize: '10px', opacity: 0.6 }}>· Preview</span>
             </button>
 
             <button
@@ -260,7 +263,7 @@ export const SettingsPage: React.FC = () => {
               id="tab-integrations"
               onClick={() => handleTabChange('integrations')}
             >
-              Integrations
+              Integrations <span style={{ fontSize: '10px', opacity: 0.6 }}>· Preview</span>
             </button>
           </nav>
         </div>
@@ -586,7 +589,7 @@ export const SettingsPage: React.FC = () => {
                         <div>
                           <h3 className="branch-item-name">{b.name}</h3>
                           <p className="branch-item-address">
-                            {b.address ? `${b.address}, ` : ''}{b.city || 'Lucknow'} · <small style={{ color: '#6b7280' }}>ID: {b.id}</small>
+                            {b.address ? (b.city ? `${b.address}, ${b.city}` : b.address) : (b.city || 'No address specified')} · <small style={{ color: '#6b7280' }}>ID: {b.id}</small>
                           </p>
                         </div>
                         <button
@@ -623,9 +626,12 @@ export const SettingsPage: React.FC = () => {
             <div className="settings-card" id="card-team-settings">
               <div className="settings-card-header">
                 <div>
-                  <h2 className="settings-card-title">Team & Staff Roles</h2>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <h2 className="settings-card-title">Team & Staff Roles</h2>
+                    <span style={{ fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', color: '#9ca3af' }}>PREVIEW ONLY</span>
+                  </div>
                   <p className="settings-card-subtitle">
-                    Staff management preview · role permissions for managers and kitchen leads.
+                    Staff management preview · role permissions for managers and kitchen leads. Real staff persistence will be connected via a future backend release.
                   </p>
                 </div>
               </div>
@@ -668,9 +674,12 @@ export const SettingsPage: React.FC = () => {
           {activeTab === 'qr_appearance' && (
             <div className="settings-card" id="card-qr-appearance-settings">
               <div className="settings-card-header">
-                <h2 className="settings-card-title">QR Menu Brand Customization</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <h2 className="settings-card-title">QR Menu Brand Customization</h2>
+                  <span style={{ fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', color: '#9ca3af' }}>LOCAL PREVIEW</span>
+                </div>
                 <p className="settings-card-subtitle">
-                  Configure brand styling displayed on table menus.
+                  Configure brand styling displayed on table menus. Changes apply locally in browser preview only and are not persisted to database.
                 </p>
               </div>
 
@@ -721,9 +730,12 @@ export const SettingsPage: React.FC = () => {
           {activeTab === 'integrations' && (
             <div className="settings-card" id="card-integrations-settings">
               <div className="settings-card-header">
-                <h2 className="settings-card-title">Hardware & Integration Connectors</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <h2 className="settings-card-title">Hardware & Integration Connectors</h2>
+                  <span style={{ fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', color: '#9ca3af' }}>PREVIEW ONLY</span>
+                </div>
                 <p className="settings-card-subtitle">
-                  External services, thermal printers, and payment providers.
+                  External services, thermal printers, and payment providers. Hardware connectors will be activated with backend device driver integrations.
                 </p>
               </div>
 

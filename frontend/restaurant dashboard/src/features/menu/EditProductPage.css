@@ -209,9 +209,167 @@
   color: var(--text-subtle);
 }
 
+/* Image Selection & Upload Area */
+.image-selection-group {
+  margin-top: 8px;
+}
+
+.toggle-manual-url-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.toggle-manual-url-btn:hover {
+  color: var(--text-primary);
+}
+
+.image-upload-control-box {
+  background: #f9fafb;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.image-upload-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-upload-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: #111827;
+  color: #ffffff;
+  border: 1px solid #111827;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-upload-file:hover:not(:disabled) {
+  background: #1f2937;
+  border-color: #1f2937;
+}
+
+.btn-upload-file:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-remove-image {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-remove-image:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: #ef4444;
+}
+
+.btn-remove-image:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.selected-file-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-primary);
+  background: #e5e7eb;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+.selected-file-badge .file-name {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selected-file-badge .file-size {
+  color: var(--text-muted);
+}
+
+.current-image-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #047857;
+  background: #d1fae5;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+.image-upload-error-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+}
+
+.image-upload-progress-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+}
+
+.spinner-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Image Preview Box */
 .image-preview-box {
-  min-height: 140px;
+  min-height: 160px;
   border: 1px dashed var(--border-color);
   border-radius: var(--radius-md);
   display: flex;
@@ -219,11 +377,13 @@
   justify-content: center;
   overflow: hidden;
   background: #fafafa;
+  position: relative;
 }
 
 .empty-media-box {
   text-align: center;
-  padding: 24px;
+  padding: 24px 16px;
+  width: 100%;
 }
 
 .empty-media-icon {
@@ -238,15 +398,104 @@
 }
 
 .empty-media-sub {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.preview-error-box {
+  background: #fff5f5;
+}
+
+.btn-retry-image {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.btn-retry-image:hover {
+  background: #f9fafb;
+}
+
+.preview-image-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f3f4f6;
 }
 
 .product-media-preview-img {
   width: 100%;
-  max-height: 180px;
+  max-height: 220px;
   object-fit: cover;
+  display: block;
+}
+
+.preview-actions-overlay {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(4px);
+}
+
+.preview-overlay-btn {
+  background: #ffffff;
+  border: none;
+  color: #111827;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.preview-overlay-btn:hover {
+  background: #e5e7eb;
+}
+
+.preview-overlay-btn.btn-danger {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.preview-overlay-btn.btn-danger:hover {
+  background: #dc2626;
+}
+
+.preview-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pending-badge {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.saved-badge {
+  background: #d1fae5;
+  color: #065f46;
 }
 
 /* Menu Membership Card */

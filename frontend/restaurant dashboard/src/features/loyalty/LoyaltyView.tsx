@@ -18,6 +18,27 @@ export const LoyaltyView: React.FC<LoyaltyViewProps> = () => {
 
   return (
     <div className="loyalty-view">
+      {/* Top Future Ready Notice Banner */}
+      <div
+        style={{
+          padding: '10px 16px',
+          borderRadius: '8px',
+          background: 'rgba(59, 130, 246, 0.08)',
+          border: '1px solid rgba(59, 130, 246, 0.25)',
+          color: '#93c5fd',
+          fontSize: '12.5px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          marginBottom: '16px',
+        }}
+      >
+        <span>ℹ️</span>
+        <span>
+          <strong>FUTURE READY PREVIEW:</strong> Loyalty program endpoints are planned for a future release. Tiers and customer balances shown below are demonstration records.
+        </span>
+      </div>
+
       {/* Top Banner showing Active Program with button to Edit / Start */}
       <div className="loyalty-hero-banner" id="loyalty-hero-banner">
         <div>
@@ -25,14 +46,14 @@ export const LoyaltyView: React.FC<LoyaltyViewProps> = () => {
             <span>✦</span>
             <span>
               {program.isConfigured
-                ? `Active Loyalty Program: ${program.programName}`
+                ? `Loyalty Program (Preview): ${program.programName}`
                 : 'No Loyalty Program Initialized'}
             </span>
           </div>
           <div className="loyalty-hero-desc">
             {program.isConfigured
               ? `${program.tagline} · ${program.earningMode} · ${program.tiers.length} Tiers configured`
-              : 'Configure earning rates, tiers and start rewarding your restaurant diners.'}
+              : 'Configure earning rates, tiers and preview loyalty customer experience.'}
           </div>
         </div>
 
@@ -41,7 +62,7 @@ export const LoyaltyView: React.FC<LoyaltyViewProps> = () => {
           id="btn-open-loyalty-setup"
           onClick={() => navigate('/dashboard/loyalty/setup')}
         >
-          {program.isConfigured ? '⚙ Edit Program Details' : '+ Start Loyalty Program'}
+          {program.isConfigured ? '⚙ Preview Program Details' : '+ Preview Loyalty Program'}
         </button>
       </div>
 
@@ -274,10 +295,10 @@ export const LoyaltyView: React.FC<LoyaltyViewProps> = () => {
       <div className="loyalty-accounts-card" id="card-accounts-table">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
           <h2 className="loyalty-card-title" style={{ margin: 0 }}>
-            Enrolled Customer Accounts ({program.sampleAccounts.length})
+            Sample Customer Accounts ({program.sampleAccounts.length})
           </h2>
           <span style={{ fontSize: '12px', color: '#6B7280' }}>
-            Live records updated via table QR check-ins
+            Demonstration accounts (Preview) · Real records will appear once loyalty backend is connected
           </span>
         </div>
 

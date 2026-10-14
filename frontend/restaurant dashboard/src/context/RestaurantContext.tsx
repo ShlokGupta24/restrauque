@@ -66,14 +66,19 @@ export const RestaurantProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           locale: 'en-IN',
         };
 
-        const mappedBranches: Branch[] = context.branches.map((b, idx) => ({
-          id: b.id,
-          restaurantId: b.restaurantId,
-          name: b.name,
-          city: 'Lucknow',
-          area: b.name,
-          isDefault: idx === 0,
-        }));
+        const mappedBranches: Branch[] = context.branches.map((b, idx) => {
+          const city = b.city?.trim() || '';
+          const area = b.address?.trim() || b.name;
+
+          return {
+            id: b.id,
+            restaurantId: b.restaurantId,
+            name: b.name,
+            city,
+            area,
+            isDefault: idx === 0,
+          };
+        });
 
         setRestaurant(loadedRestaurant);
         setAvailableBranches(mappedBranches);

@@ -12,7 +12,7 @@ export const RestaurantOnboardingScreen: React.FC = () => {
   const [restaurantName, setRestaurantName] = useState('');
   const [legalName, setLegalName] = useState('');
   const [phone, setPhone] = useState(user?.phone || '');
-  const [city, setCity] = useState('Lucknow');
+  const [city, setCity] = useState('');
   const [address, setAddress] = useState('');
   const [branchName, setBranchName] = useState('Main Branch');
 
@@ -306,7 +306,7 @@ export const RestaurantOnboardingScreen: React.FC = () => {
                   type="text"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  placeholder="Lucknow"
+                  placeholder="e.g. Mumbai, Delhi, Lucknow"
                   disabled={isSubmitting}
                   style={{
                     width: '100%',
