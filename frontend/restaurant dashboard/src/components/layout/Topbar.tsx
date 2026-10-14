@@ -1,7 +1,8 @@
 import React from 'react';
-import { Search, Printer } from 'lucide-react';
+import { Search, Printer, LogOut } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { useRestaurant } from '../../context/RestaurantContext';
+import { useAuth } from '../../context/AuthContext';
 import './Topbar.css';
 
 interface TopbarProps {
@@ -11,23 +12,25 @@ interface TopbarProps {
 
 export const Topbar: React.FC<TopbarProps> = ({ title, breadcrumbs }) => {
   const { restaurant } = useRestaurant();
+  const { user, logout } = useAuth();
   const location = useLocation();
 
   // Generate dynamic breadcrumb fallback if not provided
   const getBreadcrumbs = (): string[] => {
     if (breadcrumbs && breadcrumbs.length > 0) return breadcrumbs;
     const path = location.pathname;
-    if (path.includes('overview')) return ['BASIL & BRICK', 'OWNER', 'OVERVIEW', 'DEMO'];
-    if (path.includes('orders')) return ['BASIL & BRICK', 'DASHBOARD'];
-    if (path.includes('menu')) return ['BASIL & BRICK', 'DASHBOARD'];
-    if (path.includes('tables')) return ['BASIL & BRICK', 'DASHBOARD'];
-    if (path.includes('coupons')) return ['BASIL & BRICK', 'DASHBOARD'];
-    if (path.includes('loyalty')) return ['BASIL & BRICK', 'OWNER', 'SCHEMA ALIGNED'];
-    if (path.includes('analytics')) return ['BASIL & BRICK', 'DASHBOARD'];
-    if (path.includes('ai-insights')) return ['BASIL & BRICK', 'DASHBOARD'];
-    if (path.includes('feedback')) return ['BASIL & BRICK', 'OWNER', 'SCHEMA ALIGNED'];
-    if (path.includes('settings')) return ['BASIL & BRICK', 'SETTINGS', 'DEMO'];
-    return ['BASIL & BRICK', 'DASHBOARD'];
+    const restName = (restaurant?.name || 'RESTRAUQUE').toUpperCase();
+    if (path.includes('overview')) return [restName, 'OWNER', 'OVERVIEW'];
+    if (path.includes('orders')) return [restName, 'DASHBOARD'];
+    if (path.includes('menu')) return [restName, 'DASHBOARD'];
+    if (path.includes('tables')) return [restName, 'DASHBOARD'];
+    if (path.includes('coupons')) return [restName, 'DASHBOARD'];
+    if (path.includes('loyalty')) return [restName, 'OWNER', 'LOYALTY'];
+    if (path.includes('analytics')) return [restName, 'DASHBOARD'];
+    if (path.includes('ai-insights')) return [restName, 'DASHBOARD'];
+    if (path.includes('feedback')) return [restName, 'OWNER', 'FEEDBACK'];
+    if (path.includes('settings')) return [restName, 'SETTINGS'];
+    return [restName, 'DASHBOARD'];
   };
 
   const getPageTitle = (): string => {
@@ -48,6 +51,14 @@ export const Topbar: React.FC<TopbarProps> = ({ title, breadcrumbs }) => {
 
   const currentBreadcrumbs = getBreadcrumbs();
   const currentTitle = getPageTitle();
+
+  const displayName = user?.name || restaurant?.ownerName || 'Restaurant Owner';
+  const initials = displayName
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase();
 
   return (
     <header className="topbar-container">
@@ -71,7 +82,7 @@ export const Topbar: React.FC<TopbarProps> = ({ title, breadcrumbs }) => {
             <span className="future-ready-dot">●</span> FUTURE READY
           </div>
         ) : (
-          <div className="topbar-demo-pill">DEMO DATA</div>
+          <div className="topbar-demo-pill">VERIFIED SESSION</div>
         )}
 
         <button type="button" className="topbar-icon-btn" aria-label="Search">
@@ -83,13 +94,23 @@ export const Topbar: React.FC<TopbarProps> = ({ title, breadcrumbs }) => {
           <span className="topbar-notification-dot" />
         </button>
 
-        <div className="topbar-user-profile">
-          <div className="topbar-avatar">AK</div>
+        <div className="topbar-user-profile" title={user?.email || ''}>
+          <div className="topbar-avatar">{initials}</div>
           <div className="topbar-user-meta">
-            <span className="topbar-username">{restaurant.ownerName}</span>
-            <span className="topbar-userrole">Owner account</span>
+            <span className="topbar-username">{displayName}</span>
+            <span className="topbar-userrole">{user?.email || 'Owner account'}</span>
           </div>
         </div>
+
+        <button
+          type="button"
+          className="topbar-icon-btn"
+          aria-label="Sign out"
+          title="Sign out of owner account"
+          onClick={() => logout()}
+        >
+          <LogOut size={16} strokeWidth={2} />
+        </button>
       </div>
     </header>
   );

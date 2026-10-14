@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useRestaurant } from '../../context/RestaurantContext';
 import { useEntitlements } from '../../context/EntitlementContext';
+import { useAuth } from '../../context/AuthContext';
 import './Sidebar.css';
 
 interface NavItemConfig {
@@ -26,6 +27,7 @@ interface NavItemConfig {
 export const Sidebar: React.FC = () => {
   const { restaurant } = useRestaurant();
   const { hasAccess } = useEntitlements();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -97,6 +99,22 @@ export const Sidebar: React.FC = () => {
     },
   ];
 
+  const displayName = user?.name || restaurant?.ownerName || 'Restaurant Owner';
+  const initials = displayName
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase();
+
+  const restaurantDisplay = restaurant?.name || 'Restaurant Workspace';
+  const workspaceInitials = restaurantDisplay
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase();
+
   return (
     <aside className="sidebar-container">
       {/* Brand Logo Header */}
@@ -110,10 +128,10 @@ export const Sidebar: React.FC = () => {
 
       {/* Workspace Context Card */}
       <div className="sidebar-workspace-card">
-        <div className="workspace-avatar">BB</div>
+        <div className="workspace-avatar">{workspaceInitials}</div>
         <div className="workspace-info">
-          <div className="workspace-name">{restaurant.name}</div>
-          <div className="workspace-branch">Lucknow · Hazratganj</div>
+          <div className="workspace-name">{restaurantDisplay}</div>
+          <div className="workspace-branch">Authorized Workspace</div>
         </div>
       </div>
 
@@ -173,11 +191,11 @@ export const Sidebar: React.FC = () => {
       </div>
 
       {/* User Account Footer */}
-      <div className="sidebar-user-footer">
-        <div className="user-avatar-circle">AK</div>
+      <div className="sidebar-user-footer" title={user?.email || ''}>
+        <div className="user-avatar-circle">{initials}</div>
         <div className="user-details">
-          <div className="user-name">{restaurant.ownerName}</div>
-          <div className="user-role">Restaurant owner</div>
+          <div className="user-name">{displayName}</div>
+          <div className="user-role">{user?.role === 'RESTAURANT_OWNER' ? 'Restaurant owner' : 'Verified account'}</div>
         </div>
       </div>
     </aside>

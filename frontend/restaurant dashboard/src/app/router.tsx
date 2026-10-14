@@ -13,6 +13,7 @@ import { AnalyticsPage } from '../features/analytics/AnalyticsPage';
 import { AiInsightsPage } from '../features/insights/AiInsightsPage';
 import { FeedbackPage } from '../features/feedback/FeedbackPage';
 import { SettingsPage } from '../features/settings/SettingsPage';
+import { ProtectedRoute } from '../components/auth/ProtectedRoute';
 
 export const router = createBrowserRouter([
   {
@@ -21,7 +22,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/dashboard',
-    element: <DashboardLayout />,
+    element: (
+      <ProtectedRoute>
+        <DashboardLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         path: '',

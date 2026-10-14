@@ -19,8 +19,8 @@ export interface Branch {
   isDefault: boolean;
 }
 
-export type OrderStatus = 'pending' | 'preparing' | 'ready' | 'completed' | 'cancelled';
-export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'not_available';
+export type OrderStatus = 'pending' | 'preparing' | 'served' | 'completed' | 'cancelled' | 'ready';
+export type PaymentStatus = 'pending' | 'paid' | 'not_recorded' | 'failed' | 'not_available';
 
 export interface OrderItem {
   id: string;
@@ -71,18 +71,24 @@ export interface Product {
   addonsCount?: number;
 }
 
-export type TableOperationalStatus = 'available' | 'reserved' | 'occupied' | 'cleaning';
+export type TableOperationalStatus = 'available' | 'occupied' | 'reserved' | 'maintenance';
 
 export interface RestaurantTable {
   id: string;
   branchId: string;
+  branchName?: string;
   tableNumber: string;
   capacity: number;
-  operationalStatus: TableOperationalStatus;
+  status?: TableOperationalStatus;
+  operationalStatus?: TableOperationalStatus;
   isActive: boolean;
-  qrActive: boolean;
+  isQrActive?: boolean;
+  qrActive?: boolean;
+  qrCodeId?: string;
   qrCodeUrl?: string;
   qrPayloadUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Coupon {

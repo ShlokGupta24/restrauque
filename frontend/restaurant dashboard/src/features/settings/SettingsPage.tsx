@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useRestaurant } from '../../context/RestaurantContext';
 import { useEntitlements } from '../../context/EntitlementContext';
 import { SubscriptionPlanId } from '../../types/entitlements';
+import { restaurantService, SafeBranchProfile } from '../../services/restaurantService';
+import { ApiClientError } from '../../services/apiClient';
 import {
   INITIAL_STAFF_MEMBERS,
-  INITIAL_BRANCH_SETTINGS,
   INITIAL_QR_SETTINGS,
   INITIAL_INTEGRATIONS,
   StaffMember,
-  BranchSettings,
   QrMenuSettings,
   IntegrationService,
 } from '../../services/settingsData';
@@ -28,35 +28,158 @@ export const SettingsPage: React.FC = () => {
   const initialTab = (searchParams.get('tab') as SettingsTab) || 'profile';
   const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab);
 
-  const { restaurant, updateRestaurant } = useRestaurant();
+  const { restaurant, reloadContext } = useRestaurant();
   const { currentPlanId, setPlanId } = useEntitlements();
 
   // Form states for Restaurant Profile
-  const [restaurantName, setRestaurantName] = useState<string>(restaurant.name || 'Basil & Brick');
-  const [ownerContact, setOwnerContact] = useState<string>(restaurant.ownerEmail || 'owner@basilbrick.example');
-  const [primaryBranch, setPrimaryBranch] = useState<string>('Hazratganj, Lucknow');
-  const [currencyPolicy, setCurrencyPolicy] = useState<string>('INR');
+  const [restaurantName, setRestaurantName] = useState<string>(restaurant?.name || '');
+  const [ownerContact, setOwnerContact] = useState<string>(restaurant?.ownerEmail || '');
+  const [restaurantPhone, setRestaurantPhone] = useState<string>('');
+  const [restaurantAddress, setRestaurantAddress] = useState<string>('');
+  const [restaurantCity, setRestaurantCity] = useState<string>('Lucknow');
   const [saveSuccessMessage, setSaveSuccessMessage] = useState<string | null>(null);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [isSavingProfile, setIsSavingProfile] = useState<boolean>(false);
 
-  // States for other tabs
-  const [branches] = useState<BranchSettings[]>(INITIAL_BRANCH_SETTINGS);
+  // States for real branches
+  const [branches, setBranches] = useState<SafeBranchProfile[]>([]);
+  const [isLoadingBranches, setIsLoadingBranches] = useState<boolean>(false);
+  const [branchError, setBranchError] = useState<string | null>(null);
+  const [isAddBranchOpen, setIsAddBranchOpen] = useState<boolean>(false);
+  const [newBranchName, setNewBranchName] = useState<string>('');
+  const [newBranchCity, setNewBranchCity] = useState<string>('Lucknow');
+  const [newBranchAddress, setNewBranchAddress] = useState<string>('');
+  const [newBranchPhone, setNewBranchPhone] = useState<string>('');
+  const [isSavingBranch, setIsSavingBranch] = useState<boolean>(false);
+
+  // States for preview tabs
   const [staff] = useState<StaffMember[]>(INITIAL_STAFF_MEMBERS);
   const [qrSettings, setQrSettings] = useState<QrMenuSettings>(INITIAL_QR_SETTINGS);
   const [integrations] = useState<IntegrationService[]>(INITIAL_INTEGRATIONS);
+
+  // Load backend restaurant profile
+  const loadProfile = useCallback(async () => {
+    try {
+      const res = await restaurantService.getRestaurantProfile();
+      if (res.restaurant) {
+        setRestaurantName(res.restaurant.name);
+        if (restaurant?.ownerEmail) setOwnerContact(restaurant.ownerEmail);
+      }
+    } catch {
+      // Keep existing context state if fetch fails
+    }
+  }, [restaurant]);
+
+  // Load backend branches
+  const loadBranches = useCallback(async () => {
+    setIsLoadingBranches(true);
+    setBranchError(null);
+    try {
+      const res = await restaurantService.getBranches();
+      setBranches(res.branches);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to load branches';
+      setBranchError(msg);
+    } finally {
+      setIsLoadingBranches(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
+
+  useEffect(() => {
+    if (activeTab === 'branches') {
+      loadBranches();
+    }
+  }, [activeTab, loadBranches]);
 
   const handleTabChange = (tab: SettingsTab) => {
     setActiveTab(tab);
     setSearchParams(tab === 'profile' ? {} : { tab });
   };
 
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateRestaurant({
-      name: restaurantName,
-      ownerEmail: ownerContact,
-    });
-    setSaveSuccessMessage('Restaurant profile updated successfully!');
-    setTimeout(() => setSaveSuccessMessage(null), 3000);
+    setProfileError(null);
+    setSaveSuccessMessage(null);
+    setIsSavingProfile(true);
+
+    try {
+      await restaurantService.updateRestaurantProfile({
+        name: restaurantName.trim(),
+        email: ownerContact.trim() ? ownerContact.trim() : undefined,
+        phone: restaurantPhone.trim() ? restaurantPhone.trim() : undefined,
+        address: restaurantAddress.trim() ? restaurantAddress.trim() : undefined,
+        city: restaurantCity.trim() ? restaurantCity.trim() : undefined,
+      });
+
+      await reloadContext();
+      setSaveSuccessMessage('Restaurant profile updated successfully!');
+      setTimeout(() => setSaveSuccessMessage(null), 3000);
+    } catch (err: unknown) {
+      if (err instanceof ApiClientError) {
+        setProfileError(err.message);
+      } else if (err instanceof Error) {
+        setProfileError(err.message);
+      } else {
+        setProfileError('Failed to update restaurant profile');
+      }
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
+  const handleCreateBranch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBranchError(null);
+
+    if (!newBranchName.trim()) {
+      setBranchError('Branch name is required');
+      return;
+    }
+
+    setIsSavingBranch(true);
+    try {
+      await restaurantService.createBranch({
+        name: newBranchName.trim(),
+        city: newBranchCity.trim() ? newBranchCity.trim() : undefined,
+        address: newBranchAddress.trim() ? newBranchAddress.trim() : undefined,
+        phone: newBranchPhone.trim() ? newBranchPhone.trim() : undefined,
+      });
+
+      setNewBranchName('');
+      setNewBranchAddress('');
+      setNewBranchPhone('');
+      setIsAddBranchOpen(false);
+      await loadBranches();
+      await reloadContext();
+      setSaveSuccessMessage('Branch created successfully!');
+      setTimeout(() => setSaveSuccessMessage(null), 3000);
+    } catch (err: unknown) {
+      if (err instanceof ApiClientError) {
+        setBranchError(err.message);
+      } else if (err instanceof Error) {
+        setBranchError(err.message);
+      } else {
+        setBranchError('Failed to create branch');
+      }
+    } finally {
+      setIsSavingBranch(false);
+    }
+  };
+
+  const handleToggleBranchStatus = async (branchId: string, currentStatus: string) => {
+    const nextStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    try {
+      await restaurantService.updateBranch(branchId, { status: nextStatus });
+      await loadBranches();
+      await reloadContext();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to update branch status';
+      setBranchError(msg);
+    }
   };
 
   const handlePlanSelect = (plan: SubscriptionPlanId) => {
@@ -69,7 +192,7 @@ export const SettingsPage: React.FC = () => {
       <div className="settings-header-section">
         <h1 className="settings-page-title">Restaurant & Branch</h1>
         <p className="settings-page-subtitle">
-          Restaurant, branch and staff context · demo values · backend authorization required.
+          Manage your verified restaurant profile, branch locations, and system configuration.
         </p>
       </div>
 
@@ -144,7 +267,7 @@ export const SettingsPage: React.FC = () => {
 
         {/* Right Side: Active Settings Panel */}
         <div className="settings-content-column">
-          {/* ================= TAB 1: RESTAURANT PROFILE (Default in settings.png) ================= */}
+          {/* ================= TAB 1: RESTAURANT PROFILE ================= */}
           {(activeTab === 'profile' || activeTab === 'subscription') && (
             <>
               {activeTab === 'profile' && (
@@ -152,9 +275,25 @@ export const SettingsPage: React.FC = () => {
                   <div className="settings-card-header">
                     <h2 className="settings-card-title">Restaurant profile</h2>
                     <p className="settings-card-subtitle">
-                      Authenticated restaurant context · supported profile fields only.
+                      Authenticated restaurant context · ID: {restaurant?.id || 'Loaded from backend'}
                     </p>
                   </div>
+
+                  {profileError && (
+                    <div
+                      style={{
+                        padding: '12px 14px',
+                        borderRadius: '8px',
+                        background: 'rgba(229, 57, 53, 0.1)',
+                        border: '1px solid rgba(229, 57, 53, 0.3)',
+                        color: '#ff6c64',
+                        fontSize: '13px',
+                        marginBottom: '16px',
+                      }}
+                    >
+                      {profileError}
+                    </div>
+                  )}
 
                   <form className="settings-profile-form" onSubmit={handleSaveProfile}>
                     <div className="form-fields-2x2-grid">
@@ -168,14 +307,15 @@ export const SettingsPage: React.FC = () => {
                           className="settings-text-input"
                           value={restaurantName}
                           onChange={(e) => setRestaurantName(e.target.value)}
-                          placeholder="Basil & Brick"
+                          placeholder="e.g. Basil & Brick"
                           required
+                          disabled={isSavingProfile}
                         />
                       </div>
 
                       <div className="form-field-group">
                         <label htmlFor="input-owner-contact" className="field-label-uppercase">
-                          OWNER CONTACT
+                          OWNER CONTACT EMAIL
                         </label>
                         <input
                           type="email"
@@ -183,62 +323,81 @@ export const SettingsPage: React.FC = () => {
                           className="settings-text-input"
                           value={ownerContact}
                           onChange={(e) => setOwnerContact(e.target.value)}
-                          placeholder="owner@basilbrick.example"
-                          required
+                          placeholder="owner@restaurant.com"
+                          disabled={isSavingProfile}
                         />
                       </div>
 
                       <div className="form-field-group">
-                        <label htmlFor="input-primary-branch" className="field-label-uppercase">
-                          PRIMARY BRANCH
+                        <label htmlFor="input-restaurant-phone" className="field-label-uppercase">
+                          PHONE
+                        </label>
+                        <input
+                          type="tel"
+                          id="input-restaurant-phone"
+                          className="settings-text-input"
+                          value={restaurantPhone}
+                          onChange={(e) => setRestaurantPhone(e.target.value)}
+                          placeholder="+91 98765 43210"
+                          disabled={isSavingProfile}
+                        />
+                      </div>
+
+                      <div className="form-field-group">
+                        <label htmlFor="input-restaurant-city" className="field-label-uppercase">
+                          CITY
                         </label>
                         <input
                           type="text"
-                          id="input-primary-branch"
+                          id="input-restaurant-city"
                           className="settings-text-input"
-                          value={primaryBranch}
-                          onChange={(e) => setPrimaryBranch(e.target.value)}
-                          placeholder="Hazratganj, Lucknow"
+                          value={restaurantCity}
+                          onChange={(e) => setRestaurantCity(e.target.value)}
+                          placeholder="Lucknow"
+                          disabled={isSavingProfile}
                         />
                       </div>
 
-                      <div className="form-field-group">
-                        <label htmlFor="select-currency-policy" className="field-label-uppercase">
-                          CURRENCY · PRESENTATION POLICY
+                      <div className="form-field-group full-width">
+                        <label htmlFor="input-restaurant-address" className="field-label-uppercase">
+                          ADDRESS
                         </label>
-                        <select
-                          id="select-currency-policy"
-                          className="settings-select-input"
-                          value={currencyPolicy}
-                          onChange={(e) => setCurrencyPolicy(e.target.value)}
-                        >
-                          <option value="INR">INR — Indian Rupee ⌄ · DEMO</option>
-                          <option value="USD">USD — US Dollar · DEMO</option>
-                          <option value="EUR">EUR — Euro · DEMO</option>
-                        </select>
+                        <input
+                          type="text"
+                          id="input-restaurant-address"
+                          className="settings-text-input"
+                          value={restaurantAddress}
+                          onChange={(e) => setRestaurantAddress(e.target.value)}
+                          placeholder="e.g. M.G. Marg, Hazratganj"
+                          disabled={isSavingProfile}
+                        />
                       </div>
                     </div>
 
                     <div className="form-submit-row">
-                      <button type="submit" className="btn-save-settings" id="btn-save-profile">
-                        Save changes
+                      <button
+                        type="submit"
+                        className="btn-save-settings"
+                        id="btn-save-profile"
+                        disabled={isSavingProfile}
+                      >
+                        {isSavingProfile ? 'Saving...' : 'Save changes'}
                       </button>
                     </div>
                   </form>
                 </div>
               )}
 
-              {/* Card 2: Subscription & feature access (Present on both profile & subscription views) */}
+              {/* Card 2: Subscription & feature access */}
               <div className="settings-card" id="card-subscription-access">
                 <div className="settings-card-header">
                   <h2 className="settings-card-title">Subscription & feature access</h2>
                   <p className="settings-card-subtitle">
-                    Concept only. Plans/entitlements are not confirmed schema fields; no agent execution is implied.
+                    Concept only. Plans and entitlements are preview indicators in this build.
                   </p>
                 </div>
 
                 <div className="subscription-options-list">
-                  {/* Option 1: Operate */}
                   <div
                     className={`subscription-plan-option ${currentPlanId === 'operate' ? 'selected' : ''}`}
                     onClick={() => handlePlanSelect('operate')}
@@ -255,7 +414,6 @@ export const SettingsPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Option 2: Intelligence (Selected Default in PNG) */}
                   <div
                     className={`subscription-plan-option ${currentPlanId === 'intelligence' ? 'selected' : ''}`}
                     onClick={() => handlePlanSelect('intelligence')}
@@ -270,12 +428,11 @@ export const SettingsPage: React.FC = () => {
                         <span className="badge-preview-tag">PREVIEW</span>
                       </div>
                       <div className="plan-option-desc">
-                        Operate plus advanced analytics, AI insights and business copilot
+                        Operate plus advanced analytics, AI insights and business intelligence
                       </div>
                     </div>
                   </div>
 
-                  {/* Option 3: Autonomous */}
                   <div
                     className={`subscription-plan-option ${currentPlanId === 'autonomous' ? 'selected' : ''}`}
                     onClick={() => handlePlanSelect('autonomous')}
@@ -287,15 +444,11 @@ export const SettingsPage: React.FC = () => {
                     <div className="plan-option-content">
                       <div className="plan-option-title">Autonomous</div>
                       <div className="plan-option-desc">
-                        Intelligence plus AI agents and controlled actions
+                        Intelligence plus AI agents and automated workflows
                       </div>
                     </div>
                   </div>
                 </div>
-
-                <p className="settings-bottom-caveat">
-                  Prototype only: backend must enforce every entitlement for all endpoints and actions; hiding navigation is not access control.
-                </p>
               </div>
             </>
           )}
@@ -307,51 +460,174 @@ export const SettingsPage: React.FC = () => {
                 <div>
                   <h2 className="settings-card-title">Branch Locations</h2>
                   <p className="settings-card-subtitle">
-                    Manage branch dining capacities, GST registration, and order routing.
+                    Live branch locations scoped to restaurant: {restaurant?.name}
                   </p>
                 </div>
-                <button type="button" className="btn-add-secondary">
-                  + Add branch
+                <button
+                  type="button"
+                  className="btn-add-secondary"
+                  onClick={() => setIsAddBranchOpen(!isAddBranchOpen)}
+                >
+                  {isAddBranchOpen ? 'Cancel' : '+ Add branch'}
                 </button>
               </div>
 
-              <div className="branches-list-container">
-                {branches.map((b) => (
-                  <div key={b.id} className="branch-setting-item">
-                    <div className="branch-info-header">
-                      <div>
-                        <h3 className="branch-item-name">{b.name}</h3>
-                        <p className="branch-item-address">{b.address}, {b.city}</p>
-                      </div>
-                      <span className={`branch-status-pill ${b.isActive ? 'active' : 'inactive'}`}>
-                        {b.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                    </div>
+              {branchError && (
+                <div
+                  style={{
+                    padding: '12px 14px',
+                    borderRadius: '8px',
+                    background: 'rgba(229, 57, 53, 0.1)',
+                    border: '1px solid rgba(229, 57, 53, 0.3)',
+                    color: '#ff6c64',
+                    fontSize: '13px',
+                    marginBottom: '16px',
+                  }}
+                >
+                  {branchError}
+                </div>
+              )}
 
-                    <div className="branch-meta-row">
-                      <span><strong>Phone:</strong> {b.phone}</span>
-                      <span><strong>GSTIN:</strong> {b.gstNumber}</span>
-                      <span><strong>Tables:</strong> {b.tableCount} tables configured</span>
+              {/* Inline Add Branch Form */}
+              {isAddBranchOpen && (
+                <form
+                  onSubmit={handleCreateBranch}
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '12px',
+                    padding: '20px',
+                    marginBottom: '24px',
+                  }}
+                >
+                  <h3 style={{ fontSize: '15px', fontWeight: 600, margin: '0 0 14px' }}>
+                    New Branch Configuration
+                  </h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginBottom: '4px' }}>
+                        BRANCH NAME *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        className="settings-text-input"
+                        value={newBranchName}
+                        onChange={(e) => setNewBranchName(e.target.value)}
+                        placeholder="e.g. Gomti Nagar Branch"
+                        disabled={isSavingBranch}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginBottom: '4px' }}>
+                        PHONE
+                      </label>
+                      <input
+                        type="tel"
+                        className="settings-text-input"
+                        value={newBranchPhone}
+                        onChange={(e) => setNewBranchPhone(e.target.value)}
+                        placeholder="10-digit phone"
+                        disabled={isSavingBranch}
+                      />
                     </div>
                   </div>
-                ))}
-              </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '14px', marginBottom: '16px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginBottom: '4px' }}>
+                        ADDRESS
+                      </label>
+                      <input
+                        type="text"
+                        className="settings-text-input"
+                        value={newBranchAddress}
+                        onChange={(e) => setNewBranchAddress(e.target.value)}
+                        placeholder="Street or Mall"
+                        disabled={isSavingBranch}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginBottom: '4px' }}>
+                        CITY
+                      </label>
+                      <input
+                        type="text"
+                        className="settings-text-input"
+                        value={newBranchCity}
+                        onChange={(e) => setNewBranchCity(e.target.value)}
+                        placeholder="Lucknow"
+                        disabled={isSavingBranch}
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    className="btn-save-settings"
+                    disabled={isSavingBranch}
+                  >
+                    {isSavingBranch ? 'Creating branch...' : 'Create Branch'}
+                  </button>
+                </form>
+              )}
+
+              {isLoadingBranches ? (
+                <div style={{ padding: '24px', textAlign: 'center', color: '#9ca3af', fontSize: '13px' }}>
+                  Loading branches from backend...
+                </div>
+              ) : branches.length === 0 ? (
+                <div style={{ padding: '24px', textAlign: 'center', color: '#9ca3af', fontSize: '13px' }}>
+                  No branches found for this restaurant.
+                </div>
+              ) : (
+                <div className="branches-list-container">
+                  {branches.map((b) => (
+                    <div key={b.id} className="branch-setting-item">
+                      <div className="branch-info-header">
+                        <div>
+                          <h3 className="branch-item-name">{b.name}</h3>
+                          <p className="branch-item-address">
+                            {b.address ? `${b.address}, ` : ''}{b.city || 'Lucknow'} · <small style={{ color: '#6b7280' }}>ID: {b.id}</small>
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleBranchStatus(b.id, b.status)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: 0,
+                          }}
+                          title="Click to toggle active/inactive status"
+                        >
+                          <span className={`branch-status-pill ${b.status === 'active' ? 'active' : 'inactive'}`}>
+                            {b.status === 'active' ? 'Active' : 'Inactive'}
+                          </span>
+                        </button>
+                      </div>
+
+                      <div className="branch-meta-row">
+                        <span><strong>Phone:</strong> {b.phone || 'Not configured'}</span>
+                        <span><strong>Timezone:</strong> {b.timezone}</span>
+                        <span><strong>Status:</strong> {b.status}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
-          {/* ================= TAB 3: TEAM & PERMISSIONS ================= */}
+          {/* ================= TAB 3: TEAM & PERMISSIONS (Preview) ================= */}
           {activeTab === 'team' && (
             <div className="settings-card" id="card-team-settings">
               <div className="settings-card-header">
                 <div>
                   <h2 className="settings-card-title">Team & Staff Roles</h2>
                   <p className="settings-card-subtitle">
-                    RBAC role permissions for owner, managers, and kitchen leads.
+                    Staff management preview · role permissions for managers and kitchen leads.
                   </p>
                 </div>
-                <button type="button" className="btn-add-secondary">
-                  + Invite staff
-                </button>
               </div>
 
               <div className="staff-table-wrapper">
@@ -388,13 +664,13 @@ export const SettingsPage: React.FC = () => {
             </div>
           )}
 
-          {/* ================= TAB 4: QR MENU APPEARANCE ================= */}
+          {/* ================= TAB 4: QR MENU APPEARANCE (Preview) ================= */}
           {activeTab === 'qr_appearance' && (
             <div className="settings-card" id="card-qr-appearance-settings">
               <div className="settings-card-header">
                 <h2 className="settings-card-title">QR Menu Brand Customization</h2>
                 <p className="settings-card-subtitle">
-                  Configure the mobile web app appearance customers see when scanning table QR codes.
+                  Configure brand styling displayed on table menus.
                 </p>
               </div>
 
@@ -438,43 +714,31 @@ export const SettingsPage: React.FC = () => {
                   />
                 </div>
               </div>
-
-              <div className="form-submit-row">
-                <button
-                  type="button"
-                  className="btn-save-settings"
-                  onClick={() => {
-                    setSaveSuccessMessage('QR Menu appearance updated!');
-                    setTimeout(() => setSaveSuccessMessage(null), 3000);
-                  }}
-                >
-                  Save QR Branding
-                </button>
-              </div>
             </div>
           )}
 
-          {/* ================= TAB 6: INTEGRATIONS ================= */}
+          {/* ================= TAB 5: INTEGRATIONS (Preview) ================= */}
           {activeTab === 'integrations' && (
             <div className="settings-card" id="card-integrations-settings">
               <div className="settings-card-header">
-                <h2 className="settings-card-title">Hardware & Service Integrations</h2>
+                <h2 className="settings-card-title">Hardware & Integration Connectors</h2>
                 <p className="settings-card-subtitle">
-                  Connected POS thermal printers, payment gateways, and database pipelines.
+                  External services, thermal printers, and payment providers.
                 </p>
               </div>
 
-              <div className="integrations-grid">
+              <div className="integrations-list">
                 {integrations.map((item) => (
                   <div key={item.id} className="integration-item-card">
-                    <div className="integration-header">
-                      <span className="integration-category-tag">{item.category}</span>
-                      <span className={`integration-status-pill ${item.status.toLowerCase().replace(/\s+/g, '-')}`}>
+                    <div className="integration-item-header">
+                      <div>
+                        <h3 className="integration-name">{item.name}</h3>
+                        <p className="integration-desc">{item.description}</p>
+                      </div>
+                      <span className={`integration-status-tag ${item.status.toLowerCase().replace(/\s+/g, '-')}`}>
                         {item.status}
                       </span>
                     </div>
-                    <h3 className="integration-name">{item.name}</h3>
-                    <p className="integration-desc">{item.description}</p>
                   </div>
                 ))}
               </div>

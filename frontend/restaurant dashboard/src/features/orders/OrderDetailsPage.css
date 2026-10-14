@@ -380,3 +380,129 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Payment History and Recording Styles */
+.payment-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.record-payment-btn {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 12px;
+  background-color: #059669;
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s ease;
+}
+
+.record-payment-btn:hover {
+  background-color: #047857;
+}
+
+.record-payment-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.payment-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.payment-history-item {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background-color: #fbfcfe;
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.payment-history-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.payment-method-tag {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--graphite-900);
+}
+
+.payment-status-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.payment-status-badge.paid {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.payment-status-badge.pending {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.payment-status-badge.failed {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.payment-history-item-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.payment-amount-text {
+  font-weight: 600;
+  color: var(--graphite-900);
+}
+
+.method-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.method-choice-tile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  transition: all 0.15s ease;
+}
+
+.method-choice-tile.selected {
+  border-color: #059669;
+  background-color: #ecfdf5;
+  color: #059669;
+}
+

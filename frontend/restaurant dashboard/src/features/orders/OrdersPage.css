@@ -270,3 +270,70 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Status and Payment Pills */
+.status-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.status-badge-pending {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.status-badge-preparing {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.status-badge-served {
+  background-color: #f3e8ff;
+  color: #7c3aed;
+}
+
+.status-badge-completed {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.status-badge-cancelled {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.payment-badge-paid {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background-color: #ecfdf5;
+  color: #059669;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.payment-badge-pending {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background-color: #fef3c7;
+  color: #d97706;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.payment-badge-not-recorded {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background-color: #f3f4f6;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 500;
+}
+
