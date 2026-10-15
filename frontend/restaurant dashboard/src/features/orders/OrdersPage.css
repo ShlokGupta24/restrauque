@@ -1,0 +1,339 @@
+.orders-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.orders-subbanner {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.orders-top-action-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -8px;
+}
+
+.create-order-btn {
+  background: var(--brand-red);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 2px rgba(229, 57, 53, 0.2);
+}
+
+.create-order-btn:hover {
+  background: var(--brand-red-hover);
+}
+
+/* 4 KPI Grid */
+.orders-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.orders-kpi-card {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 90px;
+}
+
+.orders-kpi-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.orders-kpi-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--graphite-900);
+  margin-top: 4px;
+  letter-spacing: -0.5px;
+}
+
+.text-muted-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+/* Table Card */
+.orders-table-card {
+  padding: 20px;
+}
+
+/* Filter Controls Bar */
+.orders-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+
+.filter-group-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-chip-btn {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filter-chip-btn:hover {
+  border-color: #d1d5db;
+  background: var(--bg-subtle);
+}
+
+.filter-select {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  outline: none;
+  cursor: pointer;
+}
+
+.filter-select:hover {
+  border-color: #d1d5db;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.search-input {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 7px 12px 7px 30px;
+  font-size: 12px;
+  color: var(--text-primary);
+  width: 220px;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: #9ca3af;
+}
+
+.filter-action-btn {
+  padding: 7px 16px;
+}
+
+/* Orders Table */
+.orders-table-wrapper {
+  overflow-x: auto;
+  margin-top: 8px;
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.orders-table th {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-light);
+  background: #fafafa;
+}
+
+.orders-table td {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.orders-table-row:hover {
+  background: #fbfcfe;
+}
+
+.cell-order-time {
+  white-space: nowrap;
+}
+
+.order-num-text {
+  font-weight: 700;
+  color: var(--graphite-900);
+}
+
+.order-time-text {
+  color: var(--text-muted);
+}
+
+.cell-customer-table {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.cell-type {
+  color: #9ca3af;
+}
+
+.cell-total {
+  font-weight: 600;
+  color: var(--graphite-900);
+}
+
+.cell-payment-status {
+  color: #9ca3af;
+}
+
+.btn-view-detail {
+  font-size: 12px;
+  font-weight: 500;
+  color: #4b5563;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.btn-view-detail:hover {
+  color: var(--graphite-900);
+}
+
+/* Footer & Load more */
+.orders-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 12px;
+}
+
+.footer-sample-note {
+  font-size: 11px;
+  color: var(--text-subtle);
+}
+
+.btn-load-more {
+  border: 1px solid var(--border-color);
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-load-more:hover {
+  background: var(--bg-subtle);
+  border-color: #d1d5db;
+}
+
+@media (max-width: 1024px) {
+  .orders-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Status and Payment Pills */
+.status-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.status-badge-pending {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.status-badge-preparing {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.status-badge-served {
+  background-color: #f3e8ff;
+  color: #7c3aed;
+}
+
+.status-badge-completed {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.status-badge-cancelled {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.payment-badge-paid {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background-color: #ecfdf5;
+  color: #059669;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.payment-badge-pending {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background-color: #fef3c7;
+  color: #d97706;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.payment-badge-not-recorded {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background-color: #f3f4f6;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 500;
+}
+

@@ -1,0 +1,46 @@
+.floating-ai-cta {
+  position: fixed;
+  bottom: 24px;
+  right: 28px;
+  background: var(--brand-red);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(229, 57, 53, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  z-index: 50;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.floating-ai-cta:hover {
+  background: var(--brand-red-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(229, 57, 53, 0.45);
+}
+
+.floating-ai-icon {
+  font-size: 14px;
+}
+
+.floating-ai-cta.is-on-insights {
+  background: #edeae7;
+  color: #52525b;
+  box-shadow: none;
+  border: 1px solid #d4d4d8;
+}
+
+.floating-ai-cta.is-on-insights:hover {
+  background: #e4e4e7;
+  transform: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.floating-ai-cta.is-on-insights .floating-ai-icon {
+  color: #71717a;
+}
