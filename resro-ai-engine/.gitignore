@@ -1,0 +1,34 @@
+
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Python cache and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Generated development data and reports
+data/synthetic/
+reports/sentiment_evaluation/
+
+# Local MLflow tracking and artifacts
+mlflow.db
+mlflow.db-shm
+mlflow.db-wal
+mlruns/
+mlartifacts/
+
+# Downloaded model artifacts
+models/
+
+# Editor and OS files
+.vscode/
+.DS_Store
+Thumbs.db

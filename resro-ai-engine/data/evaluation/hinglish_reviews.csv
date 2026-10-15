@@ -1,0 +1,501 @@
+﻿review_id,text,language,gold_sentiment,is_mixed,sampling_target,source_type,source_reference,annotator_1_label,annotator_2_label,adjudicated_label,split
+SYN0001,"paneer tikka was delicious, and the service was excellent.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0002,Really enjoyed the paneer tikka; the waiting time was wonderful.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0003,"The paneer tikka tasted flavourful, making the visit worthwhile.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0004,Great experience overall: paneer tikka was fantastic and staff behaviour.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0005,I loved the paneer tikka. The presentation made the experience even better.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0006,Definitely recommend this place for its fresh paneer tikka.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0007,"masala dosa was fantastic, and the waiting time was excellent.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0008,Really enjoyed the masala dosa; the cleanliness was excellent.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0009,"The masala dosa tasted fresh, making the visit worthwhile.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0010,Great experience overall: masala dosa was well prepared and presentation.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0011,I loved the masala dosa. The value for money made the experience even better.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0012,Definitely recommend this place for its delicious masala dosa.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0013,"cold coffee was well prepared, and the cleanliness was excellent.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0014,Really enjoyed the cold coffee; the staff behaviour was perfectly cooked.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0015,"The cold coffee tasted delicious, making the visit worthwhile.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0016,Great experience overall: cold coffee was wonderful and value for money.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0017,I loved the cold coffee. The ambience made the experience even better.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0018,Definitely recommend this place for its fantastic cold coffee.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0019,"margherita pizza was wonderful, and the staff behaviour was excellent.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0020,Really enjoyed the margherita pizza; the presentation was flavourful.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0021,"The margherita pizza tasted fantastic, making the visit worthwhile.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0022,Great experience overall: margherita pizza was excellent and ambience.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0023,I loved the margherita pizza. The portion size made the experience even better.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0024,Definitely recommend this place for its well prepared margherita pizza.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0025,"chocolate brownie was excellent, and the presentation was excellent.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0026,Really enjoyed the chocolate brownie; the value for money was fresh.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0027,"The chocolate brownie tasted well prepared, making the visit worthwhile.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0028,Great experience overall: chocolate brownie was perfectly cooked and portion size.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0029,I loved the chocolate brownie. The service made the experience even better.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0030,Definitely recommend this place for its wonderful chocolate brownie.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0031,"veg biryani was perfectly cooked, and the value for money was excellent.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0032,Really enjoyed the veg biryani; the ambience was delicious.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0033,"The veg biryani tasted wonderful, making the visit worthwhile.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0034,Great experience overall: veg biryani was flavourful and service.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0035,I loved the veg biryani. The waiting time made the experience even better.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0036,Definitely recommend this place for its excellent veg biryani.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0037,"white sauce pasta was flavourful, and the ambience was excellent.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0038,Really enjoyed the white sauce pasta; the portion size was fantastic.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0039,"The white sauce pasta tasted excellent, making the visit worthwhile.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0040,Great experience overall: white sauce pasta was fresh and waiting time.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0041,I loved the white sauce pasta. The cleanliness made the experience even better.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0042,Definitely recommend this place for its perfectly cooked white sauce pasta.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0043,"cheese sandwich was fresh, and the portion size was excellent.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0044,Really enjoyed the cheese sandwich; the service was well prepared.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0045,"The cheese sandwich tasted perfectly cooked, making the visit worthwhile.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0046,Great experience overall: cheese sandwich was delicious and cleanliness.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0047,I loved the cheese sandwich. The staff behaviour made the experience even better.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0048,Definitely recommend this place for its flavourful cheese sandwich.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0049,"burger was delicious, and the service was excellent.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0050,Really enjoyed the burger; the waiting time was wonderful.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0051,"The burger tasted flavourful, making the visit worthwhile.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0052,Great experience overall: burger was fantastic and staff behaviour.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0053,I loved the burger. The presentation made the experience even better.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0054,Definitely recommend this place for its fresh burger.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0055,"fresh lime soda was fantastic, and the waiting time was excellent.",english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0056,Really enjoyed the fresh lime soda; the cleanliness was excellent.,english,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0057,"The paneer tikka was ordinary, and the service was average.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0058,Tried the paneer tikka; the waiting time was reasonable.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0059,"The paneer tikka was okay, and the cleanliness was fairly ordinary.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0060,An average visit. The paneer tikka was fair.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0061,Nothing unusual about the paneer tikka; the presentation was standard.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0062,The paneer tikka was neither impressive nor disappointing.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0063,"The masala dosa was fair, and the waiting time was average.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0064,Tried the masala dosa; the cleanliness was normal.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0065,"The masala dosa was okay, and the staff behaviour was fairly ordinary.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0066,An average visit. The masala dosa was okay.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0067,Nothing unusual about the masala dosa; the value for money was standard.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0068,The masala dosa was neither impressive nor disappointing.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0069,"The cold coffee was okay, and the cleanliness was average.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0070,Tried the cold coffee; the staff behaviour was average.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0071,"The cold coffee was okay, and the presentation was fairly ordinary.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0072,An average visit. The cold coffee was reasonable.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0073,Nothing unusual about the cold coffee; the ambience was standard.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0074,The cold coffee was neither impressive nor disappointing.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0075,"The margherita pizza was reasonable, and the staff behaviour was average.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0076,Tried the margherita pizza; the presentation was decent.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0077,"The margherita pizza was okay, and the value for money was fairly ordinary.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0078,An average visit. The margherita pizza was normal.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0079,Nothing unusual about the margherita pizza; the portion size was standard.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0080,The margherita pizza was neither impressive nor disappointing.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0081,"The chocolate brownie was normal, and the presentation was average.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0082,Tried the chocolate brownie; the value for money was acceptable.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0083,"The chocolate brownie was okay, and the ambience was fairly ordinary.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0084,An average visit. The chocolate brownie was average.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0085,Nothing unusual about the chocolate brownie; the service was standard.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0086,The chocolate brownie was neither impressive nor disappointing.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0087,"The veg biryani was average, and the value for money was average.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0088,Tried the veg biryani; the ambience was ordinary.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0089,"The veg biryani was okay, and the portion size was fairly ordinary.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0090,An average visit. The veg biryani was decent.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0091,Nothing unusual about the veg biryani; the waiting time was standard.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0092,The veg biryani was neither impressive nor disappointing.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0093,"The white sauce pasta was decent, and the ambience was average.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0094,Tried the white sauce pasta; the portion size was fair.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0095,"The white sauce pasta was okay, and the service was fairly ordinary.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0096,An average visit. The white sauce pasta was acceptable.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0097,Nothing unusual about the white sauce pasta; the cleanliness was standard.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0098,The white sauce pasta was neither impressive nor disappointing.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0099,"The cheese sandwich was acceptable, and the portion size was average.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0100,Tried the cheese sandwich; the service was okay.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0101,"The cheese sandwich was okay, and the waiting time was fairly ordinary.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0102,An average visit. The cheese sandwich was ordinary.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0103,Nothing unusual about the cheese sandwich; the staff behaviour was standard.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0104,The cheese sandwich was neither impressive nor disappointing.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0105,"The burger was ordinary, and the service was average.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0106,Tried the burger; the waiting time was reasonable.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0107,"The burger was okay, and the cleanliness was fairly ordinary.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0108,An average visit. The burger was fair.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0109,Nothing unusual about the burger; the presentation was standard.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0110,The burger was neither impressive nor disappointing.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0111,"The fresh lime soda was fair, and the waiting time was average.",english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0112,Tried the fresh lime soda; the cleanliness was normal.,english,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0113,"The paneer tikka was bland, and the service was disappointing.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0114,I disliked the paneer tikka; the waiting time was stale.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0115,The paneer tikka was poorly prepared and the cleanliness was terrible.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0116,Very disappointing visit because the paneer tikka was awful.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0117,Would not recommend the paneer tikka; the presentation needs improvement.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0118,"The paneer tikka was unacceptable, and the value for money made it worse.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0119,"The masala dosa was awful, and the waiting time was disappointing.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0120,I disliked the masala dosa; the cleanliness was unappetising.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0121,The masala dosa was poorly prepared and the staff behaviour was terrible.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0122,Very disappointing visit because the masala dosa was poorly prepared.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0123,Would not recommend the masala dosa; the value for money needs improvement.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0124,"The masala dosa was unacceptable, and the ambience made it worse.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0125,"The cold coffee was poorly prepared, and the cleanliness was disappointing.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0126,I disliked the cold coffee; the staff behaviour was disappointing.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0127,The cold coffee was poorly prepared and the presentation was terrible.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0128,Very disappointing visit because the cold coffee was stale.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0129,Would not recommend the cold coffee; the ambience needs improvement.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0130,"The cold coffee was unacceptable, and the portion size made it worse.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0131,"The margherita pizza was stale, and the staff behaviour was disappointing.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0132,I disliked the margherita pizza; the presentation was overcooked.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0133,The margherita pizza was poorly prepared and the value for money was terrible.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0134,Very disappointing visit because the margherita pizza was unappetising.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0135,Would not recommend the margherita pizza; the portion size needs improvement.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0136,"The margherita pizza was unacceptable, and the service made it worse.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0137,"The chocolate brownie was unappetising, and the presentation was disappointing.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0138,I disliked the chocolate brownie; the value for money was cold.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0139,The chocolate brownie was poorly prepared and the ambience was terrible.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0140,Very disappointing visit because the chocolate brownie was disappointing.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0141,Would not recommend the chocolate brownie; the service needs improvement.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0142,"The chocolate brownie was unacceptable, and the waiting time made it worse.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0143,"The veg biryani was disappointing, and the value for money was disappointing.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0144,I disliked the veg biryani; the ambience was bland.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0145,The veg biryani was poorly prepared and the portion size was terrible.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0146,Very disappointing visit because the veg biryani was overcooked.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0147,Would not recommend the veg biryani; the waiting time needs improvement.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0148,"The veg biryani was unacceptable, and the cleanliness made it worse.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0149,"The white sauce pasta was overcooked, and the ambience was disappointing.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0150,I disliked the white sauce pasta; the portion size was awful.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0151,The white sauce pasta was poorly prepared and the service was terrible.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0152,Very disappointing visit because the white sauce pasta was cold.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0153,Would not recommend the white sauce pasta; the cleanliness needs improvement.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0154,"The white sauce pasta was unacceptable, and the staff behaviour made it worse.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0155,"The cheese sandwich was cold, and the portion size was disappointing.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0156,I disliked the cheese sandwich; the service was poorly prepared.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0157,The cheese sandwich was poorly prepared and the waiting time was terrible.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0158,Very disappointing visit because the cheese sandwich was bland.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0159,Would not recommend the cheese sandwich; the staff behaviour needs improvement.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0160,"The cheese sandwich was unacceptable, and the presentation made it worse.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0161,"The burger was bland, and the service was disappointing.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0162,I disliked the burger; the waiting time was stale.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0163,The burger was poorly prepared and the cleanliness was terrible.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0164,Very disappointing visit because the burger was awful.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0165,Would not recommend the burger; the presentation needs improvement.,english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0166,"The burger was unacceptable, and the value for money made it worse.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0167,"The fresh lime soda was awful, and the waiting time was disappointing.",english,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0168,"paneer tikka ekdum tasty tha, aur service bhi zabardast thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0169,"paneer tikka kha kar maza aa gaya, waiting time bhi kaafi acchi thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0170,"Yahan ka paneer tikka bahut laajawab tha, full paisa vasool.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0171,"Overall experience mast tha, paneer tikka aur staff ka behaviour dono badhiya.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0172,paneer tikka ka taste lajawab tha aur presentation ne dil jeet liya.,hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0173,"Definitely recommend karunga, paneer tikka ekdum fresh tha.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0174,"masala dosa ekdum fantastic tha, aur waiting time bhi zabardast thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0175,"masala dosa kha kar maza aa gaya, cleanliness bhi kaafi acchi thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0176,"Yahan ka masala dosa bahut fresh tha, full paisa vasool.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0177,"Overall experience mast tha, masala dosa aur presentation dono badhiya.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0178,masala dosa ka taste lajawab tha aur value for money ne dil jeet liya.,hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0179,"Definitely recommend karunga, masala dosa ekdum tasty tha.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0180,"cold coffee ekdum badhiya tha, aur cleanliness bhi zabardast thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0181,"cold coffee kha kar maza aa gaya, staff ka behaviour bhi kaafi acchi thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0182,"Yahan ka cold coffee bahut tasty tha, full paisa vasool.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0183,"Overall experience mast tha, cold coffee aur value for money dono badhiya.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0184,cold coffee ka taste lajawab tha aur ambience ne dil jeet liya.,hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0185,"Definitely recommend karunga, cold coffee ekdum fantastic tha.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0186,"margherita pizza ekdum zabardast tha, aur staff ka behaviour bhi zabardast thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0187,"margherita pizza kha kar maza aa gaya, presentation bhi kaafi acchi thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0188,"Yahan ka margherita pizza bahut fantastic tha, full paisa vasool.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0189,"Overall experience mast tha, margherita pizza aur ambience dono badhiya.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0190,margherita pizza ka taste lajawab tha aur portion size ne dil jeet liya.,hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0191,"Definitely recommend karunga, margherita pizza ekdum badhiya tha.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0192,"chocolate brownie ekdum mast tha, aur presentation bhi zabardast thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0193,"chocolate brownie kha kar maza aa gaya, value for money bhi kaafi acchi thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0194,"Yahan ka chocolate brownie bahut badhiya tha, full paisa vasool.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0195,"Overall experience mast tha, chocolate brownie aur portion size dono badhiya.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0196,chocolate brownie ka taste lajawab tha aur service ne dil jeet liya.,hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0197,"Definitely recommend karunga, chocolate brownie ekdum zabardast tha.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0198,"veg biryani ekdum perfectly cooked tha, aur value for money bhi zabardast thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0199,"veg biryani kha kar maza aa gaya, ambience bhi kaafi acchi thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0200,"Yahan ka veg biryani bahut zabardast tha, full paisa vasool.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0201,"Overall experience mast tha, veg biryani aur service dono badhiya.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0202,veg biryani ka taste lajawab tha aur waiting time ne dil jeet liya.,hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0203,"Definitely recommend karunga, veg biryani ekdum mast tha.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0204,"white sauce pasta ekdum laajawab tha, aur ambience bhi zabardast thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0205,"white sauce pasta kha kar maza aa gaya, portion size bhi kaafi acchi thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0206,"Yahan ka white sauce pasta bahut mast tha, full paisa vasool.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0207,"Overall experience mast tha, white sauce pasta aur waiting time dono badhiya.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0208,white sauce pasta ka taste lajawab tha aur cleanliness ne dil jeet liya.,hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0209,"Definitely recommend karunga, white sauce pasta ekdum perfectly cooked tha.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0210,"cheese sandwich ekdum fresh tha, aur portion size bhi zabardast thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0211,"cheese sandwich kha kar maza aa gaya, service bhi kaafi acchi thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0212,"Yahan ka cheese sandwich bahut perfectly cooked tha, full paisa vasool.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0213,"Overall experience mast tha, cheese sandwich aur cleanliness dono badhiya.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0214,cheese sandwich ka taste lajawab tha aur staff ka behaviour ne dil jeet liya.,hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0215,"Definitely recommend karunga, cheese sandwich ekdum laajawab tha.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0216,"burger ekdum tasty tha, aur service bhi zabardast thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0217,"burger kha kar maza aa gaya, waiting time bhi kaafi acchi thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0218,"Yahan ka burger bahut laajawab tha, full paisa vasool.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0219,"Overall experience mast tha, burger aur staff ka behaviour dono badhiya.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0220,burger ka taste lajawab tha aur presentation ne dil jeet liya.,hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0221,"Definitely recommend karunga, burger ekdum fresh tha.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0222,"fresh lime soda ekdum fantastic tha, aur waiting time bhi zabardast thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0223,"fresh lime soda kha kar maza aa gaya, cleanliness bhi kaafi acchi thi.",hinglish_roman,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0224,"paneer tikka theek tha, aur service bhi average thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0225,"paneer tikka try kiya, taste normal tha aur waiting time okay thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0226,"Khana na bahut accha tha na kharab, cleanliness bhi theek thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0227,"Overall experience average tha, paneer tikka kuch khaas nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0228,paneer tikka theek-thaak tha aur presentation normal thi.,hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0229,"Sab kuch okay tha, lekin paneer tikka yaad rehne layak nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0230,"masala dosa theek tha, aur waiting time bhi average thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0231,"masala dosa try kiya, taste normal tha aur cleanliness okay thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0232,"Khana na bahut accha tha na kharab, staff ka behaviour bhi theek thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0233,"Overall experience average tha, masala dosa kuch khaas nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0234,masala dosa theek-thaak tha aur value for money normal thi.,hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0235,"Sab kuch okay tha, lekin masala dosa yaad rehne layak nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0236,"cold coffee theek tha, aur cleanliness bhi average thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0237,"cold coffee try kiya, taste normal tha aur staff ka behaviour okay thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0238,"Khana na bahut accha tha na kharab, presentation bhi theek thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0239,"Overall experience average tha, cold coffee kuch khaas nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0240,cold coffee theek-thaak tha aur ambience normal thi.,hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0241,"Sab kuch okay tha, lekin cold coffee yaad rehne layak nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0242,"margherita pizza theek tha, aur staff ka behaviour bhi average thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0243,"margherita pizza try kiya, taste normal tha aur presentation okay thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0244,"Khana na bahut accha tha na kharab, value for money bhi theek thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0245,"Overall experience average tha, margherita pizza kuch khaas nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0246,margherita pizza theek-thaak tha aur portion size normal thi.,hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0247,"Sab kuch okay tha, lekin margherita pizza yaad rehne layak nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0248,"chocolate brownie theek tha, aur presentation bhi average thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0249,"chocolate brownie try kiya, taste normal tha aur value for money okay thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0250,"Khana na bahut accha tha na kharab, ambience bhi theek thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0251,"Overall experience average tha, chocolate brownie kuch khaas nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0252,chocolate brownie theek-thaak tha aur service normal thi.,hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0253,"Sab kuch okay tha, lekin chocolate brownie yaad rehne layak nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0254,"veg biryani theek tha, aur value for money bhi average thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0255,"veg biryani try kiya, taste normal tha aur ambience okay thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0256,"Khana na bahut accha tha na kharab, portion size bhi theek thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0257,"Overall experience average tha, veg biryani kuch khaas nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0258,veg biryani theek-thaak tha aur waiting time normal thi.,hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0259,"Sab kuch okay tha, lekin veg biryani yaad rehne layak nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0260,"white sauce pasta theek tha, aur ambience bhi average thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0261,"white sauce pasta try kiya, taste normal tha aur portion size okay thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0262,"Khana na bahut accha tha na kharab, service bhi theek thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0263,"Overall experience average tha, white sauce pasta kuch khaas nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0264,white sauce pasta theek-thaak tha aur cleanliness normal thi.,hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0265,"Sab kuch okay tha, lekin white sauce pasta yaad rehne layak nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0266,"cheese sandwich theek tha, aur portion size bhi average thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0267,"cheese sandwich try kiya, taste normal tha aur service okay thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0268,"Khana na bahut accha tha na kharab, waiting time bhi theek thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0269,"Overall experience average tha, cheese sandwich kuch khaas nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0270,cheese sandwich theek-thaak tha aur staff ka behaviour normal thi.,hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0271,"Sab kuch okay tha, lekin cheese sandwich yaad rehne layak nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0272,"burger theek tha, aur service bhi average thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0273,"burger try kiya, taste normal tha aur waiting time okay thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0274,"Khana na bahut accha tha na kharab, cleanliness bhi theek thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0275,"Overall experience average tha, burger kuch khaas nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0276,burger theek-thaak tha aur presentation normal thi.,hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0277,"Sab kuch okay tha, lekin burger yaad rehne layak nahi tha.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0278,"fresh lime soda theek tha, aur waiting time bhi average thi.",hinglish_roman,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0279,paneer tikka bilkul bekaar tha aur service bhi disappointing thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0280,"paneer tikka ka taste kharab tha, waiting time bhi bahut buri thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0281,"Yahan ka paneer tikka pasand nahi aaya, cleanliness bhi bekaar thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0282,"Experience kharab raha, paneer tikka aur staff ka behaviour dono disappointing.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0283,paneer tikka bilkul paisa vasool nahi tha aur presentation bhi kharab thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0284,"Recommend nahi karunga, paneer tikka thanda tha aur value for money kharab thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0285,masala dosa bilkul awful tha aur waiting time bhi disappointing thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0286,"masala dosa ka taste kharab tha, cleanliness bhi bahut buri thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0287,"Yahan ka masala dosa pasand nahi aaya, staff ka behaviour bhi bekaar thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0288,"Experience kharab raha, masala dosa aur presentation dono disappointing.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0289,masala dosa bilkul paisa vasool nahi tha aur value for money bhi kharab thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0290,"Recommend nahi karunga, masala dosa bekaar tha aur ambience kharab thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0291,cold coffee bilkul bilkul bland tha aur cleanliness bhi disappointing thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0292,"cold coffee ka taste kharab tha, staff ka behaviour bhi bahut buri thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0293,"Yahan ka cold coffee pasand nahi aaya, presentation bhi bekaar thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0294,"Experience kharab raha, cold coffee aur value for money dono disappointing.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0295,cold coffee bilkul paisa vasool nahi tha aur ambience bhi kharab thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0296,"Recommend nahi karunga, cold coffee awful tha aur portion size kharab thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0297,margherita pizza bilkul kharab tha aur staff ka behaviour bhi disappointing thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0298,"margherita pizza ka taste kharab tha, presentation bhi bahut buri thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0299,"Yahan ka margherita pizza pasand nahi aaya, value for money bhi bekaar thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0300,"Experience kharab raha, margherita pizza aur ambience dono disappointing.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0301,margherita pizza bilkul paisa vasool nahi tha aur portion size bhi kharab thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0302,"Recommend nahi karunga, margherita pizza bilkul bland tha aur service kharab thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0303,chocolate brownie bilkul basi tha aur presentation bhi disappointing thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0304,"chocolate brownie ka taste kharab tha, value for money bhi bahut buri thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0305,"Yahan ka chocolate brownie pasand nahi aaya, ambience bhi bekaar thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0306,"Experience kharab raha, chocolate brownie aur portion size dono disappointing.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0307,chocolate brownie bilkul paisa vasool nahi tha aur service bhi kharab thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0308,"Recommend nahi karunga, chocolate brownie kharab tha aur waiting time kharab thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0309,veg biryani bilkul disappointing tha aur value for money bhi disappointing thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0310,"veg biryani ka taste kharab tha, ambience bhi bahut buri thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0311,"Yahan ka veg biryani pasand nahi aaya, portion size bhi bekaar thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0312,"Experience kharab raha, veg biryani aur service dono disappointing.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0313,veg biryani bilkul paisa vasool nahi tha aur waiting time bhi kharab thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0314,"Recommend nahi karunga, veg biryani basi tha aur cleanliness kharab thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0315,white sauce pasta bilkul overcooked tha aur ambience bhi disappointing thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0316,"white sauce pasta ka taste kharab tha, portion size bhi bahut buri thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0317,"Yahan ka white sauce pasta pasand nahi aaya, service bhi bekaar thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0318,"Experience kharab raha, white sauce pasta aur waiting time dono disappointing.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0319,white sauce pasta bilkul paisa vasool nahi tha aur cleanliness bhi kharab thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0320,"Recommend nahi karunga, white sauce pasta disappointing tha aur staff ka behaviour kharab thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0321,cheese sandwich bilkul thanda tha aur portion size bhi disappointing thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0322,"cheese sandwich ka taste kharab tha, service bhi bahut buri thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0323,"Yahan ka cheese sandwich pasand nahi aaya, waiting time bhi bekaar thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0324,"Experience kharab raha, cheese sandwich aur cleanliness dono disappointing.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0325,cheese sandwich bilkul paisa vasool nahi tha aur staff ka behaviour bhi kharab thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0326,"Recommend nahi karunga, cheese sandwich overcooked tha aur presentation kharab thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0327,burger bilkul bekaar tha aur service bhi disappointing thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0328,"burger ka taste kharab tha, waiting time bhi bahut buri thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0329,"Yahan ka burger pasand nahi aaya, cleanliness bhi bekaar thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0330,"Experience kharab raha, burger aur staff ka behaviour dono disappointing.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0331,burger bilkul paisa vasool nahi tha aur presentation bhi kharab thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0332,"Recommend nahi karunga, burger thanda tha aur value for money kharab thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0333,fresh lime soda bilkul awful tha aur waiting time bhi disappointing thi.,hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0334,"fresh lime soda ka taste kharab tha, cleanliness bhi bahut buri thi.",hinglish_roman,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0335,पनीर टिक्का बहुत स्वादिष्ट था और सेवा भी शानदार थी।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0336,"पनीर टिक्का खाकर मज़ा आ गया, इंतज़ार का समय भी बहुत अच्छी थी।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0337,यहाँ का पनीर टिक्का लाजवाब था और पूरा अनुभव बढ़िया रहा।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0338,"कुल मिलाकर अनुभव अच्छा रहा, पनीर टिक्का और स्टाफ का व्यवहार दोनों बेहतरीन थे।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0339,पनीर टिक्का का स्वाद बहुत अच्छा था और परोसने का तरीका ने दिल जीत लिया।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0340,"मैं इस जगह की सिफारिश करूँगा, पनीर टिक्का वाकई ताज़ा था।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0341,मसाला डोसा बहुत उम्दा था और इंतज़ार का समय भी शानदार थी।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0342,"मसाला डोसा खाकर मज़ा आ गया, साफ-सफाई भी बहुत अच्छी थी।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0343,यहाँ का मसाला डोसा लाजवाब था और पूरा अनुभव बढ़िया रहा।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0344,"कुल मिलाकर अनुभव अच्छा रहा, मसाला डोसा और परोसने का तरीका दोनों बेहतरीन थे।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0345,मसाला डोसा का स्वाद बहुत अच्छा था और पैसों के हिसाब से कीमत ने दिल जीत लिया।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0346,"मैं इस जगह की सिफारिश करूँगा, मसाला डोसा वाकई स्वादिष्ट था।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0347,कोल्ड कॉफी बहुत बढ़िया था और साफ-सफाई भी शानदार थी।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0348,"कोल्ड कॉफी खाकर मज़ा आ गया, स्टाफ का व्यवहार भी बहुत अच्छी थी।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0349,यहाँ का कोल्ड कॉफी लाजवाब था और पूरा अनुभव बढ़िया रहा।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0350,"कुल मिलाकर अनुभव अच्छा रहा, कोल्ड कॉफी और पैसों के हिसाब से कीमत दोनों बेहतरीन थे।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0351,कोल्ड कॉफी का स्वाद बहुत अच्छा था और माहौल ने दिल जीत लिया।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0352,"मैं इस जगह की सिफारिश करूँगा, कोल्ड कॉफी वाकई उम्दा था।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0353,मार्घेरिटा पिज़्ज़ा बहुत शानदार था और स्टाफ का व्यवहार भी शानदार थी।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0354,"मार्घेरिटा पिज़्ज़ा खाकर मज़ा आ गया, परोसने का तरीका भी बहुत अच्छी थी।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0355,यहाँ का मार्घेरिटा पिज़्ज़ा लाजवाब था और पूरा अनुभव बढ़िया रहा।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0356,"कुल मिलाकर अनुभव अच्छा रहा, मार्घेरिटा पिज़्ज़ा और माहौल दोनों बेहतरीन थे।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0357,मार्घेरिटा पिज़्ज़ा का स्वाद बहुत अच्छा था और खाने की मात्रा ने दिल जीत लिया।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0358,"मैं इस जगह की सिफारिश करूँगा, मार्घेरिटा पिज़्ज़ा वाकई बढ़िया था।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0359,चॉकलेट ब्राउनी बहुत बेहतरीन था और परोसने का तरीका भी शानदार थी।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0360,"चॉकलेट ब्राउनी खाकर मज़ा आ गया, पैसों के हिसाब से कीमत भी बहुत अच्छी थी।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0361,यहाँ का चॉकलेट ब्राउनी लाजवाब था और पूरा अनुभव बढ़िया रहा।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0362,"कुल मिलाकर अनुभव अच्छा रहा, चॉकलेट ब्राउनी और खाने की मात्रा दोनों बेहतरीन थे।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0363,चॉकलेट ब्राउनी का स्वाद बहुत अच्छा था और सेवा ने दिल जीत लिया।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0364,"मैं इस जगह की सिफारिश करूँगा, चॉकलेट ब्राउनी वाकई शानदार था।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0365,वेज बिरयानी बहुत अच्छी तरह पका हुआ था और पैसों के हिसाब से कीमत भी शानदार थी।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0366,"वेज बिरयानी खाकर मज़ा आ गया, माहौल भी बहुत अच्छी थी।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0367,यहाँ का वेज बिरयानी लाजवाब था और पूरा अनुभव बढ़िया रहा।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0368,"कुल मिलाकर अनुभव अच्छा रहा, वेज बिरयानी और सेवा दोनों बेहतरीन थे।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0369,वेज बिरयानी का स्वाद बहुत अच्छा था और इंतज़ार का समय ने दिल जीत लिया।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0370,"मैं इस जगह की सिफारिश करूँगा, वेज बिरयानी वाकई बेहतरीन था।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0371,व्हाइट सॉस पास्ता बहुत लाजवाब था और माहौल भी शानदार थी।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0372,"व्हाइट सॉस पास्ता खाकर मज़ा आ गया, खाने की मात्रा भी बहुत अच्छी थी।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0373,यहाँ का व्हाइट सॉस पास्ता लाजवाब था और पूरा अनुभव बढ़िया रहा।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0374,"कुल मिलाकर अनुभव अच्छा रहा, व्हाइट सॉस पास्ता और इंतज़ार का समय दोनों बेहतरीन थे।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0375,व्हाइट सॉस पास्ता का स्वाद बहुत अच्छा था और साफ-सफाई ने दिल जीत लिया।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0376,"मैं इस जगह की सिफारिश करूँगा, व्हाइट सॉस पास्ता वाकई अच्छी तरह पका हुआ था।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0377,चीज़ सैंडविच बहुत ताज़ा था और खाने की मात्रा भी शानदार थी।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0378,"चीज़ सैंडविच खाकर मज़ा आ गया, सेवा भी बहुत अच्छी थी।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0379,यहाँ का चीज़ सैंडविच लाजवाब था और पूरा अनुभव बढ़िया रहा।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0380,"कुल मिलाकर अनुभव अच्छा रहा, चीज़ सैंडविच और साफ-सफाई दोनों बेहतरीन थे।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0381,चीज़ सैंडविच का स्वाद बहुत अच्छा था और स्टाफ का व्यवहार ने दिल जीत लिया।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0382,"मैं इस जगह की सिफारिश करूँगा, चीज़ सैंडविच वाकई लाजवाब था।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0383,बर्गर बहुत स्वादिष्ट था और सेवा भी शानदार थी।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0384,"बर्गर खाकर मज़ा आ गया, इंतज़ार का समय भी बहुत अच्छी थी।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0385,यहाँ का बर्गर लाजवाब था और पूरा अनुभव बढ़िया रहा।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0386,"कुल मिलाकर अनुभव अच्छा रहा, बर्गर और स्टाफ का व्यवहार दोनों बेहतरीन थे।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0387,बर्गर का स्वाद बहुत अच्छा था और परोसने का तरीका ने दिल जीत लिया।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0388,"मैं इस जगह की सिफारिश करूँगा, बर्गर वाकई ताज़ा था।",hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0389,फ्रेश लाइम सोडा बहुत उम्दा था और इंतज़ार का समय भी शानदार थी।,hindi_devanagari,positive,false,positive,synthetic_generated,,,,,synthetic_only
+SYN0390,पनीर टिक्का ठीक था और सेवा भी औसत थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0391,पनीर टिक्का का स्वाद सामान्य था और इंतज़ार का समय भी ठीक थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0392,"खाना न बहुत अच्छा था न खराब, साफ-सफाई भी सामान्य थी।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0393,"कुल मिलाकर अनुभव औसत रहा, पनीर टिक्का कुछ खास नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0394,पनीर टिक्का ठीक-ठाक था और परोसने का तरीका साधारण थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0395,"सब कुछ ठीक था, लेकिन पनीर टिक्का याद रखने लायक नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0396,मसाला डोसा ठीक था और इंतज़ार का समय भी औसत थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0397,मसाला डोसा का स्वाद सामान्य था और साफ-सफाई भी ठीक थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0398,"खाना न बहुत अच्छा था न खराब, स्टाफ का व्यवहार भी सामान्य थी।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0399,"कुल मिलाकर अनुभव औसत रहा, मसाला डोसा कुछ खास नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0400,मसाला डोसा ठीक-ठाक था और पैसों के हिसाब से कीमत साधारण थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0401,"सब कुछ ठीक था, लेकिन मसाला डोसा याद रखने लायक नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0402,कोल्ड कॉफी ठीक था और साफ-सफाई भी औसत थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0403,कोल्ड कॉफी का स्वाद सामान्य था और स्टाफ का व्यवहार भी ठीक थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0404,"खाना न बहुत अच्छा था न खराब, परोसने का तरीका भी सामान्य थी।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0405,"कुल मिलाकर अनुभव औसत रहा, कोल्ड कॉफी कुछ खास नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0406,कोल्ड कॉफी ठीक-ठाक था और माहौल साधारण थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0407,"सब कुछ ठीक था, लेकिन कोल्ड कॉफी याद रखने लायक नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0408,मार्घेरिटा पिज़्ज़ा ठीक था और स्टाफ का व्यवहार भी औसत थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0409,मार्घेरिटा पिज़्ज़ा का स्वाद सामान्य था और परोसने का तरीका भी ठीक थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0410,"खाना न बहुत अच्छा था न खराब, पैसों के हिसाब से कीमत भी सामान्य थी।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0411,"कुल मिलाकर अनुभव औसत रहा, मार्घेरिटा पिज़्ज़ा कुछ खास नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0412,मार्घेरिटा पिज़्ज़ा ठीक-ठाक था और खाने की मात्रा साधारण थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0413,"सब कुछ ठीक था, लेकिन मार्घेरिटा पिज़्ज़ा याद रखने लायक नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0414,चॉकलेट ब्राउनी ठीक था और परोसने का तरीका भी औसत थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0415,चॉकलेट ब्राउनी का स्वाद सामान्य था और पैसों के हिसाब से कीमत भी ठीक थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0416,"खाना न बहुत अच्छा था न खराब, माहौल भी सामान्य थी।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0417,"कुल मिलाकर अनुभव औसत रहा, चॉकलेट ब्राउनी कुछ खास नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0418,चॉकलेट ब्राउनी ठीक-ठाक था और सेवा साधारण थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0419,"सब कुछ ठीक था, लेकिन चॉकलेट ब्राउनी याद रखने लायक नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0420,वेज बिरयानी ठीक था और पैसों के हिसाब से कीमत भी औसत थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0421,वेज बिरयानी का स्वाद सामान्य था और माहौल भी ठीक थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0422,"खाना न बहुत अच्छा था न खराब, खाने की मात्रा भी सामान्य थी।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0423,"कुल मिलाकर अनुभव औसत रहा, वेज बिरयानी कुछ खास नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0424,वेज बिरयानी ठीक-ठाक था और इंतज़ार का समय साधारण थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0425,"सब कुछ ठीक था, लेकिन वेज बिरयानी याद रखने लायक नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0426,व्हाइट सॉस पास्ता ठीक था और माहौल भी औसत थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0427,व्हाइट सॉस पास्ता का स्वाद सामान्य था और खाने की मात्रा भी ठीक थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0428,"खाना न बहुत अच्छा था न खराब, सेवा भी सामान्य थी।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0429,"कुल मिलाकर अनुभव औसत रहा, व्हाइट सॉस पास्ता कुछ खास नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0430,व्हाइट सॉस पास्ता ठीक-ठाक था और साफ-सफाई साधारण थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0431,"सब कुछ ठीक था, लेकिन व्हाइट सॉस पास्ता याद रखने लायक नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0432,चीज़ सैंडविच ठीक था और खाने की मात्रा भी औसत थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0433,चीज़ सैंडविच का स्वाद सामान्य था और सेवा भी ठीक थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0434,"खाना न बहुत अच्छा था न खराब, इंतज़ार का समय भी सामान्य थी।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0435,"कुल मिलाकर अनुभव औसत रहा, चीज़ सैंडविच कुछ खास नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0436,चीज़ सैंडविच ठीक-ठाक था और स्टाफ का व्यवहार साधारण थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0437,"सब कुछ ठीक था, लेकिन चीज़ सैंडविच याद रखने लायक नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0438,बर्गर ठीक था और सेवा भी औसत थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0439,बर्गर का स्वाद सामान्य था और इंतज़ार का समय भी ठीक थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0440,"खाना न बहुत अच्छा था न खराब, साफ-सफाई भी सामान्य थी।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0441,"कुल मिलाकर अनुभव औसत रहा, बर्गर कुछ खास नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0442,बर्गर ठीक-ठाक था और परोसने का तरीका साधारण थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0443,"सब कुछ ठीक था, लेकिन बर्गर याद रखने लायक नहीं था।",hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0444,फ्रेश लाइम सोडा ठीक था और इंतज़ार का समय भी औसत थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0445,फ्रेश लाइम सोडा का स्वाद सामान्य था और साफ-सफाई भी ठीक थी।,hindi_devanagari,neutral,false,neutral,synthetic_generated,,,,,synthetic_only
+SYN0446,पनीर टिक्का बहुत बेस्वाद था और सेवा भी निराशाजनक थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0447,पनीर टिक्का का स्वाद खराब था और इंतज़ार का समय भी बहुत बुरी थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0448,यहाँ का पनीर टिक्का पसंद नहीं आया और साफ-सफाई भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0449,"अनुभव खराब रहा, पनीर टिक्का और स्टाफ का व्यवहार दोनों निराशाजनक थे।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0450,पनीर टिक्का बिल्कुल पैसे वसूल नहीं था और परोसने का तरीका भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0451,"मैं इस जगह की सिफारिश नहीं करूँगा, पनीर टिक्का ठंडा था।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0452,मसाला डोसा बहुत बहुत बुरा था और इंतज़ार का समय भी निराशाजनक थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0453,मसाला डोसा का स्वाद खराब था और साफ-सफाई भी बहुत बुरी थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0454,यहाँ का मसाला डोसा पसंद नहीं आया और स्टाफ का व्यवहार भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0455,"अनुभव खराब रहा, मसाला डोसा और परोसने का तरीका दोनों निराशाजनक थे।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0456,मसाला डोसा बिल्कुल पैसे वसूल नहीं था और पैसों के हिसाब से कीमत भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0457,"मैं इस जगह की सिफारिश नहीं करूँगा, मसाला डोसा बेस्वाद था।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0458,कोल्ड कॉफी बहुत बेकार था और साफ-सफाई भी निराशाजनक थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0459,कोल्ड कॉफी का स्वाद खराब था और स्टाफ का व्यवहार भी बहुत बुरी थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0460,यहाँ का कोल्ड कॉफी पसंद नहीं आया और परोसने का तरीका भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0461,"अनुभव खराब रहा, कोल्ड कॉफी और पैसों के हिसाब से कीमत दोनों निराशाजनक थे।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0462,कोल्ड कॉफी बिल्कुल पैसे वसूल नहीं था और माहौल भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0463,"मैं इस जगह की सिफारिश नहीं करूँगा, कोल्ड कॉफी बहुत बुरा था।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0464,मार्घेरिटा पिज़्ज़ा बहुत खराब था और स्टाफ का व्यवहार भी निराशाजनक थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0465,मार्घेरिटा पिज़्ज़ा का स्वाद खराब था और परोसने का तरीका भी बहुत बुरी थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0466,यहाँ का मार्घेरिटा पिज़्ज़ा पसंद नहीं आया और पैसों के हिसाब से कीमत भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0467,"अनुभव खराब रहा, मार्घेरिटा पिज़्ज़ा और माहौल दोनों निराशाजनक थे।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0468,मार्घेरिटा पिज़्ज़ा बिल्कुल पैसे वसूल नहीं था और खाने की मात्रा भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0469,"मैं इस जगह की सिफारिश नहीं करूँगा, मार्घेरिटा पिज़्ज़ा बेकार था।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0470,चॉकलेट ब्राउनी बहुत बासी था और परोसने का तरीका भी निराशाजनक थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0471,चॉकलेट ब्राउनी का स्वाद खराब था और पैसों के हिसाब से कीमत भी बहुत बुरी थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0472,यहाँ का चॉकलेट ब्राउनी पसंद नहीं आया और माहौल भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0473,"अनुभव खराब रहा, चॉकलेट ब्राउनी और खाने की मात्रा दोनों निराशाजनक थे।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0474,चॉकलेट ब्राउनी बिल्कुल पैसे वसूल नहीं था और सेवा भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0475,"मैं इस जगह की सिफारिश नहीं करूँगा, चॉकलेट ब्राउनी खराब था।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0476,वेज बिरयानी बहुत निराशाजनक था और पैसों के हिसाब से कीमत भी निराशाजनक थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0477,वेज बिरयानी का स्वाद खराब था और माहौल भी बहुत बुरी थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0478,यहाँ का वेज बिरयानी पसंद नहीं आया और खाने की मात्रा भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0479,"अनुभव खराब रहा, वेज बिरयानी और सेवा दोनों निराशाजनक थे।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0480,वेज बिरयानी बिल्कुल पैसे वसूल नहीं था और इंतज़ार का समय भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0481,"मैं इस जगह की सिफारिश नहीं करूँगा, वेज बिरयानी बासी था।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0482,व्हाइट सॉस पास्ता बहुत ज़्यादा पका हुआ था और माहौल भी निराशाजनक थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0483,व्हाइट सॉस पास्ता का स्वाद खराब था और खाने की मात्रा भी बहुत बुरी थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0484,यहाँ का व्हाइट सॉस पास्ता पसंद नहीं आया और सेवा भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0485,"अनुभव खराब रहा, व्हाइट सॉस पास्ता और इंतज़ार का समय दोनों निराशाजनक थे।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0486,व्हाइट सॉस पास्ता बिल्कुल पैसे वसूल नहीं था और साफ-सफाई भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0487,"मैं इस जगह की सिफारिश नहीं करूँगा, व्हाइट सॉस पास्ता निराशाजनक था।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0488,चीज़ सैंडविच बहुत ठंडा था और खाने की मात्रा भी निराशाजनक थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0489,चीज़ सैंडविच का स्वाद खराब था और सेवा भी बहुत बुरी थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0490,यहाँ का चीज़ सैंडविच पसंद नहीं आया और इंतज़ार का समय भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0491,"अनुभव खराब रहा, चीज़ सैंडविच और साफ-सफाई दोनों निराशाजनक थे।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0492,चीज़ सैंडविच बिल्कुल पैसे वसूल नहीं था और स्टाफ का व्यवहार भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0493,"मैं इस जगह की सिफारिश नहीं करूँगा, चीज़ सैंडविच ज़्यादा पका हुआ था।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0494,बर्गर बहुत बेस्वाद था और सेवा भी निराशाजनक थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0495,बर्गर का स्वाद खराब था और इंतज़ार का समय भी बहुत बुरी थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0496,यहाँ का बर्गर पसंद नहीं आया और साफ-सफाई भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0497,"अनुभव खराब रहा, बर्गर और स्टाफ का व्यवहार दोनों निराशाजनक थे।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0498,बर्गर बिल्कुल पैसे वसूल नहीं था और परोसने का तरीका भी खराब थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0499,"मैं इस जगह की सिफारिश नहीं करूँगा, बर्गर ठंडा था।",hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
+SYN0500,फ्रेश लाइम सोडा बहुत बहुत बुरा था और इंतज़ार का समय भी निराशाजनक थी।,hindi_devanagari,negative,false,negative,synthetic_generated,,,,,synthetic_only
