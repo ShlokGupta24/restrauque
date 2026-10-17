@@ -1,0 +1,579 @@
+/* ==========================================================================
+   Screen 08: Order Confirmation & Live Tracking — Redesigned
+   ========================================================================== */
+
+.confirmation-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 36px 20px 120px 20px;
+  background-color: var(--page-background);
+  align-items: center;
+  gap: 20px;
+  position: relative;
+}
+
+/* ── Hero Section ── */
+.confirmation-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+.check-badge-wrapper {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.check-circle-green {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 32px rgba(34, 197, 94, 0.4), 0 0 0 10px rgba(34, 197, 94, 0.1);
+  animation: popIn 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.confirmation-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-color);
+  margin-bottom: 6px;
+  letter-spacing: -0.3px;
+}
+
+.confirmation-subtitle {
+  font-size: 14px;
+  color: var(--muted-text-color);
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+/* ── Order Details Card ── */
+.order-details-card {
+  width: 100%;
+  background-color: var(--surface-color);
+  border-radius: 20px;
+  padding: 20px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.order-detail-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.order-row-icon-wrap {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-text-color);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.order-row-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.order-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.order-row-label {
+  font-size: 13px;
+  color: var(--muted-text-color);
+  font-weight: 500;
+}
+
+.order-row-value-bold {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-color);
+  letter-spacing: 0.2px;
+}
+
+.order-row-value {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+/* ══════════════════════════════════════════
+   Live Order Status Tracker
+══════════════════════════════════════════ */
+.order-tracker-card {
+  width: 100%;
+  background-color: var(--surface-color);
+  border-radius: 20px;
+  padding: 20px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tracker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tracker-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.tracker-live-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #22C55E;
+}
+
+.tracker-live-dot.pulsing {
+  animation: trackerPulse 1.6s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
+}
+
+.tracker-live-dot.done {
+  background-color: #D7B67C;
+}
+
+@keyframes trackerPulse {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* Steps container */
+.tracker-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Connector line between steps */
+.tracker-connector {
+  width: 2px;
+  height: 28px;
+  background-color: var(--border-color);
+  margin-left: 23px;
+  border-radius: 2px;
+  transition: background-color 0.4s ease;
+}
+
+.tracker-connector.connector-done {
+  background: linear-gradient(180deg, #22C55E 0%, #16A34A 100%);
+}
+
+/* Each step row */
+.tracker-step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  padding: 10px 0;
+}
+
+/* Icon circle */
+.step-icon-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-icon-circle {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.35s ease;
+  position: relative;
+  z-index: 1;
+}
+
+/* Pending state */
+.step-pending .step-icon-circle {
+  background-color: #F3F4F6;
+  border: 2px solid #E5E7EB;
+  color: #9CA3AF;
+}
+
+/* Active state */
+.step-active .step-icon-circle {
+  background: linear-gradient(135deg, var(--brand-primary) 0%, #1d5fa8 100%);
+  color: #FFFFFF;
+  box-shadow: 0 6px 20px rgba(23, 74, 130, 0.35);
+}
+
+/* Completed state */
+.step-completed .step-icon-circle {
+  background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);
+}
+
+/* Active ring animation */
+.step-active-ring {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 2px solid var(--brand-primary);
+  opacity: 0.35;
+  animation: ringPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes ringPulse {
+  0%, 100% { transform: scale(1); opacity: 0.35; }
+  50% { transform: scale(1.12); opacity: 0.15; }
+}
+
+/* Step text */
+.step-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.step-label {
+  font-size: 14.5px;
+  font-weight: 700;
+  transition: color 0.35s;
+}
+
+.step-pending .step-label {
+  color: #9CA3AF;
+}
+
+.step-active .step-label {
+  color: var(--brand-primary);
+}
+
+.step-completed .step-label {
+  color: #16A34A;
+}
+
+.step-sublabel {
+  font-size: 12.5px;
+  line-height: 1.4;
+  transition: color 0.35s;
+}
+
+.step-pending .step-sublabel {
+  color: #C4C4C0;
+}
+
+.step-active .step-sublabel {
+  color: var(--muted-text-color);
+}
+
+.step-completed .step-sublabel {
+  color: var(--muted-text-color);
+}
+
+/* Spinner for active step */
+.step-spinner {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.spinner-ring {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(23, 74, 130, 0.15);
+  border-top-color: var(--brand-primary);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Check badge on completed steps */
+.step-check-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: #22C55E;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.step-check-gold {
+  background: linear-gradient(135deg, #D7B67C 0%, #C8955A 100%);
+}
+
+/* Dev simulate button */
+.status-advance-btn {
+  font-size: 11.5px;
+  color: var(--muted-text-color);
+  background: transparent;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 500;
+  align-self: flex-end;
+  opacity: 0.6;
+}
+
+/* ── Action Buttons ── */
+.confirmation-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.track-order-btn {
+  width: 100%;
+  height: 52px;
+  border-radius: var(--button-radius);
+  background: linear-gradient(135deg, var(--brand-primary) 0%, #1d5fa8 100%);
+  color: #FFFFFF;
+  font-size: 15.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 8px 24px rgba(23, 74, 130, 0.35);
+  transition: all var(--transition-fast);
+}
+
+.track-order-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(23, 74, 130, 0.42);
+}
+
+.track-order-btn.btn-waiting {
+  background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.btn-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  margin-right: 8px;
+  animation: trackerPulse 1.6s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(255,255,255,0.5);
+}
+
+.back-to-menu-btn {
+  width: 100%;
+  height: 50px;
+  border-radius: var(--button-radius);
+  background-color: transparent;
+  color: var(--brand-primary);
+  border: 1.5px solid var(--brand-primary);
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.back-to-menu-btn:hover {
+  background-color: rgba(23, 74, 130, 0.06);
+}
+
+/* ══════════════════════════════════════════
+   Post-Completion Feedback Popup
+   Scoped to the 480px mobile shell so it
+   never bleeds onto the desktop background.
+══════════════════════════════════════════ */
+.feedback-popup-overlay {
+  /* Anchored to the shell, not the full viewport */
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
+  animation: overlayFadeIn 0.25s ease both;
+  overflow: hidden;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.feedback-popup-modal {
+  width: 100%;
+  background-color: var(--surface-color);
+  border-radius: 28px 28px 0 0;
+  padding: 0 24px 44px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  overflow: hidden;
+  animation: popupSlideUp 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.05) both;
+  /* Prevent it from growing taller than the screen */
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes popupSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.popup-top-gradient {
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, #22C55E, var(--brand-primary), #D7B67C);
+  margin-bottom: 20px;
+  border-radius: 0;
+}
+
+.popup-icon-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-emoji-badge {
+  font-size: 48px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
+}
+
+.popup-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-color);
+  letter-spacing: -0.3px;
+  margin-top: 4px;
+}
+
+.popup-subtitle {
+  font-size: 14px;
+  color: var(--muted-text-color);
+  line-height: 1.55;
+  max-width: 300px;
+}
+
+.popup-loyalty-chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: linear-gradient(135deg, #FFF8EC 0%, #FFF0D4 100%);
+  border: 1px solid #EDCF9A;
+  border-radius: 50px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #A0700A;
+  margin-top: 4px;
+}
+
+.popup-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.popup-feedback-btn {
+  width: 100%;
+  height: 52px;
+  border-radius: var(--button-radius);
+  background: linear-gradient(135deg, var(--brand-primary) 0%, #1d5fa8 100%);
+  color: #FFFFFF;
+  font-size: 15.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 8px 24px rgba(23, 74, 130, 0.35);
+  transition: all 0.2s ease;
+}
+
+.popup-feedback-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(23, 74, 130, 0.42);
+}
+
+.popup-dismiss-btn {
+  width: 100%;
+  height: 46px;
+  border-radius: var(--button-radius);
+  background-color: transparent;
+  color: var(--muted-text-color);
+  border: 1.5px solid var(--border-color);
+  font-size: 14.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.popup-dismiss-btn:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  color: var(--text-color);
+}

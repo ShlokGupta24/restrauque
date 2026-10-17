@@ -1,0 +1,17 @@
+{
+  "note": "Proposed configuration contract. Current restaurants columns do not include all branding attributes, so backing API/storage must be agreed before production use.",
+  "restaurantName": "string",
+  "logoUrl": "string | null",
+  "primaryColor": "#RRGGBB",
+  "primaryHoverColor": "#RRGGBB",
+  "pageBackground": "#RRGGBB",
+  "surfaceColor": "#RRGGBB",
+  "textColor": "#RRGGBB",
+  "mutedTextColor": "#RRGGBB",
+  "borderColor": "#RRGGBB",
+  "accentColor": "#RRGGBB",
+  "fontFamily": "approved allow-listed font",
+  "cardRadius": "approved token",
+  "buttonRadius": "approved token",
+  "contentMaxWidth": "CSS length from approved values"
+}
