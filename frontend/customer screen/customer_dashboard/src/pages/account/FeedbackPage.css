@@ -1,0 +1,576 @@
+.feedback-page-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Page Header */
+.feedback-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.feedback-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.feedback-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+  max-width: 640px;
+}
+
+/* ================= HORIZONTALLY SCROLLABLE RESTAURANT SELECTOR ================= */
+.restaurant-selector-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.restaurant-selector-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.restaurant-selector-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+  width: 100%;
+}
+
+.restaurant-selector-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.restaurant-selector-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 4px;
+}
+
+.restaurant-tab-card {
+  flex: 0 0 auto;
+  min-width: 220px;
+  max-width: 280px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease-in-out;
+  scroll-snap-align: start;
+  box-shadow: var(--shadow-sm);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.restaurant-tab-card:hover {
+  border-color: var(--brand-red-border);
+  background: var(--bg-hover);
+}
+
+.restaurant-tab-card.selected {
+  border-color: var(--brand-red);
+  background: var(--brand-red-light);
+  box-shadow: 0 0 0 1px var(--brand-red);
+}
+
+.restaurant-tab-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.restaurant-tab-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.restaurant-tab-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.restaurant-tab-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.restaurant-tab-card.selected .restaurant-tab-name {
+  color: var(--brand-red);
+}
+
+.active-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brand-red);
+  flex-shrink: 0;
+}
+
+.restaurant-tab-sub {
+  font-size: 11.5px;
+}
+
+.pending-badge-text {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.caught-up-text {
+  color: #059669;
+  font-weight: 500;
+}
+
+/* ================= VENUE CONTENT CARD ================= */
+.feedback-content-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.feedback-venue-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.venue-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.venue-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.venue-meta {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.venue-reward-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .venue-reward-badge {
+  background: rgba(245, 158, 11, 0.14);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+/* Filter Pills */
+.feedback-filter-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.filter-pill {
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 12.5px;
+  font-weight: 500;
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.filter-pill:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.filter-pill.active {
+  background: var(--text-primary);
+  color: var(--text-inverse);
+  border-color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Orders List */
+.feedback-orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.feedback-order-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.15s ease;
+}
+
+.feedback-order-card:hover {
+  border-color: var(--brand-red-border);
+}
+
+.feedback-order-card.order-reviewed {
+  background: var(--bg-subtle);
+  border-left: 3px solid #059669;
+}
+
+.order-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.order-primary-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.order-number {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.order-date {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.order-table-tag {
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+}
+
+.order-amount {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.order-items-summary {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.items-label {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Review Status Section */
+.order-review-status-box {
+  padding-top: 10px;
+  border-top: 1px dashed var(--border-color);
+}
+
+/* Eligible Row */
+.eligible-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.eligible-text-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.status-indicator-pill.eligible {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #fef2f2;
+  color: var(--brand-red);
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.bonus-note {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.write-review-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--brand-red);
+  color: #ffffff;
+  border: 1px solid var(--brand-red);
+  padding: 9px 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 42px;
+  transition: all 0.15s ease;
+}
+
+.write-review-btn:hover {
+  background: var(--brand-red-hover);
+  border-color: var(--brand-red-hover);
+}
+
+/* Reviewed Details Block */
+.reviewed-details-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reviewed-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.reviewed-status-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reviewed-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #059669;
+}
+
+.one-review-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: #f1f5f9;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+}
+
+.points-awarded-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: #ecfdf5;
+  color: #059669;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.submitted-review-preview {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.preview-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.preview-rating-score {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.preview-comment-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.reviewed-card-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.view-review-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  min-height: 36px;
+  transition: all 0.15s ease;
+}
+
+.view-review-btn:hover {
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+}
+
+/* Ineligible Row */
+.ineligible-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ineligible-status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #b45309;
+}
+
+.ineligible-explanation {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Empty State */
+.feedback-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  gap: 8px;
+}
+
+.empty-state-icon {
+  color: var(--text-subtle);
+}
+
+.empty-state-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.empty-state-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 400px;
+  margin: 0;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 640px) {
+  .feedback-content-card {
+    padding: 16px;
+  }
+
+  .feedback-venue-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .eligible-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .write-review-btn {
+    width: 100%;
+  }
+
+  .reviewed-card-footer {
+    justify-content: stretch;
+  }
+
+  .view-review-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
