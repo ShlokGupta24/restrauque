@@ -1,6 +1,13 @@
 import crypto from 'crypto';
 import { prisma } from '@/lib/db/prisma';
 import { AppError, ValidationError } from '@/lib/http/errors';
+import {
+  getActiveOtpProvider,
+  TwilioVerifyProvider,
+  type OtpProvider,
+  ProviderConfigurationError,
+  ProviderTrialRestrictionError,
+} from './otp-provider';
 
 export const OTP_EXPIRY_SECONDS = 300; // 5 minutes
 export const OTP_COOLDOWN_SECONDS = 60; // 60-second resend limit
@@ -8,20 +15,26 @@ export const MAX_OTP_ATTEMPTS = 5;
 
 export interface SmsSendResult {
   delivered: boolean;
-  provider: 'twilio' | 'aws_sns' | 'dev_mock';
+  provider: 'twilio' | 'twilio_verify' | 'twilio_messaging' | 'aws_sns' | 'dev_mock';
   messageId?: string;
   isSimulated: boolean;
 }
 
 /**
  * Checks if production SMS delivery credentials are fully configured.
+ * Recognizes that Twilio Verify requires TWILIO_VERIFY_SERVICE_SID (without TWILIO_PHONE_NUMBER).
  */
 export function hasConfiguredSmsProvider(): boolean {
-  return Boolean(
-    process.env.TWILIO_ACCOUNT_SID &&
-    process.env.TWILIO_AUTH_TOKEN &&
-    process.env.TWILIO_PHONE_NUMBER
-  );
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const verifySid = process.env.TWILIO_VERIFY_SERVICE_SID;
+  const fromNumber = process.env.TWILIO_PHONE_NUMBER;
+
+  if (!accountSid || !authToken) {
+    return false;
+  }
+
+  return Boolean(verifySid || fromNumber);
 }
 
 /**
@@ -107,79 +120,8 @@ export function verifyOtpCode(phone: string, inputOtp: string, storedChallenge: 
 }
 
 /**
- * Isolated SMS Delivery Adapter
- * In production:
- * - Requires real provider credentials (e.g. Twilio).
- * - Never silently falls back to console logger.
- * - Fails with 503 SERVICE_UNAVAILABLE if provider is unconfigured.
- * - Fails with 502 BAD_GATEWAY if provider dispatch fails.
- * In development / test:
- * - Simulates delivery via console without claiming live transmission.
- */
-async function dispatchTwilioSms(phone: string, otp: string): Promise<string> {
-  const accountSid = process.env.TWILIO_ACCOUNT_SID!;
-  const authToken = process.env.TWILIO_AUTH_TOKEN!;
-  const verifySid = process.env.TWILIO_VERIFY_SERVICE_SID;
-
-  // In test environments or when using dummy credentials, bypass live HTTP call
-  if (process.env.NODE_ENV === 'test' || accountSid.startsWith('AC_dummy') || process.env.SMS_PROVIDER === 'mock') {
-    return 'mock_twilio_msg_sid';
-  }
-
-  const authHeader = 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64');
-
-  // If Twilio Verify Service is configured, use Twilio Verify API
-  if (verifySid) {
-    const body = new URLSearchParams({
-      To: phone,
-      Channel: 'sms',
-    });
-
-    const res = await fetch(`https://verify.twilio.com/v2/Services/${verifySid}/Verifications`, {
-      method: 'POST',
-      headers: {
-        Authorization: authHeader,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: body.toString(),
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.message || `Twilio Verify dispatch failed with status ${res.status}`);
-    }
-
-    return data.sid;
-  }
-
-  // Fallback: Standard Twilio Programmable Messages API
-  const fromNumber = process.env.TWILIO_PHONE_NUMBER!;
-  const body = new URLSearchParams({
-    To: phone,
-    From: fromNumber,
-    Body: `Your Restrauque verification code is: ${otp}. Valid for 5 minutes.`,
-  });
-
-  const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
-    method: 'POST',
-    headers: {
-      Authorization: authHeader,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: body.toString(),
-  });
-
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.message || `Twilio SMS dispatch failed with status ${res.status}`);
-  }
-
-  return data.sid;
-}
-
-/**
  * Validates verification code against Twilio Verify Service if configured.
- * Safely bypassed in test environments.
+ * Maintained for backward compatibility and direct verification queries.
  */
 export async function checkTwilioVerification(phone: string, inputOtp: string): Promise<boolean> {
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -190,33 +132,13 @@ export async function checkTwilioVerification(phone: string, inputOtp: string): 
     return false;
   }
 
-  // Bypass live HTTP call in test / mock environment
   if (process.env.NODE_ENV === 'test' || accountSid.startsWith('AC_dummy') || process.env.SMS_PROVIDER === 'mock') {
     return false;
   }
 
   try {
-    const authHeader = 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64');
-    const body = new URLSearchParams({
-      To: phone,
-      Code: inputOtp.trim(),
-    });
-
-    const res = await fetch(`https://verify.twilio.com/v2/Services/${verifySid}/VerificationCheck`, {
-      method: 'POST',
-      headers: {
-        Authorization: authHeader,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: body.toString(),
-    });
-
-    if (!res.ok) {
-      return false;
-    }
-
-    const data = await res.json();
-    return data.status === 'approved';
+    const provider = new TwilioVerifyProvider(accountSid, authToken, verifySid);
+    return await provider.verifyOtp(phone, inputOtp);
   } catch (err) {
     console.error(
       '[TWILIO_VERIFY_CHECK_FAILURE]',
@@ -228,75 +150,21 @@ export async function checkTwilioVerification(phone: string, inputOtp: string): 
 
 /**
  * Isolated SMS Delivery Adapter
- * In production:
- * - Requires real provider credentials (e.g. Twilio).
- * - Dispatches SMS via Twilio Messages API.
- * - Fails with 503 SERVICE_UNAVAILABLE if provider is unconfigured.
- * - Fails with 502 BAD_GATEWAY if provider dispatch fails.
- * In development / test:
- * - Dispatches via Twilio if SMS_PROVIDER='twilio' and credentials configured.
- * - Otherwise simulates delivery via console.
+ * Dispatches OTP code via the configured active provider.
+ * Does NOT deceive callers with simulated success when provider dispatch fails.
  */
 export async function sendSmsOtp(
   phone: string,
-  otp: string
+  otp?: string
 ): Promise<SmsSendResult> {
-  const isProduction = process.env.NODE_ENV === 'production';
-  const hasProvider = hasConfiguredSmsProvider();
-
-  if (isProduction || (process.env.SMS_PROVIDER === 'twilio' && hasProvider)) {
-    if (!hasProvider) {
-      if (isProduction) {
-        throw new AppError(
-          'SMS delivery service is unavailable. No approved SMS provider is configured.',
-          503,
-          'SERVICE_UNAVAILABLE'
-        );
-      }
-      console.log(`[DEV SMS ADAPTER] Simulated SMS to ${phone}: Your Restrauque OTP is ${otp}. Valid for 5 minutes.`);
-      return {
-        delivered: true,
-        provider: 'dev_mock',
-        isSimulated: true,
-      };
-    }
-
-    try {
-      const messageId = await dispatchTwilioSms(phone, otp);
-      return {
-        delivered: true,
-        provider: 'twilio',
-        messageId,
-        isSimulated: false,
-      };
-    } catch (err) {
-      console.error(
-        '[SMS_DISPATCH_FAILURE] Failed to dispatch SMS to provider:',
-        err instanceof Error ? err.message : 'Unknown provider error'
-      );
-      if (isProduction) {
-        throw new AppError(
-          'Failed to dispatch SMS verification code. Please try again later.',
-          502,
-          'BAD_GATEWAY'
-        );
-      }
-      console.log(`[DEV SMS ADAPTER FALLBACK] Simulated SMS to ${phone}: Your Restrauque OTP is ${otp}. Valid for 5 minutes.`);
-      return {
-        delivered: true,
-        provider: 'dev_mock',
-        isSimulated: true,
-      };
-    }
-  }
-
-  // Development / Test adapter
-  console.log(`[DEV SMS ADAPTER] Simulated SMS to ${phone}: Your Restrauque OTP is ${otp}. Valid for 5 minutes.`);
+  const provider = getActiveOtpProvider();
+  const result = await provider.requestOtp(phone, otp);
 
   return {
     delivered: true,
-    provider: 'dev_mock',
-    isSimulated: true,
+    provider: provider.name as any,
+    messageId: result.messageId,
+    isSimulated: result.isSimulated,
   };
 }
 
@@ -311,8 +179,8 @@ export function generateNumericOtp(): string {
  * 2. Uses PostgreSQL advisory lock to serialize rapid concurrent requests for the same phone.
  * 3. Enforces 60-second cooldown rate limit.
  * 4. Invalidates previous pending OTPs for this phone.
- * 5. Persists keyed HMAC challenge in `otp_verifications` table (no plaintext OTP).
- * 6. Dispatches OTP via SMS delivery adapter.
+ * 5. Uses configured provider (Twilio Verify / Twilio Messaging / Mock) as authoritative OTP mechanism.
+ * 6. Dispatches verification request to provider. Fails safely without false success if rejected.
  */
 export async function requestCustomerOtp(phone: string): Promise<{
   expiresInSeconds: number;
@@ -322,13 +190,12 @@ export async function requestCustomerOtp(phone: string): Promise<{
 
   // In production, verify provider is configured before writing records or triggering cooldown
   if (isProduction && !hasConfiguredSmsProvider()) {
-    throw new AppError(
-      'SMS delivery service is unavailable. No approved SMS provider is configured.',
-      503,
-      'SERVICE_UNAVAILABLE'
+    throw new ProviderConfigurationError(
+      'SMS delivery service is unavailable. No approved SMS provider is configured.'
     );
   }
 
+  const provider = getActiveOtpProvider();
   const now = new Date();
   const cooldownThreshold = new Date(now.getTime() - OTP_COOLDOWN_SECONDS * 1000);
 
@@ -375,12 +242,37 @@ export async function requestCustomerOtp(phone: string): Promise<{
       },
     });
 
-    // Generate secure 6-digit OTP and keyed HMAC representation for storage
-    const otpCode = generateNumericOtp();
-    const storedHmac = hashOtpCode(phone, otpCode);
     const expiresAt = new Date(now.getTime() + OTP_EXPIRY_SECONDS * 1000);
 
-    // Save keyed HMAC in existing `otp_verifications` table (VarChar(10) compatible)
+    // If provider manages code generation (e.g. Twilio Verify), Twilio is the authoritative generator
+    if (provider.managesCodeGeneration) {
+      // Dispatch verification request to provider first.
+      // If provider rejects (e.g. trial restrictions, invalid number), transaction rolls back cleanly
+      const sendResult = await provider.requestOtp(phone);
+
+      // Save challenge placeholder in otp_verifications for audit, cooldown, and attempt tracking
+      await tx.otp_verifications.create({
+        data: {
+          phone,
+          otp_code: 'TW_VERIFY',
+          purpose: 'login',
+          expires_at: expiresAt,
+          attempts: 0,
+          max_attempts: MAX_OTP_ATTEMPTS,
+          status: 'pending',
+        },
+      });
+
+      return {
+        expiresInSeconds: OTP_EXPIRY_SECONDS,
+        isSimulated: sendResult.isSimulated,
+      };
+    }
+
+    // Otherwise, local system generates 6-digit OTP and keyed HMAC representation for storage
+    const otpCode = generateNumericOtp();
+    const storedHmac = hashOtpCode(phone, otpCode);
+
     await tx.otp_verifications.create({
       data: {
         phone,
@@ -393,26 +285,30 @@ export async function requestCustomerOtp(phone: string): Promise<{
       },
     });
 
-    // Dispatch SMS (if dispatch fails, transaction will automatically roll back)
-    const smsResult = await sendSmsOtp(phone, otpCode);
+    // Dispatch OTP via delivery adapter
+    const sendResult = await provider.requestOtp(phone, otpCode);
 
     return {
       expiresInSeconds: OTP_EXPIRY_SECONDS,
-      isSimulated: smsResult.isSimulated,
+      isSimulated: sendResult.isSimulated,
     };
+  }, {
+    maxWait: 15000,
+    timeout: 15000,
   });
 }
 
 /**
  * Verify OTP:
  * 1. Finds active pending challenge in `otp_verifications`.
- * 2. Validates expiry, attempts limit, and code match using timing-safe comparison.
+ * 2. Validates expiry, attempts limit, and code match against active provider or stored keyed HMAC.
  * 3. Atomically marks challenge as verified using optimistic locking (anti-replay and concurrency-safe).
  */
 export async function verifyCustomerOtp(
   phone: string,
   inputOtp: string
 ): Promise<{ verified: boolean }> {
+  const provider = getActiveOtpProvider();
   const now = new Date();
 
   // Find latest pending challenge
@@ -447,12 +343,20 @@ export async function verifyCustomerOtp(
     throw new ValidationError('Maximum verification attempts exceeded. Please request a new OTP.');
   }
 
-  // Check code match using timing-safe comparison
-  let isMatch = verifyOtpCode(phone, inputOtp, challenge.otp_code);
+  // Check code match:
+  let isMatch = false;
 
-  // If local HMAC does not match and Twilio Verify Service is active, query Twilio Verify
-  if (!isMatch && process.env.TWILIO_VERIFY_SERVICE_SID) {
-    isMatch = await checkTwilioVerification(phone, inputOtp);
+  if (provider.managesCodeGeneration && challenge.otp_code === 'TW_VERIFY') {
+    // Authoritative check via provider (e.g. Twilio Verify)
+    isMatch = await provider.verifyOtp(phone, inputOtp);
+  } else {
+    // Local verification check against stored keyed HMAC or plain fixture
+    isMatch = verifyOtpCode(phone, inputOtp, challenge.otp_code);
+
+    // Fallback: If local HMAC does not match and Twilio Verify Service is configured, query Twilio Verify
+    if (!isMatch && process.env.TWILIO_VERIFY_SERVICE_SID) {
+      isMatch = await checkTwilioVerification(phone, inputOtp);
+    }
   }
 
   if (!isMatch) {

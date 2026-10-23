@@ -34,6 +34,8 @@ export interface SafeQrCodeMetadata {
   qrType: string;
   isActive: boolean;
   qrUrl?: string;
+  qrImage?: string;
+  qrSvg?: string;
   createdAt: string;
   updatedAt: string;
 }

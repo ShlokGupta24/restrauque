@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
 
     return successResponse(
       {
-        message: 'OTP verification code sent successfully',
+        message: 'OTP verification code requested successfully',
         phone: validatedData.phone,
         expiresInSeconds,
         ...(process.env.NODE_ENV !== 'production' && isSimulated ? { simulated: true } : {}),

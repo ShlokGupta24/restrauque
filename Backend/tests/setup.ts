@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { afterAll } from 'vitest';
 
 // Load .env file for vitest test runs
 const envPath = path.resolve(__dirname, '../.env');
@@ -21,3 +22,15 @@ if (fs.existsSync(envPath)) {
     }
   }
 }
+
+// Automated teardown: ensure any active Prisma connection is cleanly disconnected after each test file
+afterAll(async () => {
+  try {
+    const globalPrisma = (globalThis as { prisma?: { $disconnect: () => Promise<void> } }).prisma;
+    if (globalPrisma && typeof globalPrisma.$disconnect === 'function') {
+      await globalPrisma.$disconnect();
+    }
+  } catch {
+    // Ignore teardown disconnect errors if already closed or uninitialized
+  }
+});

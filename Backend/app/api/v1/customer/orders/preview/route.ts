@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { prisma } from '@/lib/db/prisma';
 import { requireCustomer } from '@/lib/auth/guard';
 import { orderPreviewSchema } from '@/lib/validation/order';
 import { resolveQrContext } from '@/lib/qr/resolve';
@@ -12,7 +13,8 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
   try {
     // 1. Enforce customer authentication
-    await requireCustomer(request);
+    const authContext = await requireCustomer(request);
+    const customerId = authContext.user.id;
 
     // 2. Parse and validate request body
     const body = await request.json();
@@ -30,7 +32,12 @@ export async function POST(request: NextRequest) {
       qrContext.restaurant.id,
       qrContext.table.id,
       validatedInput.couponCode,
-      validatedInput.notes
+      validatedInput.notes,
+      prisma,
+      {
+        pointsToRedeem: validatedInput.pointsToRedeem,
+        customerId,
+      }
     );
 
     // 5. Format sanitized quote response

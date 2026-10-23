@@ -3,6 +3,11 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { OrderItemInput } from '@/lib/validation/order';
 import { ValidationError, NotFoundError } from '@/lib/http/errors';
+import { resolveEffectiveVariantPrice } from '@/lib/menu/format';
+import {
+  MIN_REDEMPTION_POINTS,
+  MAX_REDEMPTION_DISCOUNT_PERCENTAGE,
+} from '@/lib/loyalty/service';
 
 export interface ValidatedAddonSnapshot {
   productAddonId: string;
@@ -27,9 +32,12 @@ export interface ValidatedItemSnapshot {
 export interface AuthoritativePricingResult {
   items: ValidatedItemSnapshot[];
   subtotal: Prisma.Decimal;
-  discountAmount: Prisma.Decimal;
+  discountAmount: Prisma.Decimal; // Promotional coupon discount only
+  loyaltyDiscountAmount: Prisma.Decimal; // Loyalty points discount separately
   taxAmount: Prisma.Decimal;
   totalAmount: Prisma.Decimal;
+  pointsRedeemed: number;
+  redemptionRate?: Prisma.Decimal | null;
   couponRecord?: {
     id: string;
     code: string;
@@ -37,6 +45,11 @@ export interface AuthoritativePricingResult {
     discountValue: Prisma.Decimal;
   } | null;
   canonicalPayloadHash: string;
+}
+
+export interface PricingOptions {
+  pointsToRedeem?: number | null;
+  customerId?: string | null;
 }
 
 /**
@@ -47,7 +60,8 @@ export function computeCanonicalPayloadHash(
   tableId: string,
   items: OrderItemInput[],
   couponCode?: string | null,
-  notes?: string | null
+  notes?: string | null,
+  pointsToRedeem?: number | null
 ): string {
   // Normalize and sort items deterministically
   const normalizedItems = items.map((it) => ({
@@ -67,6 +81,10 @@ export function computeCanonicalPayloadHash(
     items: normalizedItems,
     couponCode: couponCode?.trim().toUpperCase() ?? null,
     notes: notes?.trim() ?? null,
+    pointsToRedeem:
+      typeof pointsToRedeem === 'number' && Number.isInteger(pointsToRedeem) && pointsToRedeem > 0
+        ? pointsToRedeem
+        : null,
   };
 
   return crypto.createHash('sha256').update(JSON.stringify(canonicalObj)).digest('hex');
@@ -82,7 +100,8 @@ export async function calculateAuthoritativePricing(
   tableId: string,
   couponCode?: string | null,
   notes?: string | null,
-  dbClient: Prisma.TransactionClient | typeof prisma = prisma
+  dbClient: Prisma.TransactionClient | typeof prisma = prisma,
+  options?: PricingOptions
 ): Promise<AuthoritativePricingResult> {
   if (!items || items.length === 0) {
     throw new ValidationError('Order must contain at least one item');
@@ -145,7 +164,8 @@ export async function calculateAuthoritativePricing(
         );
       }
 
-      itemUnitPrice = new Prisma.Decimal(variant.price);
+      const effectivePrice = resolveEffectiveVariantPrice(variant.price, product.price);
+      itemUnitPrice = new Prisma.Decimal(effectivePrice.toFixed(2));
       variantNameSnapshot = variant.name;
       selectedVariantId = variant.id;
     }
@@ -259,11 +279,87 @@ export async function calculateAuthoritativePricing(
     };
   }
 
+  // 5. Calculate loyalty points discount if pointsToRedeem requested
+  let loyaltyDiscountDecimal = new Prisma.Decimal('0.00');
+  let pointsRedeemed = 0;
+  let redemptionRateDecimal: Prisma.Decimal | null = null;
+
+  if (options?.pointsToRedeem !== undefined && options?.pointsToRedeem !== null) {
+    const requestedPoints = options.pointsToRedeem;
+
+    if (typeof requestedPoints !== 'number' || !Number.isInteger(requestedPoints) || requestedPoints <= 0) {
+      throw new ValidationError('pointsToRedeem must be a positive integer');
+    }
+
+    if (requestedPoints < MIN_REDEMPTION_POINTS) {
+      throw new ValidationError(`Minimum redemption is ${MIN_REDEMPTION_POINTS} points`);
+    }
+
+    // Load authorized restaurant's active loyalty program
+    const program = await dbClient.loyalty_programs.findUnique({
+      where: { restaurant_id: restaurantId },
+    });
+
+    if (!program || !program.is_active) {
+      throw new ValidationError('Loyalty redemption is currently unavailable for this restaurant');
+    }
+
+    redemptionRateDecimal = program.redemption_rate
+      ? new Prisma.Decimal(program.redemption_rate)
+      : new Prisma.Decimal('1.00');
+
+    // Eligible bill for loyalty cap is non-negative subtotal after coupon discount, excluding tax and tips
+    let eligibleSpend = subtotalDecimal.sub(discountDecimal);
+    if (eligibleSpend.lessThan(0)) {
+      eligibleSpend = new Prisma.Decimal('0.00');
+    }
+
+    // Maximum loyalty discount: 50% of eligible bill
+    const maxLoyaltyDiscount = eligibleSpend.mul(MAX_REDEMPTION_DISCOUNT_PERCENTAGE);
+
+    // Rupee conversion: pointsToRedeem * redemptionRate, rounded to 2 decimal places deterministically
+    const pointsDec = new Prisma.Decimal(requestedPoints);
+    const calculatedLoyaltyDiscount = pointsDec.mul(redemptionRateDecimal);
+    const roundedLoyaltyDiscount = new Prisma.Decimal(calculatedLoyaltyDiscount.toFixed(2));
+
+    // Reject requests exceeding the 50% maximum discount cap (do NOT silently clamp)
+    if (roundedLoyaltyDiscount.greaterThan(maxLoyaltyDiscount)) {
+      throw new ValidationError(
+        `Requested redemption of ${requestedPoints} points (₹${roundedLoyaltyDiscount.toFixed(2)}) exceeds maximum allowed discount of ₹${maxLoyaltyDiscount.toFixed(2)} (50% of eligible bill)`
+      );
+    }
+
+    // Customer balance check if customerId provided
+    if (options.customerId) {
+      const customerAccount = await dbClient.customer_loyalty_accounts.findUnique({
+        where: {
+          customer_id_restaurant_id: {
+            customer_id: options.customerId,
+            restaurant_id: restaurantId,
+          },
+        },
+      });
+
+      const currentPoints = customerAccount ? customerAccount.stars_balance : 0;
+      if (currentPoints < requestedPoints) {
+        throw new ValidationError(
+          `Insufficient loyalty points: requested ${requestedPoints} points but account has ${currentPoints} points`
+        );
+      }
+    }
+
+    loyaltyDiscountDecimal = roundedLoyaltyDiscount;
+    if (loyaltyDiscountDecimal.greaterThan(eligibleSpend)) {
+      loyaltyDiscountDecimal = eligibleSpend;
+    }
+    pointsRedeemed = requestedPoints;
+  }
+
   // Tax calculation: Default 0.00 as verified in design (no invented arbitrary rates)
   const taxDecimal = new Prisma.Decimal(0);
 
-  // Total amount: subtotal - discount + tax
-  let totalDecimal = subtotalDecimal.sub(discountDecimal).add(taxDecimal);
+  // Total amount: subtotal - couponDiscount - loyaltyDiscount + tax
+  let totalDecimal = subtotalDecimal.sub(discountDecimal).sub(loyaltyDiscountDecimal).add(taxDecimal);
   if (totalDecimal.lessThan(0)) {
     totalDecimal = new Prisma.Decimal(0);
   }
@@ -272,15 +368,19 @@ export async function calculateAuthoritativePricing(
     tableId,
     items,
     couponCode,
-    notes
+    notes,
+    options?.pointsToRedeem
   );
 
   return {
     items: validatedSnapshots,
     subtotal: new Prisma.Decimal(subtotalDecimal.toFixed(2)),
     discountAmount: new Prisma.Decimal(discountDecimal.toFixed(2)),
+    loyaltyDiscountAmount: new Prisma.Decimal(loyaltyDiscountDecimal.toFixed(2)),
     taxAmount: new Prisma.Decimal(taxDecimal.toFixed(2)),
     totalAmount: new Prisma.Decimal(totalDecimal.toFixed(2)),
+    pointsRedeemed,
+    redemptionRate: redemptionRateDecimal,
     couponRecord: appliedCoupon,
     canonicalPayloadHash,
   };

@@ -23,6 +23,9 @@ import {
   DELETE as deleteAddonHandler,
 } from '@/app/api/v1/owner/menu/products/[productId]/addons/[addonId]/route';
 import { GET as getProductDetailHandler } from '@/app/api/v1/owner/menu/products/[productId]/route';
+import { POST as createProductHandler } from '@/app/api/v1/owner/menu/products/route';
+import { POST as createCategoryHandler } from '@/app/api/v1/owner/menu/categories/route';
+import { CATALOG_BOUNDS } from '@/lib/validation/menu';
 
 describe('STEP 8B: Product Variants & Add-ons CRUD and Isolation Integration Tests', () => {
   const timestamp = Date.now();
@@ -671,6 +674,253 @@ describe('STEP 8B: Product Variants & Add-ons CRUD and Isolation Integration Tes
       });
       expect(addonSnap).not.toBeNull();
       expect(addonSnap?.addon_name).toBe('Historical Addon');
+    });
+  });
+
+  // =========================================================================
+  // 7. Server-Side Catalog Capacity Limits Enforcement (Step 7.5A)
+  // =========================================================================
+  describe('7. Server-Side Catalog Capacity Limits Enforcement', () => {
+    it('should reject category creation when active category limit is reached', async () => {
+      process.env.TEST_OVERRIDE_MAX_CATEGORIES = '1';
+
+      try {
+        const req = new NextRequest('http://localhost/api/v1/owner/menu/categories', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${owner1Token}`,
+          },
+          body: JSON.stringify({
+            name: `Overflow Category ${Date.now()}`,
+            isActive: true,
+          }),
+        });
+
+        const res = await createCategoryHandler(req);
+        expect(res.status).toBe(400);
+
+        const json = await res.json();
+        expect(json.success).toBe(false);
+        expect(json.error.code).toBe('VALIDATION_ERROR');
+        expect(json.error.message).toContain('Category limit reached');
+      } finally {
+        delete process.env.TEST_OVERRIDE_MAX_CATEGORIES;
+      }
+    });
+
+    it('should allow creating an INACTIVE category even when active category limit is reached', async () => {
+      process.env.TEST_OVERRIDE_MAX_CATEGORIES = '1';
+
+      let createdCatId: string | undefined;
+      try {
+        const req = new NextRequest('http://localhost/api/v1/owner/menu/categories', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${owner1Token}`,
+          },
+          body: JSON.stringify({
+            name: `Inactive Allowed Category ${Date.now()}`,
+            isActive: false,
+          }),
+        });
+
+        const res = await createCategoryHandler(req);
+        expect(res.status).toBe(201);
+
+        const json = await res.json();
+        expect(json.success).toBe(true);
+        expect(json.data.category.isActive).toBe(false);
+        createdCatId = json.data.category.id;
+      } finally {
+        delete process.env.TEST_OVERRIDE_MAX_CATEGORIES;
+        if (createdCatId) {
+          await prisma.categories.deleteMany({ where: { id: createdCatId } });
+        }
+      }
+    });
+
+    it('should reject product creation when active product limit per category is reached', async () => {
+      process.env.TEST_OVERRIDE_MAX_PRODUCTS_PER_CATEGORY = '2';
+
+      try {
+        const req = new NextRequest('http://localhost/api/v1/owner/menu/products', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${owner1Token}`,
+          },
+          body: JSON.stringify({
+            categoryId: owner1CategoryId,
+            name: `Overflow Product ${Date.now()}`,
+            price: 99.99,
+            isActive: true,
+          }),
+        });
+
+        const res = await createProductHandler(req);
+        expect(res.status).toBe(400);
+
+        const json = await res.json();
+        expect(json.success).toBe(false);
+        expect(json.error.code).toBe('VALIDATION_ERROR');
+        expect(json.error.message).toContain('Product limit reached');
+      } finally {
+        delete process.env.TEST_OVERRIDE_MAX_PRODUCTS_PER_CATEGORY;
+      }
+    });
+
+    it('should reject variant creation when active variant limit per product is reached', async () => {
+      process.env.TEST_OVERRIDE_MAX_VARIANTS_PER_PRODUCT = '1';
+
+      try {
+        const req = new NextRequest(
+          `http://localhost/api/v1/owner/menu/products/${owner1Product1Id}/variants`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${owner1Token}`,
+            },
+            body: JSON.stringify({
+              name: `Overflow Variant ${Date.now()}`,
+              price: 15.0,
+              isActive: true,
+            }),
+          }
+        );
+
+        const res = await createVariantHandler(req, {
+          params: Promise.resolve({ productId: owner1Product1Id }),
+        });
+        expect(res.status).toBe(400);
+
+        const json = await res.json();
+        expect(json.success).toBe(false);
+        expect(json.error.code).toBe('VALIDATION_ERROR');
+        expect(json.error.message).toContain('Variant limit reached');
+      } finally {
+        delete process.env.TEST_OVERRIDE_MAX_VARIANTS_PER_PRODUCT;
+      }
+    });
+
+    it('should reject add-on creation when active add-on limit per product is reached', async () => {
+      process.env.TEST_OVERRIDE_MAX_ADDONS_PER_PRODUCT = '1';
+
+      try {
+        const req = new NextRequest(
+          `http://localhost/api/v1/owner/menu/products/${owner1Product1Id}/addons`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${owner1Token}`,
+            },
+            body: JSON.stringify({
+              name: `Overflow Addon ${Date.now()}`,
+              price: 5.0,
+              isActive: true,
+            }),
+          }
+        );
+
+        const res = await createAddonHandler(req, {
+          params: Promise.resolve({ productId: owner1Product1Id }),
+        });
+        expect(res.status).toBe(400);
+
+        const json = await res.json();
+        expect(json.success).toBe(false);
+        expect(json.error.code).toBe('VALIDATION_ERROR');
+        expect(json.error.message).toContain('Add-on limit reached');
+      } finally {
+        delete process.env.TEST_OVERRIDE_MAX_ADDONS_PER_PRODUCT;
+      }
+    });
+
+    it('should atomically serialize concurrent variant creation attempts and prevent capacity overflow', async () => {
+      const concurrencyProduct = await prisma.products.create({
+        data: {
+          restaurant_id: owner1RestaurantId,
+          category_id: owner1CategoryId,
+          name: `Concurrency Product ${Date.now()}`,
+          price: 150,
+          is_active: true,
+          is_available: true,
+        },
+      });
+
+      process.env.TEST_OVERRIDE_MAX_VARIANTS_PER_PRODUCT = '1';
+
+      try {
+        const createReq = (variantName: string) =>
+          new NextRequest(
+            `http://localhost/api/v1/owner/menu/products/${concurrencyProduct.id}/variants`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${owner1Token}`,
+              },
+              body: JSON.stringify({
+                name: variantName,
+                price: 19.99,
+                isActive: true,
+              }),
+            }
+          );
+
+        const [res1, res2] = await Promise.all([
+          createVariantHandler(createReq(`Concurrent-A-${Date.now()}`), {
+            params: Promise.resolve({ productId: concurrencyProduct.id }),
+          }),
+          createVariantHandler(createReq(`Concurrent-B-${Date.now()}`), {
+            params: Promise.resolve({ productId: concurrencyProduct.id }),
+          }),
+        ]);
+
+        const statuses = [res1.status, res2.status].sort();
+        // With container row-level locking, exactly one must succeed (201) and one must be rejected (400)
+        expect(statuses).toEqual([201, 400]);
+
+        const activeVariants = await prisma.product_variants.findMany({
+          where: { product_id: concurrencyProduct.id, is_active: true },
+        });
+        expect(activeVariants.length).toBe(1);
+      } finally {
+        delete process.env.TEST_OVERRIDE_MAX_VARIANTS_PER_PRODUCT;
+        await prisma.product_variants.deleteMany({
+          where: { product_id: concurrencyProduct.id },
+        });
+        await prisma.products.deleteMany({
+          where: { id: concurrencyProduct.id },
+        });
+      }
+    });
+
+    it('should NEVER allow TEST_OVERRIDE_* to override limits when NODE_ENV is production', () => {
+      const originalNodeEnv = process.env.NODE_ENV;
+      process.env.TEST_OVERRIDE_MAX_CATEGORIES = '1';
+      process.env.TEST_OVERRIDE_MAX_PRODUCTS_PER_CATEGORY = '5';
+      process.env.TEST_OVERRIDE_MAX_VARIANTS_PER_PRODUCT = '2';
+      process.env.TEST_OVERRIDE_MAX_ADDONS_PER_PRODUCT = '3';
+
+      try {
+        // Simulate production environment
+        (process.env as any).NODE_ENV = 'production';
+
+        expect(CATALOG_BOUNDS.MAX_CATEGORIES).toBe(100);
+        expect(CATALOG_BOUNDS.MAX_PRODUCTS_PER_CATEGORY).toBe(200);
+        expect(CATALOG_BOUNDS.MAX_VARIANTS_PER_PRODUCT).toBe(50);
+        expect(CATALOG_BOUNDS.MAX_ADDONS_PER_PRODUCT).toBe(50);
+      } finally {
+        (process.env as any).NODE_ENV = originalNodeEnv;
+        delete process.env.TEST_OVERRIDE_MAX_CATEGORIES;
+        delete process.env.TEST_OVERRIDE_MAX_PRODUCTS_PER_CATEGORY;
+        delete process.env.TEST_OVERRIDE_MAX_VARIANTS_PER_PRODUCT;
+        delete process.env.TEST_OVERRIDE_MAX_ADDONS_PER_PRODUCT;
+      }
     });
   });
 });

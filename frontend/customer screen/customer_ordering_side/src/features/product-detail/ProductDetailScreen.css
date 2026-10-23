@@ -1,0 +1,324 @@
+/* ==========================================================================
+   Screen 03: Product Details & Customization Styles
+   Visual reference: UIUX/03-product-details.png
+   ========================================================================== */
+
+.product-detail-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--page-background);
+  position: relative;
+  padding-bottom: 90px; /* Space for sticky bottom CTA */
+}
+
+/* Hero Media Section */
+.product-hero-media {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  background-color: #2D2824;
+}
+
+.product-hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hero-media-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 100%);
+  pointer-events: none;
+}
+
+/* Floating Top Controls */
+.hero-floating-controls {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.floating-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform var(--transition-fast), background-color var(--transition-fast);
+}
+
+.floating-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.98);
+  transform: scale(1.05);
+}
+
+.floating-icon-btn:active {
+  transform: scale(0.95);
+}
+
+.favorite-btn.favorited {
+  color: #E25C5C;
+}
+
+/* Bottom Sheet Content */
+.product-detail-content {
+  position: relative;
+  margin-top: -28px;
+  background-color: var(--page-background);
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  padding: 24px 20px 20px 20px;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.08);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* Title & Price Header */
+.product-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.product-detail-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-color);
+  line-height: 1.25;
+}
+
+.product-detail-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-color);
+  white-space: nowrap;
+}
+
+.product-detail-description {
+  font-size: 13.5px;
+  color: var(--muted-text-color);
+  line-height: 1.45;
+  margin-top: -12px;
+}
+
+/* Customization Sections */
+.customization-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+/* Variant Pills */
+.variant-options-group {
+  display: flex;
+  gap: 12px;
+}
+
+.variant-pill-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: var(--button-radius);
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  font-size: 14px;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.variant-pill-btn.active {
+  background-color: var(--brand-primary);
+  color: #FFFFFF;
+  border-color: var(--brand-primary);
+  box-shadow: 0 4px 12px rgba(23, 74, 130, 0.25);
+}
+
+.variant-price-delta {
+  font-size: 12.5px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+/* Add-ons Checklist */
+.addons-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.addon-checkbox-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.addon-checkbox-row:hover {
+  border-color: #C2BEB4;
+}
+
+.addon-checkbox-row.selected {
+  border-color: var(--brand-primary);
+  background-color: #F8FAFD;
+}
+
+.addon-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.addon-check-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid #C0BCB2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #FFFFFF;
+  color: #FFFFFF;
+  transition: all var(--transition-fast);
+}
+
+.addon-checkbox-row.selected .addon-check-box {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+.addon-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.addon-price {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+/* Quantity Stepper Section */
+.quantity-stepper-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 6px;
+}
+
+.stepper-pill {
+  display: flex;
+  align-items: center;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--button-radius);
+  padding: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.stepper-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  background: transparent;
+  transition: background-color var(--transition-fast);
+}
+
+.stepper-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.stepper-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.stepper-count {
+  width: 32px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+/* Sticky Bottom Action Button */
+.detail-sticky-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  padding: 16px 20px 20px 20px;
+  background: linear-gradient(180deg, rgba(252, 248, 237, 0) 0%, rgba(252, 248, 237, 0.95) 25%, #FCF8ED 100%);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+}
+
+.add-to-cart-submit-btn {
+  width: 100%;
+  height: 52px;
+  border-radius: var(--button-radius);
+  background-color: var(--brand-primary);
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 8px 24px rgba(23, 74, 130, 0.35);
+  transition: all var(--transition-fast);
+}
+
+.add-to-cart-submit-btn:hover {
+  background-color: var(--brand-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(23, 74, 130, 0.42);
+}
+
+.add-to-cart-submit-btn:active {
+  transform: translateY(0);
+}

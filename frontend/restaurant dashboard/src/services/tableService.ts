@@ -54,6 +54,8 @@ export interface CreateTableResponse {
     isActive: boolean;
     rawToken: string;
     qrUrl: string;
+    qrImage?: string;
+    qrSvg?: string;
   };
 }
 
@@ -73,6 +75,9 @@ export interface SafeQrCodeMetadata {
   branchName?: string;
   qrType: string;
   isActive: boolean;
+  qrUrl?: string;
+  qrImage?: string;
+  qrSvg?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -83,6 +88,8 @@ export interface RotateQrResponse {
   isQrActive: boolean;
   rawToken: string;
   qrUrl: string;
+  qrImage?: string;
+  qrSvg?: string;
   rotatedAt: string;
 }
 
@@ -165,10 +172,15 @@ export const tableService = {
     );
   },
 
-  getTableQr: async (tableId: string): Promise<{ qr: SafeQrCodeMetadata }> => {
+  getTableQr: async (tableId: string, autoProvision = true): Promise<{ qr: SafeQrCodeMetadata }> => {
+    const qs = autoProvision ? '?autoProvision=true' : '';
     return apiClient.get<{ qr: SafeQrCodeMetadata }>(
-      `/api/v1/owner/tables/${encodeURIComponent(tableId)}/qr`
+      `/api/v1/owner/tables/${encodeURIComponent(tableId)}/qr${qs}`
     );
+  },
+
+  getTableQrImageUrl: (tableId: string, format: 'png' | 'svg' = 'png'): string => {
+    return `/api/v1/owner/tables/${encodeURIComponent(tableId)}/qr/image?format=${format}`;
   },
 
   rotateTableQr: async (tableId: string): Promise<RotateQrResponse> => {

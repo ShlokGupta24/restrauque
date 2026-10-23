@@ -1,7 +1,15 @@
+import crypto from 'crypto';
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { requireAuthorizedRestaurant, validateUuid } from '@/lib/auth/tenancy';
 import { formatQrMetadata } from '@/lib/tables/format';
+import {
+  deriveDeterministicQrToken,
+  hashQrToken,
+  buildPublicQrUrl,
+  generateQrCodeDataUrl,
+  generateQrCodeSvg,
+} from '@/lib/qr/token';
 import { successResponse } from '@/lib/http/response';
 import { handleApiError, NotFoundError } from '@/lib/http/errors';
 
@@ -40,13 +48,69 @@ export async function GET(
       throw new NotFoundError('Table not found');
     }
 
-    const activeQr = table.qr_codes[0];
+    const { searchParams } = new URL(request.url);
+    const autoProvision = searchParams.get('autoProvision') === 'true';
+
+    let activeQr = table.qr_codes[0];
+
+    // Auto-provision if table has no active QR identity and requested
+    if (!activeQr && autoProvision) {
+      const qrId = crypto.randomUUID();
+      const rawToken = deriveDeterministicQrToken(table.id, qrId);
+      const hashedCode = hashQrToken(rawToken);
+
+      activeQr = await prisma.qr_codes.create({
+        data: {
+          id: qrId,
+          table_id: table.id,
+          code: hashedCode,
+          qr_type: 'table',
+          is_active: true,
+        },
+      });
+    }
+
     if (!activeQr) {
       throw new NotFoundError('No active QR code found for this table');
     }
 
+    // Determine if token is deterministically recoverable from server secret
+    const derivedToken = deriveDeterministicQrToken(table.id, activeQr.id);
+    let isMatch = hashQrToken(derivedToken) === activeQr.code;
+
+    // If autoProvision is enabled and legacy record does not match, heal it
+    if (!isMatch && autoProvision) {
+      activeQr = await prisma.qr_codes.update({
+        where: { id: activeQr.id },
+        data: {
+          code: hashQrToken(derivedToken),
+          updated_at: new Date(),
+        },
+      });
+      isMatch = true;
+    }
+
+    let qrUrl: string | undefined;
+    let qrImage: string | undefined;
+    let qrSvg: string | undefined;
+
+    if (isMatch) {
+      qrUrl = buildPublicQrUrl(derivedToken);
+      const [img, svg] = await Promise.all([
+        generateQrCodeDataUrl(qrUrl),
+        generateQrCodeSvg(qrUrl),
+      ]);
+      qrImage = img;
+      qrSvg = svg;
+    }
+
     return successResponse({
-      qr: formatQrMetadata(activeQr, table, table.branches),
+      qr: {
+        ...formatQrMetadata(activeQr, table, table.branches),
+        ...(qrUrl ? { qrUrl } : {}),
+        ...(qrImage ? { qrImage } : {}),
+        ...(qrSvg ? { qrSvg } : {}),
+      },
     });
   } catch (error) {
     return handleApiError(error);

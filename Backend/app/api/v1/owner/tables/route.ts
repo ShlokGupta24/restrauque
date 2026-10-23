@@ -3,7 +3,14 @@ import { prisma } from '@/lib/db/prisma';
 import { requireAuthorizedRestaurant, validateUuid } from '@/lib/auth/tenancy';
 import { createTableSchema } from '@/lib/validation/tables';
 import { formatDiningTable } from '@/lib/tables/format';
-import { generateSecureQrToken, hashQrToken, buildPublicQrUrl } from '@/lib/qr/token';
+import crypto from 'crypto';
+import {
+  generateSecureQrToken,
+  hashQrToken,
+  buildPublicQrUrl,
+  generateQrCodeDataUrl,
+  generateQrCodeSvg,
+} from '@/lib/qr/token';
 import { successResponse } from '@/lib/http/response';
 import { handleApiError, ConflictError, ValidationError } from '@/lib/http/errors';
 import { Prisma } from '@prisma/client';
@@ -163,13 +170,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const rawToken = generateSecureQrToken();
+    const tableId = crypto.randomUUID();
+    const qrId = crypto.randomUUID();
+    const rawToken = generateSecureQrToken(tableId, qrId);
     const hashedCode = hashQrToken(rawToken);
 
     try {
       const result = await prisma.$transaction(async (tx) => {
         const table = await tx.restaurant_tables.create({
           data: {
+            id: tableId,
             branch_id: validatedData.branchId,
             table_number: validatedData.tableNumber,
             capacity: validatedData.capacity,
@@ -180,6 +190,7 @@ export async function POST(request: NextRequest) {
 
         const qr = await tx.qr_codes.create({
           data: {
+            id: qrId,
             table_id: table.id,
             code: hashedCode,
             qr_type: 'table',
@@ -190,6 +201,12 @@ export async function POST(request: NextRequest) {
         return { table, qr };
       });
 
+      const qrUrl = buildPublicQrUrl(rawToken);
+      const [qrImage, qrSvg] = await Promise.all([
+        generateQrCodeDataUrl(qrUrl),
+        generateQrCodeSvg(qrUrl),
+      ]);
+
       return successResponse(
         {
           table: formatDiningTable(result.table, branch.name, result.qr),
@@ -197,7 +214,9 @@ export async function POST(request: NextRequest) {
             id: result.qr.id,
             isActive: result.qr.is_active,
             rawToken,
-            qrUrl: buildPublicQrUrl(rawToken),
+            qrUrl,
+            qrImage,
+            qrSvg,
           },
         },
         201

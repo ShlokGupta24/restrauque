@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Plus,
   ArrowUpRight,
@@ -10,6 +10,9 @@ import {
   ExternalLink,
   Copy,
   Trash2,
+  Download,
+  Printer,
+  X,
 } from 'lucide-react';
 import { useRestaurant } from '../../context/RestaurantContext';
 import {
@@ -37,6 +40,9 @@ export const TablesQrPage: React.FC = () => {
   const [isRotatingQr, setIsRotatingQr] = useState<boolean>(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState<boolean>(false);
+
+  const printCardRef = useRef<HTMLDivElement>(null);
 
   const showToast = (msg: string) => {
     setSuccessToast(msg);
@@ -79,11 +85,14 @@ export const TablesQrPage: React.FC = () => {
     }
   }, [activeBranch]);
 
-  // Load QR metadata for selected table
+  // Load QR metadata & image for selected table
   const loadSelectedQrMetadata = useCallback(async (tableId: string) => {
     try {
-      const res = await tableService.getTableQr(tableId);
+      const res = await tableService.getTableQr(tableId, true);
       setTableQrMetadata(res.qr);
+      if (res.qr.qrUrl) {
+        setTableQrUrls((prev) => ({ ...prev, [tableId]: res.qr.qrUrl! }));
+      }
     } catch {
       setTableQrMetadata(null);
     }
@@ -106,7 +115,7 @@ export const TablesQrPage: React.FC = () => {
   // Handle table created from modal
   const handleSaveNewTable = (
     newTable: SafeDiningTable,
-    qr?: { rawToken: string; qrUrl: string }
+    qr?: { rawToken: string; qrUrl: string; qrImage?: string; qrSvg?: string }
   ) => {
     setTables((prev) => [...prev, newTable]);
     setSelectedTableId(newTable.id);
@@ -159,7 +168,9 @@ export const TablesQrPage: React.FC = () => {
       setTables((prev) =>
         prev.map((t) => (t.id === selectedTable.id ? { ...t, isQrActive: res.table.isQrActive } : t))
       );
-      showToast(`QR ordering ${nextQrActive ? 'enabled' : 'disabled'} for "${selectedTable.tableNumber}"`);
+      showToast(
+        `QR ordering ${nextQrActive ? 'enabled' : 'disabled'} for "${selectedTable.tableNumber}"`
+      );
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to toggle QR status';
       alert(msg);
@@ -214,13 +225,63 @@ export const TablesQrPage: React.FC = () => {
     showToast('Authoritative QR Link copied to clipboard!');
   };
 
+  // Download QR as PNG
+  const handleDownloadQrPng = () => {
+    if (!selectedTable || !tableQrMetadata) return;
+
+    const fileName = `${restaurant?.name || 'Restaurant'}_${activeBranch?.name || 'Branch'}_Table_${selectedTable.tableNumber}_QR.png`.replace(
+      /[^a-zA-Z0-9_-]/g,
+      '_'
+    );
+
+    if (tableQrMetadata.qrImage) {
+      const a = document.createElement('a');
+      a.href = tableQrMetadata.qrImage;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast(`Downloaded PNG for Table ${selectedTable.tableNumber}!`);
+    } else {
+      // Fallback to direct backend endpoint
+      const directUrl = tableService.getTableQrImageUrl(selectedTable.id, 'png');
+      window.open(directUrl, '_blank');
+    }
+  };
+
+  // Download QR as SVG
+  const handleDownloadQrSvg = () => {
+    if (!selectedTable || !tableQrMetadata?.qrSvg) return;
+
+    const fileName = `${restaurant?.name || 'Restaurant'}_${activeBranch?.name || 'Branch'}_Table_${selectedTable.tableNumber}_QR.svg`.replace(
+      /[^a-zA-Z0-9_-]/g,
+      '_'
+    );
+
+    const blob = new Blob([tableQrMetadata.qrSvg], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`Downloaded SVG for Table ${selectedTable.tableNumber}!`);
+  };
+
+  // Trigger Print
+  const handlePrint = () => {
+    window.print();
+  };
+
   // Metrics
   const totalTables = summary ? summary.totalTables : tables.length;
   const activeTablesCount = summary ? summary.activeTables : tables.filter((t) => t.isActive).length;
   const qrActiveCount = summary ? summary.qrActiveTables : tables.filter((t) => t.isQrActive).length;
   const inactiveTablesCount = summary ? summary.inactiveTables : tables.filter((t) => !t.isActive).length;
 
-  const currentQrUrl = selectedTable ? tableQrUrls[selectedTable.id] : undefined;
+  const currentQrUrl = selectedTable ? tableQrUrls[selectedTable.id] || tableQrMetadata?.qrUrl : undefined;
 
   const getStatusBadgeStyle = (status: TableOperationalStatus) => {
     switch (status) {
@@ -450,7 +511,7 @@ export const TablesQrPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column: QR Code Preview */}
+        {/* Right Column: QR Code Preview & Actions */}
         <div className="card qr-preview-card">
           <div className="card-header-clean">
             <h3 className="card-title">QR code preview</h3>
@@ -461,93 +522,152 @@ export const TablesQrPage: React.FC = () => {
 
           {selectedTable ? (
             <>
-              {/* Large QR Box */}
+              {/* Real Scannable QR Container */}
               <div className="large-qr-container">
-                <svg viewBox="0 0 100 100" className="large-qr-svg">
-                  {/* Outer Position Markers */}
-                  <rect x="10" y="10" width="24" height="24" rx="4" fill="#111827" />
-                  <rect x="15" y="15" width="14" height="14" fill="#ffffff" />
-                  <rect x="18" y="18" width="8" height="8" fill="#111827" />
-
-                  <rect x="66" y="10" width="24" height="24" rx="4" fill="#111827" />
-                  <rect x="71" y="15" width="14" height="14" fill="#ffffff" />
-                  <rect x="74" y="18" width="8" height="8" fill="#111827" />
-
-                  <rect x="10" y="66" width="24" height="24" rx="4" fill="#111827" />
-                  <rect x="15" y="71" width="14" height="14" fill="#ffffff" />
-                  <rect x="18" y="74" width="8" height="8" fill="#111827" />
-
-                  {/* Data Blocks */}
-                  <rect x="44" y="12" width="8" height="8" fill="#111827" />
-                  <rect x="44" y="30" width="8" height="8" fill="#111827" />
-                  <rect x="44" y="48" width="8" height="8" fill="#111827" />
-                  <rect x="44" y="66" width="8" height="8" fill="#111827" />
-                  <rect x="24" y="44" width="8" height="8" fill="#111827" />
-                  <rect x="68" y="44" width="8" height="8" fill="#111827" />
-                  <rect x="68" y="68" width="12" height="12" fill="#111827" />
-                  <rect x="56" y="80" width="8" height="8" fill="#111827" />
-                  <rect x="34" y="56" width="6" height="6" fill="#111827" />
-                  <rect x="56" y="34" width="6" height="6" fill="#111827" />
-                </svg>
+                {tableQrMetadata?.qrSvg ? (
+                  <div
+                    className="real-qr-svg-wrapper"
+                    dangerouslySetInnerHTML={{ __html: tableQrMetadata.qrSvg }}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  />
+                ) : tableQrMetadata?.qrImage ? (
+                  <img
+                    src={tableQrMetadata.qrImage}
+                    alt={`Scannable QR Code for Table ${selectedTable.tableNumber}`}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      display: 'block',
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#9ca3af',
+                      fontSize: '11px',
+                      textAlign: 'center',
+                    }}
+                  >
+                    Generating QR code...
+                  </div>
+                )}
               </div>
 
               <div className="qr-headline-text">
-                {restaurant?.name || 'Restaurant'} · {selectedTable.tableNumber}
+                {restaurant?.name || 'Restaurant'} · Table {selectedTable.tableNumber}
               </div>
               <div className="qr-subline-text">
-                Status: <span style={{ textTransform: 'capitalize', fontWeight: 600 }}>{selectedTable.status}</span> · {selectedTable.capacity} Seats · ID: <small style={{ color: '#9ca3af' }}>{selectedTable.id}</small>
+                Status:{' '}
+                <span style={{ textTransform: 'capitalize', fontWeight: 600 }}>
+                  {selectedTable.status}
+                </span>{' '}
+                · {selectedTable.capacity} Seats · Branch: {activeBranch?.name || 'Main Branch'}
               </div>
 
               {/* Status Switcher Row */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginBottom: '6px' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '11px',
+                    color: '#9ca3af',
+                    marginBottom: '6px',
+                  }}
+                >
                   OPERATIONAL STATUS
                 </label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px' }}>
-                  {(['available', 'occupied', 'reserved', 'maintenance'] as TableOperationalStatus[]).map((st) => (
-                    <button
-                      key={st}
-                      type="button"
-                      disabled={isUpdatingStatus}
-                      onClick={() => handleChangeStatus(st)}
-                      style={{
-                        padding: '6px 10px',
-                        borderRadius: '6px',
-                        border: selectedTable.status === st ? '1px solid var(--brand-red)' : '1px solid #374151',
-                        backgroundColor: selectedTable.status === st ? 'rgba(229, 57, 53, 0.15)' : '#1f2937',
-                        color: selectedTable.status === st ? '#ffffff' : '#9ca3af',
-                        fontSize: '11px',
-                        textTransform: 'capitalize',
-                        cursor: 'pointer',
-                        fontWeight: selectedTable.status === st ? 600 : 400,
-                      }}
-                    >
-                      {st}
-                    </button>
-                  ))}
+                  {(['available', 'occupied', 'reserved', 'maintenance'] as TableOperationalStatus[]).map(
+                    (st) => (
+                      <button
+                        key={st}
+                        type="button"
+                        disabled={isUpdatingStatus}
+                        onClick={() => handleChangeStatus(st)}
+                        style={{
+                          padding: '6px 10px',
+                          borderRadius: '6px',
+                          border:
+                            selectedTable.status === st
+                              ? '1px solid var(--brand-red)'
+                              : '1px solid #374151',
+                          backgroundColor:
+                            selectedTable.status === st
+                              ? 'rgba(229, 57, 53, 0.15)'
+                              : '#1f2937',
+                          color: selectedTable.status === st ? '#ffffff' : '#9ca3af',
+                          fontSize: '11px',
+                          textTransform: 'capitalize',
+                          cursor: 'pointer',
+                          fontWeight: selectedTable.status === st ? 600 : 400,
+                        }}
+                      >
+                        {st}
+                      </button>
+                    )
+                  )}
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="qr-actions-list">
+                {/* Print and Download Quick Actions */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <button
+                    type="button"
+                    className="btn btn-primary-red qr-btn-action"
+                    onClick={() => setIsPrintModalOpen(true)}
+                    disabled={!currentQrUrl}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                  >
+                    <Printer size={14} />
+                    <span>Print Label</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn btn-outline qr-btn-action"
+                    onClick={handleDownloadQrPng}
+                    disabled={!currentQrUrl}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                  >
+                    <Download size={14} />
+                    <span>Download PNG</span>
+                  </button>
+                </div>
+
                 {currentQrUrl ? (
                   <>
                     <button
                       type="button"
                       className="btn btn-outline qr-btn-action"
                       onClick={() => handleCopyQrLink(currentQrUrl)}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                     >
                       <Copy size={14} />
-                      <span>Copy Customer QR Link</span>
+                      <span>Copy Customer Scan URL</span>
                     </button>
 
                     <button
                       type="button"
                       className="btn btn-outline qr-btn-action"
                       onClick={() => window.open(currentQrUrl, '_blank')}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                     >
                       <ExternalLink size={14} />
-                      <span>Open Customer QR Order Page</span>
+                      <span>Test Scan in Browser</span>
                     </button>
                   </>
                 ) : (
@@ -558,7 +678,9 @@ export const TablesQrPage: React.FC = () => {
                     onClick={handleRotateQr}
                   >
                     <RotateCw size={14} className={isRotatingQr ? 'spin-icon' : ''} />
-                    <span>{isRotatingQr ? 'Generating QR token...' : 'Generate / Rotate QR Token'}</span>
+                    <span>
+                      {isRotatingQr ? 'Generating QR token...' : 'Generate / Provision QR Code'}
+                    </span>
                   </button>
                 )}
 
@@ -568,7 +690,14 @@ export const TablesQrPage: React.FC = () => {
                     className="btn btn-outline qr-btn-action"
                     disabled={isRotatingQr}
                     onClick={handleRotateQr}
-                    style={{ color: '#f59e0b', borderColor: '#78350f' }}
+                    style={{
+                      color: '#f59e0b',
+                      borderColor: '#78350f',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                    }}
                   >
                     <RotateCw size={14} className={isRotatingQr ? 'spin-icon' : ''} />
                     <span>Rotate QR Token (Invalidates old code)</span>
@@ -581,14 +710,23 @@ export const TablesQrPage: React.FC = () => {
                   disabled={isUpdatingStatus}
                   onClick={handleToggleQrActive}
                 >
-                  <span>{selectedTable.isQrActive ? 'Disable QR Ordering' : 'Enable QR Ordering'}</span>
+                  <span>
+                    {selectedTable.isQrActive ? 'Disable QR Ordering' : 'Enable QR Ordering'}
+                  </span>
                 </button>
 
                 <button
                   type="button"
                   className="btn btn-outline qr-btn-action"
                   onClick={() => handleDeleteTable(selectedTable)}
-                  style={{ color: '#ff6c64', borderColor: 'rgba(229, 57, 53, 0.4)' }}
+                  style={{
+                    color: '#ff6c64',
+                    borderColor: 'rgba(229, 57, 53, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                  }}
                 >
                   <Trash2 size={14} />
                   <span>Delete / Archive Table</span>
@@ -597,28 +735,43 @@ export const TablesQrPage: React.FC = () => {
 
               {/* Backend Confirmation Box */}
               <div className="backend-confirm-box">
-                <div className="confirm-box-title">Cryptographic Token Status</div>
-                <p className="confirm-box-text">
+                <div className="confirm-box-title">Cryptographic Token & Resolver Status</div>
+                <div className="confirm-box-text">
                   {currentQrUrl ? (
                     <>
-                      Active token URL loaded: <br />
-                      <code style={{ fontSize: '10px', color: '#10b981', wordBreak: 'break-all' }}>
+                      <div>
+                        Authoritative Scan Target:
+                      </div>
+                      <code
+                        style={{
+                          fontSize: '11px',
+                          color: '#10b981',
+                          wordBreak: 'break-all',
+                          display: 'block',
+                          margin: '4px 0',
+                        }}
+                      >
                         {currentQrUrl}
                       </code>
-                    </>
-                  ) : tableQrMetadata ? (
-                    <>
-                      QR record registered: <code>{tableQrMetadata.id}</code> (SHA-256 hash stored in DB).
-                      Click "Generate / Rotate QR Token" above to generate a new active public URL.
+                      <div style={{ color: '#9ca3af', fontSize: '10px' }}>
+                        Scannable with any iOS/Android smartphone camera. Resolves to this specific table.
+                      </div>
                     </>
                   ) : (
-                    'No active QR code recorded. Click generate above to create one.'
+                    'Loading QR token status from Neon database...'
                   )}
-                </p>
+                </div>
               </div>
             </>
           ) : (
-            <div style={{ padding: '40px', textAlign: 'center', color: '#9ca3af', fontSize: '13px' }}>
+            <div
+              style={{
+                padding: '40px',
+                textAlign: 'center',
+                color: '#9ca3af',
+                fontSize: '13px',
+              }}
+            >
               Select a table from the floor grid to view details and manage QR tokens.
             </div>
           )}
@@ -631,6 +784,93 @@ export const TablesQrPage: React.FC = () => {
         onClose={() => setIsAddModalOpen(false)}
         onSave={handleSaveNewTable}
       />
+
+      {/* Print Preview & Label Modal */}
+      {isPrintModalOpen && selectedTable && tableQrMetadata && (
+        <div
+          className="print-modal-overlay"
+          onClick={() => setIsPrintModalOpen(false)}
+        >
+          <div
+            className="print-modal-container"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="print-modal-header">
+              <h3>Print Table QR Label</h3>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={() => setIsPrintModalOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="print-modal-body">
+              {/* Stand Label Card to Print */}
+              <div
+                id="printable-table-label"
+                ref={printCardRef}
+                className="printable-table-label-card"
+              >
+                <div className="label-restaurant-name">
+                  {restaurant?.name || 'Restaurant'}
+                </div>
+                <div className="label-branch-name">
+                  {activeBranch?.name || 'Main Branch'}
+                </div>
+
+                <div className="label-table-badge">
+                  <span>TABLE</span>
+                  <span className="label-table-num">{selectedTable.tableNumber}</span>
+                </div>
+
+                <div className="label-qr-wrapper">
+                  {tableQrMetadata.qrImage ? (
+                    <img
+                      src={tableQrMetadata.qrImage}
+                      alt={`QR Code Table ${selectedTable.tableNumber}`}
+                      className="label-qr-img"
+                    />
+                  ) : (
+                    <div
+                      dangerouslySetInnerHTML={{ __html: tableQrMetadata.qrSvg || '' }}
+                    />
+                  )}
+                </div>
+
+                <div className="label-instructions">
+                  <strong>SCAN TO BROWSE & ORDER</strong>
+                  <p>Point phone camera at code to view live menu</p>
+                </div>
+
+                <div className="label-powered-by">
+                  Powered by Restrauque Intelligence
+                </div>
+              </div>
+            </div>
+
+            <div className="print-modal-footer">
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={handleDownloadQrSvg}
+              >
+                <Download size={14} style={{ marginRight: '6px' }} />
+                Save Vector SVG
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary-red"
+                onClick={handlePrint}
+              >
+                <Printer size={14} style={{ marginRight: '6px' }} />
+                Print Sticker / Label
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

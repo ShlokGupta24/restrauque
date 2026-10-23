@@ -1,10 +1,10 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { requireAuthorizedRestaurant, validateUuid } from '@/lib/auth/tenancy';
-import { updateVariantSchema } from '@/lib/validation/menu';
+import { updateVariantSchema, CATALOG_BOUNDS } from '@/lib/validation/menu';
 import { formatVariant } from '@/lib/menu/format';
 import { successResponse } from '@/lib/http/response';
-import { handleApiError, NotFoundError, ConflictError } from '@/lib/http/errors';
+import { handleApiError, NotFoundError, ConflictError, ValidationError } from '@/lib/http/errors';
 import { Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
@@ -46,7 +46,7 @@ export async function GET(
     }
 
     return successResponse({
-      variant: formatVariant(variant),
+      variant: formatVariant(variant, product.price),
     });
   } catch (error) {
     return handleApiError(error);
@@ -92,47 +92,78 @@ export async function PATCH(
     const rawBody = await request.json();
     const validatedData = updateVariantSchema.parse(rawBody);
 
-    // If changing name, verify uniqueness within this product
-    if (
-      validatedData.name &&
-      validatedData.name.toLowerCase() !== existingVariant.name.toLowerCase()
-    ) {
-      const duplicate = await prisma.product_variants.findFirst({
-        where: {
-          product_id: productId,
-          name: { equals: validatedData.name, mode: 'insensitive' },
-          NOT: { id: variantId },
-        },
-      });
-
-      if (duplicate) {
-        throw new ConflictError(
-          `A variant named "${validatedData.name}" already exists for this product`
-        );
-      }
+    if (validatedData.price !== undefined && validatedData.price === 0 && Number(product.price) > 0) {
+      throw new ValidationError(
+        `Variant price cannot be 0 for a paid product (Base price: ${Number(product.price)}). Please provide the full price for this variant.`
+      );
     }
 
     try {
-      const updated = await prisma.product_variants.update({
-        where: { id: variantId },
-        data: {
-          ...(validatedData.name !== undefined ? { name: validatedData.name } : {}),
-          ...(validatedData.price !== undefined
-            ? { price: new Prisma.Decimal(validatedData.price.toFixed(2)) }
-            : {}),
-          ...(validatedData.displayOrder !== undefined
-            ? { display_order: validatedData.displayOrder }
-            : {}),
-          ...(validatedData.isActive !== undefined ? { is_active: validatedData.isActive } : {}),
-          ...(validatedData.isAvailable !== undefined
-            ? { is_available: validatedData.isAvailable }
-            : {}),
-          updated_at: new Date(),
+      const updated = await prisma.$transaction(
+        async (tx) => {
+          // If activating a previously inactive variant, check active variant capacity limit with container-level row lock
+          if (validatedData.isActive === true && !existingVariant.is_active) {
+            if (typeof (tx as any).$executeRaw === 'function') {
+              await (tx as any).$executeRaw`SELECT id FROM products WHERE id = ${productId}::uuid FOR UPDATE`;
+            }
+
+            const activeCount = await tx.product_variants.count({
+              where: {
+                product_id: productId,
+                is_active: true,
+              },
+            });
+
+            if (activeCount >= CATALOG_BOUNDS.MAX_VARIANTS_PER_PRODUCT) {
+              throw new ValidationError(
+                `Variant limit reached. A product cannot have more than ${CATALOG_BOUNDS.MAX_VARIANTS_PER_PRODUCT} active variants.`
+              );
+            }
+          }
+
+          // If changing name, verify uniqueness within this product
+          if (
+            validatedData.name &&
+            validatedData.name.toLowerCase() !== existingVariant.name.toLowerCase()
+          ) {
+            const duplicate = await tx.product_variants.findFirst({
+              where: {
+                product_id: productId,
+                name: { equals: validatedData.name, mode: 'insensitive' },
+                NOT: { id: variantId },
+              },
+            });
+
+            if (duplicate) {
+              throw new ConflictError(
+                `A variant named "${validatedData.name}" already exists for this product`
+              );
+            }
+          }
+
+          return tx.product_variants.update({
+            where: { id: variantId },
+            data: {
+              ...(validatedData.name !== undefined ? { name: validatedData.name } : {}),
+              ...(validatedData.price !== undefined
+                ? { price: new Prisma.Decimal(validatedData.price.toFixed(2)) }
+                : {}),
+              ...(validatedData.displayOrder !== undefined
+                ? { display_order: validatedData.displayOrder }
+                : {}),
+              ...(validatedData.isActive !== undefined ? { is_active: validatedData.isActive } : {}),
+              ...(validatedData.isAvailable !== undefined
+                ? { is_available: validatedData.isAvailable }
+                : {}),
+              updated_at: new Date(),
+            },
+          });
         },
-      });
+        { isolationLevel: 'ReadCommitted', maxWait: 5000, timeout: 10000 }
+      );
 
       return successResponse({
-        variant: formatVariant(updated),
+        variant: formatVariant(updated, product.price),
       });
     } catch (dbError) {
       if (dbError instanceof Prisma.PrismaClientKnownRequestError && dbError.code === 'P2002') {
@@ -202,7 +233,7 @@ export async function DELETE(
       return successResponse({
         deleted: false,
         archived: true,
-        variant: formatVariant(deactivated),
+        variant: formatVariant(deactivated, product.price),
         message:
           'Variant has existing order history. It has been deactivated and archived instead of permanently deleted to preserve historical order records.',
       });
@@ -234,7 +265,7 @@ export async function DELETE(
         return successResponse({
           deleted: false,
           archived: true,
-          variant: formatVariant(deactivated),
+          variant: formatVariant(deactivated, product.price),
           message:
             'Variant was referenced by a concurrent order. It has been deactivated and archived instead of permanently deleted.',
         });

@@ -21,7 +21,11 @@ interface BackendResponse<T> {
   timestamp: string;
 }
 
-const BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+const BASE_URL = (
+  typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL
+    ? (import.meta.env.VITE_API_BASE_URL as string)
+    : ''
+).replace(/\/+$/, '');
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
@@ -99,6 +103,13 @@ export const apiClient = {
     request<T>(endpoint, {
       ...options,
       method: 'PATCH',
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    }),
+
+  put: <T>(endpoint: string, body?: unknown, options?: RequestInit) =>
+    request<T>(endpoint, {
+      ...options,
+      method: 'PUT',
       body: body !== undefined ? JSON.stringify(body) : undefined,
     }),
 

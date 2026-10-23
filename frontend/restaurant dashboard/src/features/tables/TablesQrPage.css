@@ -250,3 +250,171 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Print Modal Overlay & Container */
+.print-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.print-modal-container {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.print-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.print-modal-header h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--graphite-900);
+  margin: 0;
+}
+
+.print-modal-body {
+  padding: 24px;
+  background: #f8fafc;
+  display: flex;
+  justify-content: center;
+}
+
+.print-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-color);
+  background: #ffffff;
+}
+
+/* Printable Table Label Card */
+.printable-table-label-card {
+  width: 260px;
+  background: #ffffff;
+  border: 2px solid #111827;
+  border-radius: 16px;
+  padding: 20px 16px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.label-restaurant-name {
+  font-size: 16px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.label-branch-name {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.label-table-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin: 12px 0 14px;
+}
+
+.label-table-num {
+  font-size: 14px;
+}
+
+.label-qr-wrapper {
+  width: 170px;
+  height: 170px;
+  margin: 0 auto;
+  padding: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label-qr-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.label-instructions {
+  margin-top: 12px;
+}
+
+.label-instructions strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: 0.5px;
+}
+
+.label-instructions p {
+  font-size: 10px;
+  color: #64748b;
+  margin: 2px 0 0;
+}
+
+.label-powered-by {
+  font-size: 8px;
+  color: #94a3b8;
+  margin-top: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* Print Media Query */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-table-label,
+  #printable-table-label * {
+    visibility: visible;
+  }
+  #printable-table-label {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 320px;
+    padding: 24px;
+    border: 2px solid #111827;
+    border-radius: 16px;
+    background: #ffffff !important;
+    color: #111827 !important;
+    text-align: center;
+    box-shadow: none !important;
+    margin: 0;
+  }
+}
+

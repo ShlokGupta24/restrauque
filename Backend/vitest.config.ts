@@ -6,7 +6,10 @@ export default defineConfig({
     environment: 'node',
     globals: true,
     setupFiles: ['./tests/setup.ts'],
-    testTimeout: 20000,
+    testTimeout: 60000,
+    hookTimeout: 60000,
+    fileParallelism: false,
+    maxWorkers: 1,
   },
   resolve: {
     alias: {

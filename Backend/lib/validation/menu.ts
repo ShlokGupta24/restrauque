@@ -2,6 +2,37 @@ import { z } from 'zod';
 
 const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+export const CATALOG_BOUNDS = {
+  get MAX_CATEGORIES(): number {
+    if (process.env.NODE_ENV === 'test' && process.env.TEST_OVERRIDE_MAX_CATEGORIES) {
+      const parsed = parseInt(process.env.TEST_OVERRIDE_MAX_CATEGORIES, 10);
+      if (!Number.isNaN(parsed) && parsed >= 0) return parsed;
+    }
+    return 100;
+  },
+  get MAX_PRODUCTS_PER_CATEGORY(): number {
+    if (process.env.NODE_ENV === 'test' && process.env.TEST_OVERRIDE_MAX_PRODUCTS_PER_CATEGORY) {
+      const parsed = parseInt(process.env.TEST_OVERRIDE_MAX_PRODUCTS_PER_CATEGORY, 10);
+      if (!Number.isNaN(parsed) && parsed >= 0) return parsed;
+    }
+    return 200;
+  },
+  get MAX_VARIANTS_PER_PRODUCT(): number {
+    if (process.env.NODE_ENV === 'test' && process.env.TEST_OVERRIDE_MAX_VARIANTS_PER_PRODUCT) {
+      const parsed = parseInt(process.env.TEST_OVERRIDE_MAX_VARIANTS_PER_PRODUCT, 10);
+      if (!Number.isNaN(parsed) && parsed >= 0) return parsed;
+    }
+    return 50;
+  },
+  get MAX_ADDONS_PER_PRODUCT(): number {
+    if (process.env.NODE_ENV === 'test' && process.env.TEST_OVERRIDE_MAX_ADDONS_PER_PRODUCT) {
+      const parsed = parseInt(process.env.TEST_OVERRIDE_MAX_ADDONS_PER_PRODUCT, 10);
+      if (!Number.isNaN(parsed) && parsed >= 0) return parsed;
+    }
+    return 50;
+  },
+};
+
 export const priceSchema = z
   .number({ required_error: 'Price is required' })
   .min(0, 'Price cannot be negative')

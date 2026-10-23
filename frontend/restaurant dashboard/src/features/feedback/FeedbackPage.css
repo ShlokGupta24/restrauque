@@ -447,6 +447,235 @@
   line-height: 1.45;
 }
 
+/* Live Feedback Interactive States & Reviews List */
+.feedback-loading-card,
+.feedback-error-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 40px 24px;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 24px;
+}
+
+.feedback-loading-card p,
+.feedback-error-card p {
+  color: var(--text-secondary);
+  font-size: 13.5px;
+  margin: 10px auto 0 auto;
+  max-width: 450px;
+}
+
+.feedback-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #f3f4f6;
+  border-top-color: var(--brand-red);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 12px auto;
+}
+
+.spinning {
+  display: inline-block;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.btn-feedback-retry {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  padding: 8px 18px;
+  background-color: var(--brand-red);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.btn-feedback-retry:hover {
+  opacity: 0.9;
+}
+
+/* Reviews List Styles */
+.feedback-reviews-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.reviews-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.review-item-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.review-item-card:hover {
+  border-color: #d1d5db;
+  background-color: #f9fafb;
+}
+
+.review-item-card.selected {
+  border-color: var(--brand-red);
+  background-color: #fffaf9;
+  box-shadow: 0 0 0 1px var(--brand-red);
+}
+
+.review-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.review-item-stars {
+  font-weight: 700;
+  color: #f59e0b;
+  font-size: 13.5px;
+}
+
+.review-item-date {
+  font-size: 12px;
+  color: var(--text-subtle);
+}
+
+.review-item-comment {
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.45;
+  margin: 0 0 10px 0;
+  word-break: break-word;
+}
+
+.review-item-comment.empty-comment {
+  color: var(--text-subtle);
+  font-style: italic;
+}
+
+.review-item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+
+.review-customer-name {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.review-branch-badge {
+  background-color: #f3f4f6;
+  color: var(--text-secondary);
+  padding: 2px 7px;
+  border-radius: var(--radius-xs);
+  font-size: 11px;
+}
+
+.btn-order-link {
+  background: none;
+  border: none;
+  color: var(--brand-red);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  text-decoration: underline;
+  transition: background-color 0.15s ease;
+}
+
+.btn-order-link:hover {
+  background-color: #fee2e2;
+}
+
+.btn-load-more {
+  width: 100%;
+  padding: 10px;
+  margin-top: 14px;
+  background-color: #ffffff;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-load-more:hover:not(:disabled) {
+  border-color: var(--brand-red);
+  color: var(--brand-red);
+  background-color: #fffaf9;
+}
+
+.btn-load-more:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.topics-in-dev-pill {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  background-color: #f3f4f6;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.topics-empty-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.feedback-empty-state {
+  padding: 36px 20px;
+  text-align: center;
+}
+
+.feedback-empty-state .empty-icon {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.feedback-empty-state h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px 0;
+}
+
+.feedback-empty-state p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  max-width: 440px;
+  margin: 0 auto;
+  line-height: 1.45;
+}
+
 /* Responsiveness */
 @media (max-width: 1024px) {
   .feedback-kpi-grid {

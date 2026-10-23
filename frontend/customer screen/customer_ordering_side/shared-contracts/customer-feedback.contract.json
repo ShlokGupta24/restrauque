@@ -1,0 +1,31 @@
+{
+  "note": "Proposed API contract only. Not a current verified endpoint. IDs should be validated server-side and may be represented as public opaque IDs in the API.",
+  "submitFeedbackRequest": {
+    "rating": "integer 1..5; optional only if feedback policy permits",
+    "comment": "string | null",
+    "items": [
+      {
+        "productId": "string identifier returned for an order item product",
+        "comment": "string | null"
+      }
+    ]
+  },
+  "response": {
+    "feedbackId": "customer-safe identifier only if needed",
+    "submittedAt": "ISO-8601 timestamp",
+    "message": "Feedback received"
+  },
+  "schemaMapping": {
+    "overallRating": "feedback.rating",
+    "overallComment": "feedback.comment",
+    "itemComment": "feedback_aspects.aspect_value",
+    "itemProductRelation": "feedback_aspects.product_id",
+    "itemAspect": "agreed stable backend value such as item_review",
+    "sentiment": "required by current feedback_aspects schema; backend-owned explicit policy"
+  },
+  "limitations": [
+    "No dedicated numeric per-product rating field in verified schema",
+    "No order_item_id field on feedback_aspects",
+    "feedback_products exists but its current columns require inspection"
+  ]
+}

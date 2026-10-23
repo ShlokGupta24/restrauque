@@ -39,15 +39,27 @@ export async function POST(request: NextRequest) {
         },
       });
     } else {
-      // Create new customer record
-      customer = await prisma.customers.create({
-        data: {
-          name: validatedData.name || 'Customer',
-          phone: validatedData.phone,
-          status: 'active',
-          first_visit_at: new Date(),
-        },
-      });
+      // Create new customer record with concurrency-safe unique constraint handling
+      try {
+        customer = await prisma.customers.create({
+          data: {
+            name: validatedData.name || 'Customer',
+            phone: validatedData.phone,
+            status: 'active',
+            first_visit_at: new Date(),
+          },
+        });
+      } catch (createErr: unknown) {
+        // If concurrent signup request already created this customer (Postgres unique constraint P2002),
+        // cleanly retrieve the created customer record instead of throwing conflict error
+        const isP2002 = typeof createErr === 'object' && createErr !== null && 'code' in createErr && (createErr as { code: string }).code === 'P2002';
+        if (isP2002) {
+          customer = await prisma.customers.findUnique({
+            where: { phone: validatedData.phone },
+          });
+        }
+        if (!customer) throw createErr;
+      }
     }
 
     // Establish secure session in customer_sessions table
