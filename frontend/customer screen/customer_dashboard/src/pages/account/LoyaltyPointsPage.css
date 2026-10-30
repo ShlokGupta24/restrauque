@@ -1,0 +1,568 @@
+.loyalty-page-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Header */
+.loyalty-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.loyalty-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.loyalty-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+  max-width: 640px;
+}
+
+/* ================= COMBINED SUMMARY BANNER ================= */
+.loyalty-summary-banner {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.banner-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.banner-icon-wrap {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-md);
+  background: #fef3c7;
+  color: #b45309;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .banner-icon-wrap {
+  background: rgba(245, 158, 11, 0.14);
+  color: #fbbf24;
+}
+
+.banner-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.banner-points-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.banner-points-number {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.banner-points-unit {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.banner-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  max-width: 380px;
+  text-align: right;
+}
+
+.informational-disclaimer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .informational-disclaimer-pill {
+  background: rgba(245, 158, 11, 0.14);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.info-icon {
+  color: #b45309;
+}
+
+[data-theme="dark"] .info-icon {
+  color: #fbbf24;
+}
+
+.disclaimer-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ================= TWO RESTAURANT LOYALTY CARDS ================= */
+.wallets-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.restaurant-wallet-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.restaurant-wallet-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.wallet-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.wallet-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wallet-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.wallet-restaurant-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.wallet-tier-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  display: inline-block;
+}
+
+.wallet-balance-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.balance-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.balance-number {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.wallet-earning-highlight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fef2f2;
+  color: var(--brand-red);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-size: 12.5px;
+}
+
+[data-theme="dark"] .wallet-earning-highlight {
+  background: var(--brand-red-light);
+}
+
+.sparkle-gold {
+  color: var(--brand-red);
+  flex-shrink: 0;
+}
+
+/* Compact Transactions Section */
+.wallet-transactions-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg-subtle);
+  padding: 12px;
+  border-radius: var(--radius-md);
+}
+
+.transactions-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.txn-desc-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.txn-desc {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.txn-date {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.txn-points {
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.txn-points.positive {
+  color: #059669;
+}
+
+.txn-points.negative {
+  color: #b91c1c;
+}
+
+.no-transactions {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 6px 0;
+}
+
+/* Footer Action */
+.wallet-card-footer {
+  margin-top: auto;
+}
+
+.wallet-footer-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  color: var(--brand-red);
+  border: 1px solid var(--brand-red-border);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 42px;
+  transition: all 0.15s ease;
+}
+
+.wallet-footer-btn:hover {
+  background: var(--brand-red-light);
+  border-color: var(--brand-red);
+}
+
+/* Lifetime Stats Row */
+.wallet-lifetime-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.lifetime-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lifetime-stat-label {
+  color: var(--text-muted);
+}
+
+.lifetime-stat-val {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Redemption Policy Card */
+.wallet-redemption-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--bg-subtle);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.wallet-redemption-icon {
+  color: #059669;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Loading, Error & Empty States */
+.loyalty-loading-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+
+.loyalty-error-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+}
+
+[data-theme="dark"] .loyalty-error-card {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.loyalty-error-icon {
+  color: #dc2626;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .loyalty-error-icon {
+  color: #f87171;
+}
+
+.loyalty-error-content {
+  flex: 1;
+}
+
+.loyalty-error-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #991b1b;
+  margin: 0 0 4px;
+}
+
+[data-theme="dark"] .loyalty-error-title {
+  color: #fca5a5;
+}
+
+.loyalty-error-message {
+  font-size: 13px;
+  color: #7f1d1d;
+  margin: 0;
+}
+
+[data-theme="dark"] .loyalty-error-message {
+  color: #fecaca;
+}
+
+.loyalty-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-card);
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.loyalty-retry-btn:hover {
+  background: #fee2e2;
+}
+
+[data-theme="dark"] .loyalty-retry-btn {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .loyalty-retry-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+.loyalty-empty-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  gap: 12px;
+}
+
+.loyalty-empty-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loyalty-empty-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.loyalty-empty-desc {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  max-width: 440px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .loyalty-summary-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .banner-right {
+    align-items: flex-start;
+    text-align: left;
+    max-width: 100%;
+  }
+
+  .wallets-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .loyalty-summary-banner {
+    padding: 16px;
+  }
+
+  .banner-points-number {
+    font-size: 24px;
+  }
+
+  .restaurant-wallet-card {
+    padding: 16px;
+  }
+
+  .wallet-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .wallet-balance-box {
+    align-items: flex-start;
+  }
+}

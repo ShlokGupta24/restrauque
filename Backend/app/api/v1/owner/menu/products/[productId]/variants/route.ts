@@ -1,10 +1,10 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { requireAuthorizedRestaurant, validateUuid } from '@/lib/auth/tenancy';
-import { createVariantSchema } from '@/lib/validation/menu';
+import { createVariantSchema, CATALOG_BOUNDS } from '@/lib/validation/menu';
 import { formatVariant } from '@/lib/menu/format';
 import { successResponse } from '@/lib/http/response';
-import { handleApiError, NotFoundError, ConflictError } from '@/lib/http/errors';
+import { handleApiError, NotFoundError, ConflictError, ValidationError } from '@/lib/http/errors';
 import { Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
@@ -45,7 +45,7 @@ export async function GET(
     });
 
     return successResponse({
-      variants: variants.map(formatVariant),
+      variants: variants.map((v) => formatVariant(v, product.price)),
     });
   } catch (error) {
     return handleApiError(error);
@@ -78,35 +78,66 @@ export async function POST(
     const rawBody = await request.json();
     const validatedData = createVariantSchema.parse(rawBody);
 
-    // Check for duplicate variant name within this product
-    const existing = await prisma.product_variants.findFirst({
-      where: {
-        product_id: productId,
-        name: { equals: validatedData.name, mode: 'insensitive' },
-      },
-    });
-
-    if (existing) {
-      throw new ConflictError(
-        `A variant named "${validatedData.name}" already exists for this product`
+    if (validatedData.price === 0 && Number(product.price) > 0) {
+      throw new ValidationError(
+        `Variant price cannot be 0 for a paid product (Base price: ${Number(product.price)}). Please provide the full price for this variant.`
       );
     }
 
     try {
-      const created = await prisma.product_variants.create({
-        data: {
-          product_id: productId,
-          name: validatedData.name,
-          price: new Prisma.Decimal(validatedData.price.toFixed(2)),
-          display_order: validatedData.displayOrder ?? 0,
-          is_available: validatedData.isAvailable ?? true,
-          is_active: validatedData.isActive ?? true,
+      const created = await prisma.$transaction(
+        async (tx) => {
+          // Enforce active variant capacity limit per product with container-level row lock
+          if (validatedData.isActive !== false) {
+            if (typeof (tx as any).$executeRaw === 'function') {
+              await (tx as any).$executeRaw`SELECT id FROM products WHERE id = ${productId}::uuid FOR UPDATE`;
+            }
+
+            const activeVariantCount = await tx.product_variants.count({
+              where: {
+                product_id: productId,
+                is_active: true,
+              },
+            });
+
+            if (activeVariantCount >= CATALOG_BOUNDS.MAX_VARIANTS_PER_PRODUCT) {
+              throw new ValidationError(
+                `Variant limit reached. A product cannot have more than ${CATALOG_BOUNDS.MAX_VARIANTS_PER_PRODUCT} active variants.`
+              );
+            }
+          }
+
+          // Check for duplicate variant name within this product
+          const existing = await tx.product_variants.findFirst({
+            where: {
+              product_id: productId,
+              name: { equals: validatedData.name, mode: 'insensitive' },
+            },
+          });
+
+          if (existing) {
+            throw new ConflictError(
+              `A variant named "${validatedData.name}" already exists for this product`
+            );
+          }
+
+          return tx.product_variants.create({
+            data: {
+              product_id: productId,
+              name: validatedData.name,
+              price: new Prisma.Decimal(validatedData.price.toFixed(2)),
+              display_order: validatedData.displayOrder ?? 0,
+              is_available: validatedData.isAvailable ?? true,
+              is_active: validatedData.isActive ?? true,
+            },
+          });
         },
-      });
+        { isolationLevel: 'ReadCommitted', maxWait: 5000, timeout: 10000 }
+      );
 
       return successResponse(
         {
-          variant: formatVariant(created),
+          variant: formatVariant(created, product.price),
         },
         201
       );

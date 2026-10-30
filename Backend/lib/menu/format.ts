@@ -18,8 +18,42 @@ export function formatCategory(c: any, productCount?: number): SafeCategory {
   };
 }
 
-export function formatVariant(v: any): SafeProductVariant {
-  const numericPrice = typeof v.price === 'number' ? v.price : Number(v.price);
+/**
+ * Authoritative single helper to resolve effective variant price.
+ * Follows the legacy data policy: if variant price is 0 on a paid product (parent price > 0),
+ * it authoritatively falls back to the parent product's base price.
+ * For genuinely free products (parent price === 0) or positive variant prices,
+ * the variant's own price is preserved.
+ */
+export function resolveEffectiveVariantPrice(
+  rawVariantPrice: number | string | { toString(): string } | null | undefined,
+  parentProductPrice?: number | string | { toString(): string } | null | undefined
+): number {
+  const numericVarPrice =
+    typeof rawVariantPrice === 'number'
+      ? rawVariantPrice
+      : rawVariantPrice !== null && rawVariantPrice !== undefined
+      ? Number(rawVariantPrice)
+      : NaN;
+
+  const numericParentPrice =
+    parentProductPrice !== undefined && parentProductPrice !== null
+      ? typeof parentProductPrice === 'number'
+        ? parentProductPrice
+        : Number(parentProductPrice)
+      : undefined;
+
+  if (numericVarPrice === 0 && numericParentPrice !== undefined && !isNaN(numericParentPrice) && numericParentPrice > 0) {
+    return numericParentPrice;
+  }
+  return isNaN(numericVarPrice) ? 0 : numericVarPrice;
+}
+
+export function formatVariant(
+  v: any,
+  parentProductPrice?: number | string | { toString(): string } | null | undefined
+): SafeProductVariant {
+  const numericPrice = resolveEffectiveVariantPrice(v.price, parentProductPrice);
   return {
     id: v.id,
     productId: v.product_id,
@@ -66,7 +100,9 @@ export function formatProduct(p: any): SafeProduct {
     isActive: p.is_active,
     isAvailable: p.is_available,
     ...(Array.isArray(p.product_variants)
-      ? { variants: p.product_variants.map(formatVariant) }
+      ? {
+          variants: p.product_variants.map((v: any) => formatVariant(v, numericPrice)),
+        }
       : {}),
     ...(Array.isArray(p.product_addons)
       ? { addons: p.product_addons.map(formatAddon) }

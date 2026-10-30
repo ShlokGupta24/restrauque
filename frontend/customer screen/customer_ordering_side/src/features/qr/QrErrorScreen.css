@@ -1,0 +1,139 @@
+.qr-error-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--brand-bg, #FCF8ED);
+  color: var(--brand-text, #1E293B);
+  padding: 1.5rem 1rem 2rem;
+  box-sizing: border-box;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.qr-error-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+}
+
+.qr-error-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  padding: 0 0.5rem;
+}
+
+.qr-error-icon-bubble {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(215, 182, 124, 0.15);
+  border: 2px solid rgba(215, 182, 124, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-primary, #174A82);
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 14px rgba(23, 74, 130, 0.08);
+}
+
+.qr-error-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--brand-primary, #174A82);
+  margin: 0 0 0.75rem;
+  line-height: 1.25;
+}
+
+.qr-error-description {
+  font-size: 0.95rem;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0 0 1.5rem;
+  max-width: 380px;
+}
+
+.qr-error-advice-card {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid rgba(23, 74, 130, 0.1);
+  border-radius: 16px;
+  padding: 1.25rem 1rem;
+  text-align: left;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.advice-card-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--brand-primary, #174A82);
+  margin-bottom: 0.75rem;
+}
+
+.advice-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.advice-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.875rem;
+  color: #334155;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.advice-item:last-child {
+  margin-bottom: 0;
+}
+
+.advice-bullet {
+  color: var(--brand-accent, #D7B67C);
+  font-weight: bold;
+}
+
+.qr-retry-btn {
+  width: 100%;
+  background: var(--brand-primary, #174A82);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  padding: 0.9rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(23, 74, 130, 0.2);
+}
+
+.qr-retry-btn:hover {
+  background: #113863;
+  transform: translateY(-1px);
+}
+
+.qr-retry-btn:active {
+  transform: translateY(0);
+}
+
+.qr-error-footer {
+  text-align: center;
+  padding-top: 1.5rem;
+  color: #94A3B8;
+  font-size: 0.8rem;
+}

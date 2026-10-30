@@ -37,6 +37,9 @@ export function formatOrderPreviewResponse(
       subtotalFormatted: pricingResult.subtotal.toFixed(2),
       discountAmount: Number(pricingResult.discountAmount),
       discountAmountFormatted: pricingResult.discountAmount.toFixed(2),
+      loyaltyDiscountAmount: Number(pricingResult.loyaltyDiscountAmount ?? 0),
+      loyaltyDiscountAmountFormatted: (pricingResult.loyaltyDiscountAmount ?? new Prisma.Decimal(0)).toFixed(2),
+      pointsRedeemed: pricingResult.pointsRedeemed ?? 0,
       taxAmount: Number(pricingResult.taxAmount),
       taxAmountFormatted: pricingResult.taxAmount.toFixed(2),
       totalAmount: Number(pricingResult.totalAmount),
@@ -59,6 +62,9 @@ export function formatCustomerOrder(order: any) {
   const discountAmount = typeof order.discount_amount === 'object' && order.discount_amount !== null
     ? new Prisma.Decimal(order.discount_amount)
     : new Prisma.Decimal(order.discount_amount ?? 0);
+  const loyaltyDiscountAmount = typeof order.loyalty_discount_amount === 'object' && order.loyalty_discount_amount !== null
+    ? new Prisma.Decimal(order.loyalty_discount_amount)
+    : new Prisma.Decimal(order.loyalty_discount_amount ?? 0);
   const taxAmount = typeof order.tax_amount === 'object' && order.tax_amount !== null
     ? new Prisma.Decimal(order.tax_amount)
     : new Prisma.Decimal(order.tax_amount ?? 0);
@@ -86,6 +92,8 @@ export function formatCustomerOrder(order: any) {
       subtotalFormatted: subtotal.toFixed(2),
       discountAmount: Number(discountAmount),
       discountAmountFormatted: discountAmount.toFixed(2),
+      loyaltyDiscountAmount: Number(loyaltyDiscountAmount),
+      loyaltyDiscountAmountFormatted: loyaltyDiscountAmount.toFixed(2),
       taxAmount: Number(taxAmount),
       taxAmountFormatted: taxAmount.toFixed(2),
       totalAmount: Number(totalAmount),
@@ -138,3 +146,110 @@ export function formatCustomerOrder(order: any) {
       : [],
   };
 }
+
+export function formatCustomerOrderHistoryItem(order: any) {
+  const subtotal =
+    typeof order.subtotal === 'object' && order.subtotal !== null
+      ? new Prisma.Decimal(order.subtotal)
+      : new Prisma.Decimal(order.subtotal ?? 0);
+  const discountAmount =
+    typeof order.discount_amount === 'object' && order.discount_amount !== null
+      ? new Prisma.Decimal(order.discount_amount)
+      : new Prisma.Decimal(order.discount_amount ?? 0);
+  const loyaltyDiscountAmount =
+    typeof order.loyalty_discount_amount === 'object' && order.loyalty_discount_amount !== null
+      ? new Prisma.Decimal(order.loyalty_discount_amount)
+      : new Prisma.Decimal(order.loyalty_discount_amount ?? 0);
+  const taxAmount =
+    typeof order.tax_amount === 'object' && order.tax_amount !== null
+      ? new Prisma.Decimal(order.tax_amount)
+      : new Prisma.Decimal(order.tax_amount ?? 0);
+  const totalAmount =
+    typeof order.total_amount === 'object' && order.total_amount !== null
+      ? new Prisma.Decimal(order.total_amount)
+      : new Prisma.Decimal(order.total_amount ?? 0);
+
+  // Derive payment status
+  let paymentStatus: 'paid' | 'pending' | 'unpaid' = 'unpaid';
+  if (Array.isArray(order.payments) && order.payments.length > 0) {
+    if (order.payments.some((p: any) => p.status === 'paid')) {
+      paymentStatus = 'paid';
+    } else if (order.payments.some((p: any) => p.status === 'pending')) {
+      paymentStatus = 'pending';
+    }
+  }
+
+  const items = Array.isArray(order.order_items)
+    ? order.order_items.map((it: any) => {
+        const itemTotal =
+          typeof it.total_price === 'object' && it.total_price !== null
+            ? new Prisma.Decimal(it.total_price)
+            : new Prisma.Decimal(it.total_price ?? 0);
+        return {
+          id: it.id,
+          productName: it.product_name,
+          quantity: it.quantity,
+          totalPrice: Number(itemTotal),
+          totalPriceFormatted: itemTotal.toFixed(2),
+        };
+      })
+    : [];
+
+  const itemCount = items.reduce(
+    (acc: number, it: any) => acc + (typeof it.quantity === 'number' ? it.quantity : 1),
+    0
+  );
+
+  return {
+    id: order.id,
+    orderNumber: order.order_number,
+    status: order.status,
+    orderType: order.order_type,
+    restaurant: order.restaurants
+      ? {
+          id: order.restaurants.id,
+          name: order.restaurants.name,
+        }
+      : null,
+    branch: order.branches
+      ? {
+          id: order.branches.id,
+          name: order.branches.name,
+        }
+      : null,
+    table: order.restaurant_tables
+      ? {
+          id: order.restaurant_tables.id,
+          tableNumber: order.restaurant_tables.table_number,
+        }
+      : order.table_id
+      ? { id: order.table_id }
+      : null,
+    pricing: {
+      subtotal: Number(subtotal),
+      subtotalFormatted: subtotal.toFixed(2),
+      discountAmount: Number(discountAmount),
+      discountAmountFormatted: discountAmount.toFixed(2),
+      loyaltyDiscountAmount: Number(loyaltyDiscountAmount),
+      loyaltyDiscountAmountFormatted: loyaltyDiscountAmount.toFixed(2),
+      taxAmount: Number(taxAmount),
+      taxAmountFormatted: taxAmount.toFixed(2),
+      totalAmount: Number(totalAmount),
+      totalAmountFormatted: totalAmount.toFixed(2),
+    },
+    paymentStatus,
+    itemCount,
+    itemsSummary: items,
+    orderedAt:
+      order.ordered_at instanceof Date
+        ? order.ordered_at.toISOString()
+        : order.ordered_at,
+    completedAt:
+      order.completed_at instanceof Date
+        ? order.completed_at.toISOString()
+        : order.completed_at ?? null,
+    hasFeedback:
+      Array.isArray(order.feedback) && order.feedback.length > 0,
+  };
+}
+

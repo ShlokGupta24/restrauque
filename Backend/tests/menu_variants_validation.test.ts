@@ -6,6 +6,7 @@ import {
   updateAddonSchema,
 } from '@/lib/validation/menu';
 import {
+  resolveEffectiveVariantPrice,
   formatVariant,
   formatAddon,
   formatProduct,
@@ -250,6 +251,78 @@ describe('STEP 8B: Product Variants & Add-ons Validation & Formatting Tests', ()
       expect(formatted.addons?.[0].priceFormatted).toBe('25.00');
     });
 
+    it('should resolve variant price to base product price when variant price is 0 on a paid product (defect regression)', () => {
+      const mockProductWithZeroVariant = {
+        id: 'p-cake',
+        restaurant_id: 'r1',
+        category_id: 'c1',
+        name: 'cake',
+        price: new Prisma.Decimal('149.30'),
+        display_order: 0,
+        is_active: true,
+        is_available: true,
+        created_at: new Date(),
+        updated_at: new Date(),
+        product_variants: [
+          {
+            id: 'v-large',
+            product_id: 'p-cake',
+            name: 'large',
+            price: new Prisma.Decimal('0.00'),
+            display_order: 0,
+            is_active: true,
+            is_available: true,
+            created_at: new Date(),
+            updated_at: new Date(),
+          },
+        ],
+        product_addons: [],
+      };
+
+      const formatted = formatProduct(mockProductWithZeroVariant);
+      expect(formatted.price).toBe(149.3);
+      expect(formatted.priceFormatted).toBe('149.30');
+      expect(formatted.variants).toBeDefined();
+      expect(formatted.variants?.length).toBe(1);
+      // Stored variant was 0, but formatProduct ensures variant inherits the authoritative base price
+      expect(formatted.variants?.[0].price).toBe(149.3);
+      expect(formatted.variants?.[0].priceFormatted).toBe('149.30');
+    });
+
+    it('should preserve variant price 0 for legitimate free product', () => {
+      const freeProduct = {
+        id: 'p-free',
+        restaurant_id: 'r1',
+        category_id: 'c1',
+        name: 'Complimentary Water',
+        price: new Prisma.Decimal('0.00'),
+        display_order: 0,
+        is_active: true,
+        is_available: true,
+        created_at: new Date(),
+        updated_at: new Date(),
+        product_variants: [
+          {
+            id: 'v-free',
+            product_id: 'p-free',
+            name: 'Glass',
+            price: new Prisma.Decimal('0.00'),
+            display_order: 0,
+            is_active: true,
+            is_available: true,
+            created_at: new Date(),
+            updated_at: new Date(),
+          },
+        ],
+        product_addons: [],
+      };
+
+      const formatted = formatProduct(freeProduct);
+      expect(formatted.price).toBe(0);
+      expect(formatted.variants?.[0].price).toBe(0);
+      expect(formatted.variants?.[0].priceFormatted).toBe('0.00');
+    });
+
     it('should maintain backward compatibility for formatProduct when variants and addons are not loaded', () => {
       const simpleProduct = {
         id: 'p2',
@@ -286,4 +359,64 @@ describe('STEP 8B: Product Variants & Add-ons Validation & Formatting Tests', ()
       expect(decideDeletionAction(0)).toBe('DELETE');
     });
   });
+
+  describe('resolveEffectiveVariantPrice authoritative helper', () => {
+    it('should resolve variant price 0 to parent base price when product is paid', () => {
+      expect(resolveEffectiveVariantPrice(0, 149.3)).toBe(149.3);
+      expect(resolveEffectiveVariantPrice('0', '149.30')).toBe(149.3);
+      expect(resolveEffectiveVariantPrice(new Prisma.Decimal('0.00'), new Prisma.Decimal('149.30'))).toBe(149.3);
+    });
+
+    it('should retain positive variant price even if parent price is different', () => {
+      expect(resolveEffectiveVariantPrice(280, 250)).toBe(280);
+      expect(resolveEffectiveVariantPrice(200, 250)).toBe(200);
+    });
+
+    it('should preserve 0 price for legitimate free product and free variant', () => {
+      expect(resolveEffectiveVariantPrice(0, 0)).toBe(0);
+      expect(resolveEffectiveVariantPrice('0.00', '0.00')).toBe(0);
+    });
+
+    it('should preserve variant price as-is when parent price is omitted or undefined', () => {
+      expect(resolveEffectiveVariantPrice(0)).toBe(0);
+      expect(resolveEffectiveVariantPrice(250)).toBe(250);
+    });
+
+    it('formatVariant should inherit parent price when variant price is 0 on paid product', () => {
+      const rawVariant = {
+        id: 'v1',
+        product_id: 'p1',
+        name: 'large',
+        price: new Prisma.Decimal('0.00'),
+        display_order: 0,
+        is_active: true,
+        is_available: true,
+        created_at: new Date(),
+        updated_at: new Date(),
+      };
+
+      const formatted = formatVariant(rawVariant, 149.3);
+      expect(formatted.price).toBe(149.3);
+      expect(formatted.priceFormatted).toBe('149.30');
+    });
+
+    it('formatVariant should preserve 0 for free product variant', () => {
+      const rawVariant = {
+        id: 'v2',
+        product_id: 'p2',
+        name: 'complimentary sample',
+        price: new Prisma.Decimal('0.00'),
+        display_order: 0,
+        is_active: true,
+        is_available: true,
+        created_at: new Date(),
+        updated_at: new Date(),
+      };
+
+      const formatted = formatVariant(rawVariant, 0);
+      expect(formatted.price).toBe(0);
+      expect(formatted.priceFormatted).toBe('0.00');
+    });
+  });
 });
+

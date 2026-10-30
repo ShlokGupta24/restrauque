@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { requireAuthorizedRestaurant, validateUuid } from '@/lib/auth/tenancy';
-import { updateProductSchema } from '@/lib/validation/menu';
+import { updateProductSchema, CATALOG_BOUNDS } from '@/lib/validation/menu';
 import { formatProduct } from '@/lib/menu/format';
 import { successResponse } from '@/lib/http/response';
 import { handleApiError, NotFoundError, ConflictError, ValidationError } from '@/lib/http/errors';
@@ -83,61 +83,95 @@ export async function PATCH(
     const rawBody = await request.json();
     const validatedData = updateProductSchema.parse(rawBody);
 
-    // If changing category, ensure target category belongs to this restaurant
-    if (validatedData.categoryId && validatedData.categoryId !== existingProduct.category_id) {
-      const category = await prisma.categories.findFirst({
-        where: {
-          id: validatedData.categoryId,
-          restaurant_id: restaurantId,
-        },
-      });
-
-      if (!category) {
-        throw new ValidationError(
-          'The specified category does not exist or does not belong to this restaurant'
-        );
-      }
-    }
-
-    // If changing name, check uniqueness in this restaurant
-    if (validatedData.name && validatedData.name.toLowerCase() !== existingProduct.name.toLowerCase()) {
-      const duplicate = await prisma.products.findFirst({
-        where: {
-          restaurant_id: restaurantId,
-          name: { equals: validatedData.name, mode: 'insensitive' },
-          NOT: { id: productId },
-        },
-      });
-
-      if (duplicate) {
-        throw new ConflictError(
-          `A product named "${validatedData.name}" already exists in this restaurant`
-        );
-      }
-    }
-
     try {
-      const updated = await prisma.products.update({
-        where: { id: productId },
-        data: {
-          ...(validatedData.categoryId !== undefined ? { category_id: validatedData.categoryId } : {}),
-          ...(validatedData.name !== undefined ? { name: validatedData.name } : {}),
-          ...(validatedData.description !== undefined ? { description: validatedData.description } : {}),
-          ...(validatedData.price !== undefined
-            ? { price: new Prisma.Decimal(validatedData.price.toFixed(2)) }
-            : {}),
-          ...(validatedData.imageUrl !== undefined ? { image_url: validatedData.imageUrl } : {}),
-          ...(validatedData.displayOrder !== undefined ? { display_order: validatedData.displayOrder } : {}),
-          ...(validatedData.isActive !== undefined ? { is_active: validatedData.isActive } : {}),
-          ...(validatedData.isAvailable !== undefined ? { is_available: validatedData.isAvailable } : {}),
-          updated_at: new Date(),
+      const updated = await prisma.$transaction(
+        async (tx) => {
+          // If changing category, ensure target category belongs to this restaurant
+          if (validatedData.categoryId && validatedData.categoryId !== existingProduct.category_id) {
+            const category = await tx.categories.findFirst({
+              where: {
+                id: validatedData.categoryId,
+                restaurant_id: restaurantId,
+              },
+            });
+
+            if (!category) {
+              throw new ValidationError(
+                'The specified category does not exist or does not belong to this restaurant'
+              );
+            }
+          }
+
+          // Check active product limit if reactivating or moving categories with container-level row lock
+          const targetCategoryId = validatedData.categoryId ?? existingProduct.category_id;
+          const willBeActive =
+            validatedData.isActive !== undefined ? validatedData.isActive : existingProduct.is_active;
+
+          if (
+            willBeActive &&
+            (!existingProduct.is_active ||
+              (validatedData.categoryId && validatedData.categoryId !== existingProduct.category_id))
+          ) {
+            if (typeof (tx as any).$executeRaw === 'function') {
+              await (tx as any).$executeRaw`SELECT id FROM categories WHERE id = ${targetCategoryId}::uuid FOR UPDATE`;
+            }
+
+            const activeCount = await tx.products.count({
+              where: {
+                category_id: targetCategoryId,
+                is_active: true,
+                NOT: { id: productId },
+              },
+            });
+
+            if (activeCount >= CATALOG_BOUNDS.MAX_PRODUCTS_PER_CATEGORY) {
+              throw new ValidationError(
+                `Product limit reached. A category cannot have more than ${CATALOG_BOUNDS.MAX_PRODUCTS_PER_CATEGORY} active products.`
+              );
+            }
+          }
+
+          // If changing name, check uniqueness in this restaurant
+          if (validatedData.name && validatedData.name.toLowerCase() !== existingProduct.name.toLowerCase()) {
+            const duplicate = await tx.products.findFirst({
+              where: {
+                restaurant_id: restaurantId,
+                name: { equals: validatedData.name, mode: 'insensitive' },
+                NOT: { id: productId },
+              },
+            });
+
+            if (duplicate) {
+              throw new ConflictError(
+                `A product named "${validatedData.name}" already exists in this restaurant`
+              );
+            }
+          }
+
+          return tx.products.update({
+            where: { id: productId },
+            data: {
+              ...(validatedData.categoryId !== undefined ? { category_id: validatedData.categoryId } : {}),
+              ...(validatedData.name !== undefined ? { name: validatedData.name } : {}),
+              ...(validatedData.description !== undefined ? { description: validatedData.description } : {}),
+              ...(validatedData.price !== undefined
+                ? { price: new Prisma.Decimal(validatedData.price.toFixed(2)) }
+                : {}),
+              ...(validatedData.imageUrl !== undefined ? { image_url: validatedData.imageUrl } : {}),
+              ...(validatedData.displayOrder !== undefined ? { display_order: validatedData.displayOrder } : {}),
+              ...(validatedData.isActive !== undefined ? { is_active: validatedData.isActive } : {}),
+              ...(validatedData.isAvailable !== undefined ? { is_available: validatedData.isAvailable } : {}),
+              updated_at: new Date(),
+            },
+            include: {
+              categories: {
+                select: { name: true },
+              },
+            },
+          });
         },
-        include: {
-          categories: {
-            select: { name: true },
-          },
-        },
-      });
+        { isolationLevel: 'ReadCommitted', maxWait: 5000, timeout: 10000 }
+      );
 
       return successResponse({
         product: formatProduct(updated),

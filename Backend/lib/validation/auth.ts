@@ -3,18 +3,33 @@ import { ALLOWED_REGISTRATION_ROLES, type AuthRole } from '@/types/auth';
 
 export function normalizePhoneNumber(raw: string): string {
   if (!raw) return '';
-  // Strip all whitespace, hyphens, and parentheses
-  let cleaned = raw.trim().replace(/[\s\-\(\)]/g, '');
-  // If 10-digit number without country code, prefix with Indian country code +91
-  if (/^\d{10}$/.test(cleaned)) {
-    cleaned = `+91${cleaned}`;
-  } else if (/^0\d{10}$/.test(cleaned)) {
-    // Leading 0 + 10 digits
-    cleaned = `+91${cleaned.substring(1)}`;
-  } else if (/^91\d{10}$/.test(cleaned)) {
-    cleaned = `+${cleaned}`;
+  // Strip all whitespace, hyphens, parentheses, and dots
+  let cleaned = raw.trim().replace(/[\s\-\(\)\.]/g, '');
+
+  // Strip all leading '+' for clean pattern matching
+  cleaned = cleaned.replace(/^\++/, '');
+
+  // 1. If 10-digit number starting with 0 (e.g. 09876543210), strip 0 and prefix +91
+  if (/^0[6-9]\d{9}$/.test(cleaned)) {
+    return `+91${cleaned.substring(1)}`;
   }
-  return cleaned;
+
+  // 2. If 10-digit Indian mobile number (6, 7, 8, 9), prefix with Indian country code +91
+  if (/^[6-9]\d{9}$/.test(cleaned)) {
+    return `+91${cleaned}`;
+  }
+
+  // 3. If 12-digit number starting with 91 followed by Indian mobile (e.g. 919876543210)
+  if (/^91[6-9]\d{9}$/.test(cleaned)) {
+    return `+${cleaned}`;
+  }
+
+  // 4. Standard international E.164 digits without plus (7 to 15 digits)
+  if (/^[1-9]\d{6,14}$/.test(cleaned)) {
+    return `+${cleaned}`;
+  }
+
+  return cleaned.startsWith('+') ? cleaned : `+${cleaned}`;
 }
 
 export const phoneSchema = z
@@ -25,6 +40,15 @@ export const phoneSchema = z
   .refine(
     (val) => /^\+[1-9]\d{7,14}$/.test(val),
     { message: 'Invalid phone number format. Please provide a valid E.164 phone number (e.g. +919876543210).' }
+  )
+  .refine(
+    (val) => {
+      if (val.startsWith('+91')) {
+        return /^\+91[6-9]\d{9}$/.test(val);
+      }
+      return true;
+    },
+    { message: 'Invalid Indian mobile number. Indian mobile numbers must be 10 digits starting with 6, 7, 8, or 9.' }
   );
 
 const emailSchema = z

@@ -1,10 +1,10 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { requireAuthorizedRestaurant, validateUuid } from '@/lib/auth/tenancy';
-import { updateAddonSchema } from '@/lib/validation/menu';
+import { updateAddonSchema, CATALOG_BOUNDS } from '@/lib/validation/menu';
 import { formatAddon } from '@/lib/menu/format';
 import { successResponse } from '@/lib/http/response';
-import { handleApiError, NotFoundError, ConflictError } from '@/lib/http/errors';
+import { handleApiError, NotFoundError, ConflictError, ValidationError } from '@/lib/http/errors';
 import { Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
@@ -92,44 +92,69 @@ export async function PATCH(
     const rawBody = await request.json();
     const validatedData = updateAddonSchema.parse(rawBody);
 
-    // If changing name, verify uniqueness within this product
-    if (
-      validatedData.name &&
-      validatedData.name.toLowerCase() !== existingAddon.name.toLowerCase()
-    ) {
-      const duplicate = await prisma.product_addons.findFirst({
-        where: {
-          product_id: productId,
-          name: { equals: validatedData.name, mode: 'insensitive' },
-          NOT: { id: addonId },
-        },
-      });
-
-      if (duplicate) {
-        throw new ConflictError(
-          `An add-on named "${validatedData.name}" already exists for this product`
-        );
-      }
-    }
-
     try {
-      const updated = await prisma.product_addons.update({
-        where: { id: addonId },
-        data: {
-          ...(validatedData.name !== undefined ? { name: validatedData.name } : {}),
-          ...(validatedData.price !== undefined
-            ? { price: new Prisma.Decimal(validatedData.price.toFixed(2)) }
-            : {}),
-          ...(validatedData.displayOrder !== undefined
-            ? { display_order: validatedData.displayOrder }
-            : {}),
-          ...(validatedData.isActive !== undefined ? { is_active: validatedData.isActive } : {}),
-          ...(validatedData.isAvailable !== undefined
-            ? { is_available: validatedData.isAvailable }
-            : {}),
-          updated_at: new Date(),
+      const updated = await prisma.$transaction(
+        async (tx) => {
+          // If activating a previously inactive add-on, check active add-on capacity limit with container-level row lock
+          if (validatedData.isActive === true && !existingAddon.is_active) {
+            if (typeof (tx as any).$executeRaw === 'function') {
+              await (tx as any).$executeRaw`SELECT id FROM products WHERE id = ${productId}::uuid FOR UPDATE`;
+            }
+
+            const activeCount = await tx.product_addons.count({
+              where: {
+                product_id: productId,
+                is_active: true,
+              },
+            });
+
+            if (activeCount >= CATALOG_BOUNDS.MAX_ADDONS_PER_PRODUCT) {
+              throw new ValidationError(
+                `Add-on limit reached. A product cannot have more than ${CATALOG_BOUNDS.MAX_ADDONS_PER_PRODUCT} active add-ons.`
+              );
+            }
+          }
+
+          // If changing name, verify uniqueness within this product
+          if (
+            validatedData.name &&
+            validatedData.name.toLowerCase() !== existingAddon.name.toLowerCase()
+          ) {
+            const duplicate = await tx.product_addons.findFirst({
+              where: {
+                product_id: productId,
+                name: { equals: validatedData.name, mode: 'insensitive' },
+                NOT: { id: addonId },
+              },
+            });
+
+            if (duplicate) {
+              throw new ConflictError(
+                `An add-on named "${validatedData.name}" already exists for this product`
+              );
+            }
+          }
+
+          return tx.product_addons.update({
+            where: { id: addonId },
+            data: {
+              ...(validatedData.name !== undefined ? { name: validatedData.name } : {}),
+              ...(validatedData.price !== undefined
+                ? { price: new Prisma.Decimal(validatedData.price.toFixed(2)) }
+                : {}),
+              ...(validatedData.displayOrder !== undefined
+                ? { display_order: validatedData.displayOrder }
+                : {}),
+              ...(validatedData.isActive !== undefined ? { is_active: validatedData.isActive } : {}),
+              ...(validatedData.isAvailable !== undefined
+                ? { is_available: validatedData.isAvailable }
+                : {}),
+              updated_at: new Date(),
+            },
+          });
         },
-      });
+        { isolationLevel: 'ReadCommitted', maxWait: 5000, timeout: 10000 }
+      );
 
       return successResponse({
         addon: formatAddon(updated),

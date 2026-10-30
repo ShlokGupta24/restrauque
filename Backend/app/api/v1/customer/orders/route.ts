@@ -2,20 +2,22 @@ import { NextRequest } from 'next/server';
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { requireCustomer } from '@/lib/auth/guard';
-import { createOrderSchema } from '@/lib/validation/order';
+import { createOrderSchema, customerOrdersQuerySchema } from '@/lib/validation/order';
 import { resolveQrContext } from '@/lib/qr/resolve';
 import {
   calculateAuthoritativePricing,
   computeCanonicalPayloadHash,
 } from '@/lib/orders/pricing';
 import { generateUniqueOrderNumber } from '@/lib/orders/number';
-import { formatCustomerOrder } from '@/lib/orders/format';
+import { formatCustomerOrder, formatCustomerOrderHistoryItem } from '@/lib/orders/format';
+import { encodeOrderCursor, decodeOrderCursor } from '@/lib/orders/cursor';
 import { successResponse } from '@/lib/http/response';
 import {
   handleApiError,
   AppError,
   ConflictError,
   NotFoundError,
+  ValidationError,
 } from '@/lib/http/errors';
 
 export const dynamic = 'force-dynamic';
@@ -44,7 +46,8 @@ export async function POST(request: NextRequest) {
       tableId,
       validatedInput.items,
       validatedInput.couponCode,
-      validatedInput.notes
+      validatedInput.notes,
+      validatedInput.pointsToRedeem
     );
 
     // 4. Pre-check persistent idempotency for committed prior retries
@@ -88,7 +91,12 @@ export async function POST(request: NextRequest) {
       restaurantId,
       tableId,
       validatedInput.couponCode,
-      validatedInput.notes
+      validatedInput.notes,
+      prisma,
+      {
+        pointsToRedeem: validatedInput.pointsToRedeem,
+        customerId,
+      }
     );
 
     if (
@@ -109,6 +117,7 @@ export async function POST(request: NextRequest) {
             pricing: {
               subtotal: Number(previewPricing.subtotal),
               discountAmount: Number(previewPricing.discountAmount),
+              loyaltyDiscountAmount: Number(previewPricing.loyaltyDiscountAmount),
               taxAmount: Number(previewPricing.taxAmount),
               totalAmount: Number(previewPricing.totalAmount),
             },
@@ -172,14 +181,44 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          // C. Re-calculate authoritative pricing under transaction
+          // C. Acquire row-level lock on customer loyalty account if points redemption is requested
+          let lockedAccountId: string | null = null;
+          const pointsToRedeem = validatedInput.pointsToRedeem ?? 0;
+
+          if (pointsToRedeem > 0) {
+            const lockedAccounts: any[] = await tx.$queryRaw`
+              SELECT id, stars_balance, lifetime_stars_earned, lifetime_stars_redeemed
+              FROM customer_loyalty_accounts
+              WHERE customer_id = ${customerId}::uuid AND restaurant_id = ${restaurantId}::uuid
+              FOR UPDATE
+            `;
+
+            if (!lockedAccounts || lockedAccounts.length === 0) {
+              throw new ValidationError('Customer loyalty account not found or has no points');
+            }
+
+            const currentAccount = lockedAccounts[0];
+            if (currentAccount.stars_balance < pointsToRedeem) {
+              throw new ValidationError(
+                `Insufficient loyalty points: requested ${pointsToRedeem} points but account has ${currentAccount.stars_balance} points`
+              );
+            }
+
+            lockedAccountId = currentAccount.id;
+          }
+
+          // D. Re-calculate authoritative pricing under transaction
           const txPricing = await calculateAuthoritativePricing(
             validatedInput.items,
             restaurantId,
             tableId,
             validatedInput.couponCode,
             validatedInput.notes,
-            tx
+            tx,
+            {
+              pointsToRedeem: validatedInput.pointsToRedeem,
+              customerId,
+            }
           );
 
           // Verify expectedTotal again
@@ -201,6 +240,7 @@ export async function POST(request: NextRequest) {
                   pricing: {
                     subtotal: Number(txPricing.subtotal),
                     discountAmount: Number(txPricing.discountAmount),
+                    loyaltyDiscountAmount: Number(txPricing.loyaltyDiscountAmount),
                     taxAmount: Number(txPricing.taxAmount),
                     totalAmount: Number(txPricing.totalAmount),
                   },
@@ -209,10 +249,10 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          // D. Generate collision-resistant order number
+          // E. Generate collision-resistant order number
           const orderNumber = await generateUniqueOrderNumber(branchId, tx);
 
-          // E. Insert order row
+          // F. Insert order row
           const order = await tx.orders.create({
             data: {
               restaurant_id: restaurantId,
@@ -224,6 +264,7 @@ export async function POST(request: NextRequest) {
               status: 'pending',
               subtotal: txPricing.subtotal,
               discount_amount: txPricing.discountAmount,
+              loyalty_discount_amount: txPricing.loyaltyDiscountAmount,
               tax_amount: txPricing.taxAmount,
               total_amount: txPricing.totalAmount,
               notes: validatedInput.notes?.trim() || null,
@@ -283,7 +324,31 @@ export async function POST(request: NextRequest) {
             });
           }
 
-          // H. Insert initial order status history
+          // H. Deduct loyalty points and persist signed ledger transaction if points redeemed
+          if (pointsToRedeem > 0 && lockedAccountId) {
+            await tx.loyalty_transactions.create({
+              data: {
+                loyalty_account_id: lockedAccountId,
+                customer_id: customerId,
+                restaurant_id: restaurantId,
+                order_id: order.id,
+                transaction_type: 'redemption',
+                stars: -pointsToRedeem,
+                description: `Redeemed ${pointsToRedeem} points for dining discount (Order #${orderNumber})`,
+              },
+            });
+
+            await tx.customer_loyalty_accounts.update({
+              where: { id: lockedAccountId },
+              data: {
+                stars_balance: { decrement: pointsToRedeem },
+                lifetime_stars_redeemed: { increment: pointsToRedeem },
+                updated_at: new Date(),
+              },
+            });
+          }
+
+          // I. Insert initial order status history
           await tx.order_status_history.create({
             data: {
               order_id: order.id,
@@ -292,7 +357,7 @@ export async function POST(request: NextRequest) {
             },
           });
 
-          // I. Update table status from available to occupied atomically
+          // J. Update table status from available to occupied atomically
           if (tableRow.status === 'available') {
             await tx.restaurant_tables.update({
               where: { id: tableId },
@@ -385,3 +450,205 @@ export async function POST(request: NextRequest) {
     return handleApiError(error);
   }
 }
+
+export async function GET(request: NextRequest) {
+  try {
+    // 1. Authenticate customer - customerId derived strictly from session
+    const authContext = await requireCustomer(request);
+    const customerId = authContext.user.id;
+
+    // 2. Parse and validate query parameters
+    const { searchParams } = new URL(request.url);
+    const queryInput = {
+      limit: searchParams.get('limit') || undefined,
+      cursor: searchParams.get('cursor') || undefined,
+      status: searchParams.get('status') || undefined,
+      feedbackStatus: searchParams.get('feedbackStatus') || undefined,
+      restaurantId: searchParams.get('restaurantId') || undefined,
+      dateFrom: searchParams.get('dateFrom') || undefined,
+      dateTo: searchParams.get('dateTo') || undefined,
+    };
+
+    const validatedQuery = customerOrdersQuerySchema.parse(queryInput);
+
+    // 3. Construct customer-scoped filter clause
+    const where: Prisma.ordersWhereInput = {
+      customer_id: customerId,
+    };
+
+    if (validatedQuery.restaurantId) {
+      where.restaurant_id = validatedQuery.restaurantId;
+    }
+
+    if (validatedQuery.status) {
+      where.status = validatedQuery.status;
+    }
+
+    if (validatedQuery.feedbackStatus === 'awaiting_review') {
+      where.status = 'completed';
+      where.feedback = { none: {} };
+    } else if (validatedQuery.feedbackStatus === 'reviewed') {
+      where.feedback = { some: {} };
+    }
+
+    if (validatedQuery.dateFrom || validatedQuery.dateTo) {
+      where.ordered_at = {};
+      if (validatedQuery.dateFrom) {
+        where.ordered_at.gte = new Date(validatedQuery.dateFrom);
+      }
+      if (validatedQuery.dateTo) {
+        let toDate = new Date(validatedQuery.dateTo);
+        if (/^\d{4}-\d{2}-\d{2}$/.test(validatedQuery.dateTo.trim())) {
+          toDate = new Date(`${validatedQuery.dateTo.trim()}T23:59:59.999Z`);
+        }
+        where.ordered_at.lte = toDate;
+      }
+    }
+
+    // 4. Handle cursor pagination anchor if provided
+    if (validatedQuery.cursor) {
+      const decodedCursorId = decodeOrderCursor(validatedQuery.cursor);
+      if (!decodedCursorId) {
+        throw new ValidationError('Invalid cursor: malformed cursor string');
+      }
+
+      // Verify the cursor order exists and belongs to THIS authenticated customer
+      const cursorOrder = await prisma.orders.findFirst({
+        where: {
+          id: decodedCursorId,
+          customer_id: customerId, // Enforces customer tenant isolation
+        },
+        select: {
+          id: true,
+          ordered_at: true,
+        },
+      });
+
+      if (!cursorOrder) {
+        throw new ValidationError(
+          'Invalid cursor: referenced order does not exist or does not belong to you'
+        );
+      }
+
+      // Tie-breaker keyset condition: (ordered_at < cursorOrder.ordered_at) OR (ordered_at = cursorOrder.ordered_at AND id < cursorOrder.id)
+      const cursorCondition: Prisma.ordersWhereInput = {
+        OR: [
+          {
+            ordered_at: {
+              lt: cursorOrder.ordered_at,
+            },
+          },
+          {
+            ordered_at: cursorOrder.ordered_at,
+            id: {
+              lt: cursorOrder.id,
+            },
+          },
+        ],
+      };
+
+      if (where.AND) {
+        if (Array.isArray(where.AND)) {
+          where.AND.push(cursorCondition);
+        } else {
+          where.AND = [where.AND, cursorCondition];
+        }
+      } else {
+        where.AND = [cursorCondition];
+      }
+    }
+
+    const limit = validatedQuery.limit ?? 10;
+
+    // 5. Query orders and summary aggregates in parallel
+    const [orders, statusGroups] = await Promise.all([
+      prisma.orders.findMany({
+        where,
+        include: {
+          restaurants: {
+            select: { id: true, name: true },
+          },
+          branches: {
+            select: { id: true, name: true },
+          },
+          restaurant_tables: {
+            select: { id: true, table_number: true },
+          },
+          payments: {
+            select: { id: true, status: true, amount: true, payment_method: true },
+            orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
+          },
+          order_items: {
+            select: {
+              id: true,
+              product_name: true,
+              quantity: true,
+              total_price: true,
+            },
+            orderBy: { id: 'asc' },
+          },
+          feedback: {
+            select: { id: true },
+            take: 1,
+          },
+        },
+        orderBy: [
+          { ordered_at: 'desc' },
+          { id: 'desc' },
+        ],
+        take: limit + 1,
+      }),
+      prisma.orders.groupBy({
+        by: ['status'],
+        where: { customer_id: customerId },
+        _count: { id: true },
+      }),
+    ]);
+
+    // 6. Calculate pagination metadata
+    const hasNextPage = orders.length > limit;
+    const pagedOrders = hasNextPage ? orders.slice(0, limit) : orders;
+    const lastOrder = pagedOrders[pagedOrders.length - 1];
+    const nextCursor =
+      hasNextPage && lastOrder
+        ? encodeOrderCursor(lastOrder.id, lastOrder.ordered_at)
+        : null;
+
+    // 7. Calculate customer lifetime status summary
+    const statusCounts: Record<string, number> = {
+      pending: 0,
+      preparing: 0,
+      served: 0,
+      completed: 0,
+      cancelled: 0,
+    };
+
+    for (const group of statusGroups) {
+      if (group.status in statusCounts) {
+        statusCounts[group.status] = group._count.id;
+      }
+    }
+
+    const totalOrders = Object.values(statusCounts).reduce((a, b) => a + b, 0);
+
+    return successResponse({
+      orders: pagedOrders.map(formatCustomerOrderHistoryItem),
+      pagination: {
+        limit,
+        hasNextPage,
+        nextCursor,
+      },
+      summary: {
+        totalOrders,
+        pending: statusCounts.pending,
+        preparing: statusCounts.preparing,
+        served: statusCounts.served,
+        completed: statusCounts.completed,
+        cancelled: statusCounts.cancelled,
+      },
+    });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+

@@ -1,0 +1,298 @@
+/* ==========================================================================
+   Screen 07: Payment & Order Summary Styles
+   Visual reference: UIUX/07-payment-order-summary.png
+   ========================================================================== */
+
+.checkout-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 16px 20px 110px 20px;
+  background-color: var(--page-background);
+}
+
+/* Header */
+.checkout-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  margin-bottom: 20px;
+  padding-top: 4px;
+}
+
+.checkout-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-color);
+  letter-spacing: -0.2px;
+}
+
+/* Table / Location Card */
+.location-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--surface-color);
+  border-radius: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  margin-bottom: 24px;
+}
+
+.location-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.location-pin-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background-color: var(--brand-primary-light, #EBF2F9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-primary, #174A82);
+  flex-shrink: 0;
+}
+
+.location-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.location-restaurant-name {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.location-table-label {
+  font-size: 13px;
+  color: var(--muted-text-color);
+  font-weight: 500;
+}
+
+.location-change-btn {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--brand-primary);
+  background: transparent;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background-color var(--transition-fast);
+}
+
+.location-change-btn:hover {
+  background-color: rgba(23, 74, 130, 0.05);
+}
+
+/* Section Common Styling */
+.summary-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.section-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.summary-item-count {
+  font-size: 14px;
+  color: var(--muted-text-color);
+  font-weight: 500;
+}
+
+/* Order Summary Items List */
+.summary-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14.5px;
+}
+
+.summary-item-name {
+  font-weight: 600;
+  color: var(--text-color);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 12px;
+}
+
+.summary-item-qty {
+  color: var(--muted-text-color);
+  font-weight: 500;
+  width: 40px;
+  text-align: center;
+}
+
+.summary-item-price {
+  font-weight: 700;
+  color: var(--text-color);
+  text-align: right;
+  min-width: 60px;
+}
+
+/* Amount Details Card */
+.amount-details-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.amount-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: var(--muted-text-color);
+}
+
+.amount-row.discount {
+  color: #16A34A;
+  font-weight: 600;
+}
+
+.amount-divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 4px 0;
+}
+
+.amount-row.total {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-color);
+  padding-top: 2px;
+}
+
+/* Payment Method Card */
+.payment-method-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--surface-color);
+  border-radius: 16px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.payment-method-card.selected {
+  border-color: var(--brand-primary);
+  background-color: #FFFFFF;
+}
+
+.payment-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.payment-check-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--brand-primary);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.payment-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.payment-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.payment-subtitle {
+  font-size: 12.5px;
+  color: var(--muted-text-color);
+}
+
+.payment-store-icon {
+  color: var(--text-color);
+  opacity: 0.85;
+}
+
+/* Sticky Bottom Place Order Action */
+.checkout-sticky-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  padding: 16px 20px 20px 20px;
+  background: linear-gradient(180deg, rgba(252, 248, 237, 0) 0%, rgba(252, 248, 237, 0.95) 25%, #FCF8ED 100%);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+}
+
+.place-order-submit-btn {
+  width: 100%;
+  height: 52px;
+  border-radius: var(--button-radius);
+  background-color: var(--brand-primary);
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 8px 24px rgba(23, 74, 130, 0.35);
+  transition: all var(--transition-fast);
+}
+
+.place-order-submit-btn:hover:not(:disabled) {
+  background-color: var(--brand-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(23, 74, 130, 0.42);
+}
+
+.place-order-submit-btn:active {
+  transform: translateY(0);
+}
+
+.place-order-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

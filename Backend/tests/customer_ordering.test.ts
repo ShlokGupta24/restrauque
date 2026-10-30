@@ -356,69 +356,86 @@ describe('STEP 6 — Phase 2B: Customer Dine-In Ordering, Pricing & Idempotency'
 
   afterAll(async () => {
     try {
-      // Clean up orders and relations
-      await prisma.order_coupons.deleteMany({
-        where: { coupons: { restaurant_id: restaurant1Id } },
-      });
-      await prisma.order_item_addons.deleteMany({
-        where: { order_items: { orders: { restaurant_id: restaurant1Id } } },
-      });
-      await prisma.order_items.deleteMany({
-        where: { orders: { restaurant_id: restaurant1Id } },
-      });
-      await prisma.order_status_history.deleteMany({
-        where: { orders: { restaurant_id: restaurant1Id } },
-      });
-      await prisma.orders.deleteMany({
-        where: { restaurant_id: { in: [restaurant1Id, restaurant2Id] } },
-      });
+      if (restaurant1Id) {
+        // Clean up orders and relations
+        await prisma.order_coupons.deleteMany({
+          where: { coupons: { restaurant_id: restaurant1Id } },
+        }).catch(() => {});
+        await prisma.order_item_addons.deleteMany({
+          where: { order_items: { orders: { restaurant_id: restaurant1Id } } },
+        }).catch(() => {});
+        await prisma.order_items.deleteMany({
+          where: { orders: { restaurant_id: restaurant1Id } },
+        }).catch(() => {});
+        await prisma.order_status_history.deleteMany({
+          where: { orders: { restaurant_id: restaurant1Id } },
+        }).catch(() => {});
+        const restIds = [restaurant1Id, restaurant2Id].filter(Boolean);
+        if (restIds.length > 0) {
+          await prisma.orders.deleteMany({
+            where: { restaurant_id: { in: restIds } },
+          }).catch(() => {});
+        }
 
-      // Clean up catalog
-      await prisma.product_addons.deleteMany({
-        where: { products: { restaurant_id: restaurant1Id } },
-      });
-      await prisma.product_variants.deleteMany({
-        where: { products: { restaurant_id: restaurant1Id } },
-      });
-      await prisma.products.deleteMany({
-        where: { restaurant_id: { in: [restaurant1Id, restaurant2Id] } },
-      });
-      await prisma.categories.deleteMany({
-        where: { restaurant_id: { in: [restaurant1Id, restaurant2Id] } },
-      });
-      await prisma.coupons.deleteMany({
-        where: { id: testCouponId },
-      });
+        // Clean up catalog
+        await prisma.product_addons.deleteMany({
+          where: { products: { restaurant_id: restaurant1Id } },
+        }).catch(() => {});
+        await prisma.product_variants.deleteMany({
+          where: { products: { restaurant_id: restaurant1Id } },
+        }).catch(() => {});
+        if (restIds.length > 0) {
+          await prisma.products.deleteMany({
+            where: { restaurant_id: { in: restIds } },
+          }).catch(() => {});
+          await prisma.categories.deleteMany({
+            where: { restaurant_id: { in: restIds } },
+          }).catch(() => {});
+        }
 
-      // Clean up tables & QR
-      await prisma.qr_codes.deleteMany({
-        where: { restaurant_tables: { branches: { restaurant_id: restaurant1Id } } },
-      });
-      await prisma.restaurant_tables.deleteMany({
-        where: { branches: { restaurant_id: restaurant1Id } },
-      });
+        // Clean up tables & QR
+        await prisma.qr_codes.deleteMany({
+          where: { restaurant_tables: { branches: { restaurant_id: restaurant1Id } } },
+        }).catch(() => {});
+        await prisma.restaurant_tables.deleteMany({
+          where: { branches: { restaurant_id: restaurant1Id } },
+        }).catch(() => {});
 
-      // Clean up branches & venues
-      await prisma.branches.deleteMany({
-        where: { restaurant_id: { in: [restaurant1Id, restaurant2Id] } },
-      });
-      await prisma.restaurants.deleteMany({
-        where: { id: { in: [restaurant1Id, restaurant2Id] } },
-      });
+        // Clean up branches & venues
+        if (restIds.length > 0) {
+          await prisma.branches.deleteMany({
+            where: { restaurant_id: { in: restIds } },
+          }).catch(() => {});
+          await prisma.restaurants.deleteMany({
+            where: { id: { in: restIds } },
+          }).catch(() => {});
+        }
+      }
+
+      if (testCouponId) {
+        await prisma.coupons.deleteMany({
+          where: { id: testCouponId },
+        }).catch(() => {});
+      }
 
       // Clean up users & customers
-      await prisma.customer_sessions.deleteMany({
-        where: { customer_id: { in: [customerAId, customerBId] } },
-      });
-      await prisma.customers.deleteMany({
-        where: { id: { in: [customerAId, customerBId] } },
-      });
-      await prisma.user_sessions.deleteMany({
-        where: { user_id: owner1Id },
-      });
-      await prisma.users.deleteMany({
-        where: { id: owner1Id },
-      });
+      const custIds = [customerAId, customerBId].filter(Boolean);
+      if (custIds.length > 0) {
+        await prisma.customer_sessions.deleteMany({
+          where: { customer_id: { in: custIds } },
+        }).catch(() => {});
+        await prisma.customers.deleteMany({
+          where: { id: { in: custIds } },
+        }).catch(() => {});
+      }
+      if (owner1Id) {
+        await prisma.user_sessions.deleteMany({
+          where: { user_id: owner1Id },
+        }).catch(() => {});
+        await prisma.users.deleteMany({
+          where: { id: owner1Id },
+        }).catch(() => {});
+      }
     } finally {
       await prisma.$disconnect();
     }
@@ -507,6 +524,149 @@ describe('STEP 6 — Phase 2B: Customer Dine-In Ordering, Pricing & Idempotency'
       expect(cappuccino.addons.length).toBe(1);
       expect(cappuccino.addons[0].name).toBe('Extra Shot');
       expect(cappuccino.addons[0].price).toBe(50.0);
+    });
+
+    it('should strictly exclude inactive categories from customer menu response', async () => {
+      // Create a temporary inactive category
+      const inactiveCategory = await prisma.categories.create({
+        data: {
+          restaurant_id: restaurant1Id,
+          name: `Inactive Desserts ${timestamp}`,
+          display_order: 99,
+          is_active: false,
+        },
+      });
+
+      try {
+        const req = new NextRequest(
+          `http://localhost:3000/api/v1/customer/menu?qrToken=${table1RawToken}&tableId=${table1Id}`
+        );
+        const res = await getCustomerMenuHandler(req);
+        expect(res.status).toBe(200);
+
+        const json = await res.json();
+        expect(json.success).toBe(true);
+
+        // Assert inactive category is completely absent from customer menu
+        const found = json.data.categories.find((c: any) => c.id === inactiveCategory.id);
+        expect(found).toBeUndefined();
+      } finally {
+        await prisma.categories.deleteMany({
+          where: { id: inactiveCategory.id },
+        });
+      }
+    });
+
+    it('should return 422 CATALOG_SIZE_LIMIT_EXCEEDED when category count exceeds maximum supported categories', async () => {
+      // Temporarily add a second active category to restaurant 1
+      const extraCategory = await prisma.categories.create({
+        data: {
+          restaurant_id: restaurant1Id,
+          name: `Extra Active Category ${Date.now()}`,
+          is_active: true,
+        },
+      });
+
+      process.env.TEST_OVERRIDE_MAX_CATEGORIES = '1';
+
+      try {
+        const req = new NextRequest(
+          `http://localhost:3000/api/v1/customer/menu?qrToken=${table1RawToken}&tableId=${table1Id}`
+        );
+        const res = await getCustomerMenuHandler(req);
+        expect(res.status).toBe(422);
+
+        const json = await res.json();
+        expect(json.success).toBe(false);
+        expect(json.error.code).toBe('CATALOG_SIZE_LIMIT_EXCEEDED');
+        expect(json.error.message).toContain('category limit');
+      } finally {
+        delete process.env.TEST_OVERRIDE_MAX_CATEGORIES;
+        await prisma.categories.deleteMany({
+          where: { id: extraCategory.id },
+        });
+      }
+    });
+
+    it('should return 422 CATALOG_SIZE_LIMIT_EXCEEDED when products in a category exceed supported products limit', async () => {
+      // Category 1 has 2 active+available products (Cappuccino and Croissant)
+      process.env.TEST_OVERRIDE_MAX_PRODUCTS_PER_CATEGORY = '1';
+
+      try {
+        const req = new NextRequest(
+          `http://localhost:3000/api/v1/customer/menu?qrToken=${table1RawToken}&tableId=${table1Id}`
+        );
+        const res = await getCustomerMenuHandler(req);
+        expect(res.status).toBe(422);
+
+        const json = await res.json();
+        expect(json.success).toBe(false);
+        expect(json.error.code).toBe('CATALOG_SIZE_LIMIT_EXCEEDED');
+        expect(json.error.message).toContain('products per category limit');
+      } finally {
+        delete process.env.TEST_OVERRIDE_MAX_PRODUCTS_PER_CATEGORY;
+      }
+    });
+
+    it('should return 422 CATALOG_SIZE_LIMIT_EXCEEDED when product variants exceed supported variants limit', async () => {
+      // Product 1 (Cappuccino) has 2 active+available variants (Small and Large)
+      process.env.TEST_OVERRIDE_MAX_VARIANTS_PER_PRODUCT = '1';
+
+      try {
+        const req = new NextRequest(
+          `http://localhost:3000/api/v1/customer/menu?qrToken=${table1RawToken}&tableId=${table1Id}`
+        );
+        const res = await getCustomerMenuHandler(req);
+        expect(res.status).toBe(422);
+
+        const json = await res.json();
+        expect(json.success).toBe(false);
+        expect(json.error.code).toBe('CATALOG_SIZE_LIMIT_EXCEEDED');
+        expect(json.error.message).toContain('variants per product limit');
+      } finally {
+        delete process.env.TEST_OVERRIDE_MAX_VARIANTS_PER_PRODUCT;
+      }
+    });
+
+    it('should return 422 CATALOG_SIZE_LIMIT_EXCEEDED when product add-ons exceed supported add-ons limit', async () => {
+      // Product 1 (Cappuccino) has 1 active+available add-on (Extra Shot)
+      process.env.TEST_OVERRIDE_MAX_ADDONS_PER_PRODUCT = '0';
+
+      try {
+        const req = new NextRequest(
+          `http://localhost:3000/api/v1/customer/menu?qrToken=${table1RawToken}&tableId=${table1Id}`
+        );
+        const res = await getCustomerMenuHandler(req);
+        expect(res.status).toBe(422);
+
+        const json = await res.json();
+        expect(json.success).toBe(false);
+        expect(json.error.code).toBe('CATALOG_SIZE_LIMIT_EXCEEDED');
+        expect(json.error.message).toContain('add-ons per product limit');
+      } finally {
+        delete process.env.TEST_OVERRIDE_MAX_ADDONS_PER_PRODUCT;
+      }
+    });
+
+    it('should successfully return menu when catalog counts match the supported limit exactly', async () => {
+      // Exactly 2 active+available products in category 1; set limit to 2
+      process.env.TEST_OVERRIDE_MAX_PRODUCTS_PER_CATEGORY = '2';
+
+      try {
+        const req = new NextRequest(
+          `http://localhost:3000/api/v1/customer/menu?qrToken=${table1RawToken}&tableId=${table1Id}`
+        );
+        const res = await getCustomerMenuHandler(req);
+        expect(res.status).toBe(200);
+
+        const json = await res.json();
+        expect(json.success).toBe(true);
+        const category = json.data.categories.find((c: any) => c.id === category1Id);
+        expect(category).toBeDefined();
+        expect(category.products.length).toBe(2);
+      } finally {
+        delete process.env.TEST_OVERRIDE_MAX_PRODUCTS_PER_CATEGORY;
+      }
     });
   });
 

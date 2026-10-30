@@ -242,7 +242,7 @@ export const EditProductPage: React.FC = () => {
       {
         id: `temp_${Date.now()}`,
         name: '',
-        price: '',
+        price: price ? String(price) : '',
         isActive: true,
         isAvailable: true,
       },
@@ -319,6 +319,26 @@ export const EditProductPage: React.FC = () => {
       return;
     }
 
+    // Validate variants before submission
+    for (let i = 0; i < variants.length; i++) {
+      const v = variants[i];
+      if (!v.name.trim()) {
+        setPageError(`Variant #${i + 1} name is required`);
+        return;
+      }
+      const vPrice = parseFloat(String(v.price));
+      if (isNaN(vPrice) || vPrice < 0) {
+        setPageError(`Variant "${v.name}" price must be a valid non-negative number`);
+        return;
+      }
+      if (numericPrice > 0 && vPrice === 0) {
+        setPageError(
+          `Variant "${v.name}" price cannot be ₹0 for a paid product (Base Price: ₹${numericPrice}). If this variant has no additional charge, set its price to ₹${numericPrice}.`
+        );
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     setUploadError(null);
     try {
@@ -365,9 +385,12 @@ export const EditProductPage: React.FC = () => {
         for (const v of variants) {
           if (v.name.trim()) {
             const vPrice = parseFloat(String(v.price));
+            const safePrice = isNaN(vPrice) || (vPrice <= 0 && numericPrice > 0)
+              ? numericPrice
+              : Math.round(vPrice * 100) / 100;
             await menuService.createVariant(targetProductId, {
               name: v.name.trim(),
-              price: isNaN(vPrice) ? numericPrice : Math.round(vPrice * 100) / 100,
+              price: safePrice,
               isActive: v.isActive,
               isAvailable: v.isAvailable,
             });
@@ -414,7 +437,9 @@ export const EditProductPage: React.FC = () => {
         for (const v of variants) {
           if (!v.name.trim()) continue;
           const vPrice = parseFloat(String(v.price));
-          const safePrice = isNaN(vPrice) ? numericPrice : Math.round(vPrice * 100) / 100;
+          const safePrice = isNaN(vPrice) || (vPrice <= 0 && numericPrice > 0)
+            ? numericPrice
+            : Math.round(vPrice * 100) / 100;
 
           if (v.id.startsWith('temp_')) {
             await menuService.createVariant(targetProductId, {

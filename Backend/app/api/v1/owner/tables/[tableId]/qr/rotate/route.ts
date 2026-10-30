@@ -1,7 +1,14 @@
+import crypto from 'crypto';
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { requireAuthorizedRestaurant, validateUuid } from '@/lib/auth/tenancy';
-import { generateSecureQrToken, hashQrToken, buildPublicQrUrl } from '@/lib/qr/token';
+import {
+  generateSecureQrToken,
+  hashQrToken,
+  buildPublicQrUrl,
+  generateQrCodeDataUrl,
+  generateQrCodeSvg,
+} from '@/lib/qr/token';
 import { successResponse } from '@/lib/http/response';
 import { handleApiError, NotFoundError } from '@/lib/http/errors';
 
@@ -31,7 +38,8 @@ export async function POST(
       throw new NotFoundError('Table not found');
     }
 
-    const newRawToken = generateSecureQrToken();
+    const newQrId = crypto.randomUUID();
+    const newRawToken = generateSecureQrToken(tableId, newQrId);
     const newHashedCode = hashQrToken(newRawToken);
 
     const newQr = await prisma.$transaction(async (tx) => {
@@ -47,9 +55,10 @@ export async function POST(
         },
       });
 
-      // Create new active QR code
+      // Create new active QR code with pre-generated UUID
       return tx.qr_codes.create({
         data: {
+          id: newQrId,
           table_id: tableId,
           code: newHashedCode,
           qr_type: 'table',
@@ -58,12 +67,20 @@ export async function POST(
       });
     });
 
+    const qrUrl = buildPublicQrUrl(newRawToken);
+    const [qrImage, qrSvg] = await Promise.all([
+      generateQrCodeDataUrl(qrUrl),
+      generateQrCodeSvg(qrUrl),
+    ]);
+
     return successResponse({
       qrCodeId: newQr.id,
       tableId: table.id,
       isQrActive: newQr.is_active,
       rawToken: newRawToken,
-      qrUrl: buildPublicQrUrl(newRawToken),
+      qrUrl,
+      qrImage,
+      qrSvg,
       rotatedAt: newQr.created_at.toISOString(),
     });
   } catch (error) {

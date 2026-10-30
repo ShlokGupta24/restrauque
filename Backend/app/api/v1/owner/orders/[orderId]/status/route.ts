@@ -12,6 +12,14 @@ import {
   NotFoundError,
   ConflictError,
 } from '@/lib/http/errors';
+import {
+  createOrderCompletionNotificationIntent,
+  dispatchOrderCompletionNotifications,
+} from '@/lib/notifications/service';
+import {
+  awardOrderSpendLoyaltyReward,
+  reverseOrderLoyaltyOnCancellation,
+} from '@/lib/loyalty/service';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,7 +46,7 @@ export async function PATCH(
       async (tx) => {
         // A. Acquire row-level lock on the target order to serialize concurrent updates
         const lockedOrders: any[] = await tx.$queryRaw`
-          SELECT id, restaurant_id, branch_id, table_id, status, order_number, completed_at
+          SELECT id, restaurant_id, branch_id, table_id, status, order_number, completed_at, customer_id, subtotal, discount_amount
           FROM orders
           WHERE id = ${orderId}::uuid
           FOR UPDATE
@@ -101,7 +109,64 @@ export async function PATCH(
           },
         });
 
-        // F. Retrieve updated order with relations for sanitized DTO response
+        // F. If transitioning to completed, create durable notification intent and award spend loyalty points
+        if (targetStatus === 'completed' && currentStatus !== 'completed') {
+          const orderCustomer = await tx.orders.findUnique({
+            where: { id: orderId },
+            select: {
+              customer_id: true,
+              subtotal: true,
+              discount_amount: true,
+              customers: { select: { id: true, name: true, phone: true } },
+              restaurants: { select: { id: true, name: true } },
+            },
+          });
+
+          if (orderCustomer?.customers) {
+            await createOrderCompletionNotificationIntent(tx, {
+              orderId,
+              orderNumber: currentOrder.order_number,
+              restaurantId: orderCustomer.restaurants.id,
+              restaurantName: orderCustomer.restaurants.name,
+              customerId: orderCustomer.customers.id,
+              customerName: orderCustomer.customers.name,
+              customerPhone: orderCustomer.customers.phone,
+              customerEmail: (orderCustomer.customers as any).email || null,
+            });
+          }
+
+          const targetCustomerId = orderCustomer?.customer_id || currentOrder.customer_id;
+          if (targetCustomerId) {
+            await awardOrderSpendLoyaltyReward(tx, {
+              orderId,
+              orderNumber: currentOrder.order_number,
+              restaurantId: orderCustomer?.restaurants?.id || restaurantId,
+              customerId: targetCustomerId,
+              subtotal: orderCustomer?.subtotal ?? currentOrder.subtotal ?? 0,
+              discountAmount: orderCustomer?.discount_amount ?? currentOrder.discount_amount ?? 0,
+            });
+          }
+        }
+
+        // G. If transitioning to cancelled, restore redeemed points and reverse spend loyalty points atomically
+        if (targetStatus === 'cancelled' && currentStatus !== 'cancelled') {
+          const targetCustomerId = currentOrder.customer_id;
+          if (targetCustomerId) {
+            await reverseOrderLoyaltyOnCancellation(tx, {
+              orderId,
+              orderNumber: currentOrder.order_number,
+              restaurantId: currentOrder.restaurant_id || restaurantId,
+              customerId: targetCustomerId,
+            });
+          } else {
+            await tx.orders.update({
+              where: { id: orderId },
+              data: { unrecovered_loyalty_points: 0 },
+            });
+          }
+        }
+
+        // H. Retrieve updated order with relations for sanitized DTO response
         const refreshedOrder = await tx.orders.findUnique({
           where: { id: orderId },
           include: {
@@ -137,6 +202,15 @@ export async function PATCH(
         timeout: 10000,
       }
     );
+
+    // 5. Trigger notification dispatch outside the database transaction
+    if (targetStatus === 'completed') {
+      try {
+        await dispatchOrderCompletionNotifications(orderId);
+      } catch (dispatchErr) {
+        console.error('[POST_COMMIT_NOTIFICATION_DISPATCH_ERROR]', dispatchErr);
+      }
+    }
 
     return successResponse(formatOwnerOrderSummary(updated));
   } catch (error) {

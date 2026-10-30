@@ -8,7 +8,10 @@ import './AddTableModal.css';
 interface AddTableModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (newTable: SafeDiningTable, qr?: { rawToken: string; qrUrl: string }) => void;
+  onSave: (
+    newTable: SafeDiningTable,
+    qr?: { rawToken: string; qrUrl: string; qrImage?: string; qrSvg?: string }
+  ) => void;
 }
 
 export const AddTableModal: React.FC<AddTableModalProps> = ({ isOpen, onClose, onSave }) => {

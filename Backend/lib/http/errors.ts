@@ -44,6 +44,15 @@ export class ConflictError extends AppError {
   }
 }
 
+export class CatalogSizeLimitExceededError extends AppError {
+  constructor(
+    message: string = 'The restaurant menu catalog exceeds the supported size limit and cannot be safely displayed.',
+    details?: unknown
+  ) {
+    super(message, 422, 'CATALOG_SIZE_LIMIT_EXCEEDED', details);
+  }
+}
+
 export function handleApiError(error: unknown) {
   // Zod validation errors
   if (error instanceof ZodError) {

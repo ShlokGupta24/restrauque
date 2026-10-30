@@ -3,7 +3,9 @@ import { prisma } from '@/lib/db/prisma';
 import { customerMenuQuerySchema } from '@/lib/validation/order';
 import { resolveQrContext } from '@/lib/qr/resolve';
 import { successResponse } from '@/lib/http/response';
-import { handleApiError } from '@/lib/http/errors';
+import { handleApiError, CatalogSizeLimitExceededError } from '@/lib/http/errors';
+import { CATALOG_BOUNDS } from '@/lib/validation/menu';
+import { resolveEffectiveVariantPrice } from '@/lib/menu/format';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,11 +28,13 @@ export async function GET(request: NextRequest) {
     );
 
     // Retrieve active categories and eligible active+available products with variants & addons
+    // We fetch (LIMIT + 1) to distinguish between a full menu and an oversized catalog that would be truncated.
     const categories = await prisma.categories.findMany({
       where: {
         restaurant_id: context.restaurant.id,
         is_active: true,
       },
+      take: CATALOG_BOUNDS.MAX_CATEGORIES + 1,
       orderBy: {
         display_order: 'asc',
       },
@@ -41,6 +45,7 @@ export async function GET(request: NextRequest) {
             is_active: true,
             is_available: true,
           },
+          take: CATALOG_BOUNDS.MAX_PRODUCTS_PER_CATEGORY + 1,
           orderBy: {
             display_order: 'asc',
           },
@@ -50,6 +55,7 @@ export async function GET(request: NextRequest) {
                 is_active: true,
                 is_available: true,
               },
+              take: CATALOG_BOUNDS.MAX_VARIANTS_PER_PRODUCT + 1,
               orderBy: {
                 display_order: 'asc',
               },
@@ -59,6 +65,7 @@ export async function GET(request: NextRequest) {
                 is_active: true,
                 is_available: true,
               },
+              take: CATALOG_BOUNDS.MAX_ADDONS_PER_PRODUCT + 1,
               orderBy: {
                 display_order: 'asc',
               },
@@ -67,6 +74,35 @@ export async function GET(request: NextRequest) {
         },
       },
     });
+
+    // Enforce completeness: fail safe rather than silently omitting items from an oversized catalog
+    if (categories.length > CATALOG_BOUNDS.MAX_CATEGORIES) {
+      throw new CatalogSizeLimitExceededError(
+        'The restaurant menu catalog exceeds the maximum supported category limit and cannot be safely displayed.'
+      );
+    }
+
+    for (const category of categories) {
+      if (category.products.length > CATALOG_BOUNDS.MAX_PRODUCTS_PER_CATEGORY) {
+        throw new CatalogSizeLimitExceededError(
+          'The restaurant menu catalog exceeds the maximum supported products per category limit and cannot be safely displayed.'
+        );
+      }
+
+      for (const product of category.products) {
+        if (product.product_variants.length > CATALOG_BOUNDS.MAX_VARIANTS_PER_PRODUCT) {
+          throw new CatalogSizeLimitExceededError(
+            'The restaurant menu catalog exceeds the maximum supported variants per product limit and cannot be safely displayed.'
+          );
+        }
+
+        if (product.product_addons.length > CATALOG_BOUNDS.MAX_ADDONS_PER_PRODUCT) {
+          throw new CatalogSizeLimitExceededError(
+            'The restaurant menu catalog exceeds the maximum supported add-ons per product limit and cannot be safely displayed.'
+          );
+        }
+      }
+    }
 
     const publicCategories = categories
       .map((cat) => ({
@@ -85,7 +121,7 @@ export async function GET(request: NextRequest) {
             imageUrl: p.image_url ?? null,
             displayOrder: p.display_order,
             variants: p.product_variants.map((v) => {
-              const vPrice = typeof v.price === 'number' ? v.price : Number(v.price);
+              const vPrice = resolveEffectiveVariantPrice(v.price, numericPrice);
               return {
                 id: v.id,
                 name: v.name,
